@@ -41,49 +41,65 @@ export function UserProvider({ children }: { children: ReactNode }) {
     
     // Load users from localStorage
     const savedUsers = localStorage.getItem('fahman_hub_device_users');
+    let initialUsers: DeviceUser[] = [];
+    
     if (savedUsers) {
       try {
         const parsedUsers = JSON.parse(savedUsers);
-        setUsers(parsedUsers);
+        initialUsers = parsedUsers;
       } catch (error) {
         console.error('Error loading users:', error);
       }
+    }
+    
+    // Always add demo devices for testing
+    const demoDevices: DeviceUser[] = [
+      {
+        deviceId: 'demo-1',
+        name: 'جهاز احمد',
+        avatar: '💻',
+        score: 850,
+        rank: 1,
+        studyTime: 7200, // 2 hours
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString()
+      },
+      {
+        deviceId: 'demo-2', 
+        name: 'جهاز محمد',
+        avatar: '📱',
+        score: 650,
+        rank: 2,
+        studyTime: 5400, // 1.5 hours
+        createdAt: new Date().toISOString(),
+        lastActive: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
+      },
+      {
+        deviceId: 'demo-3',
+        name: 'جهاز فاطمة',
+        avatar: '🎮',
+        score: 420,
+        rank: 3,
+        studyTime: 3600, // 1 hour
+        createdAt: new Date().toISOString(),
+        lastActive: new Date(Date.now() - 60 * 60 * 1000).toISOString() // 1 hour ago
+      }
+    ];
+    
+    // Combine demo devices with saved devices (avoid duplicates)
+    const allUsers = [...demoDevices];
+    if (initialUsers.length > 0) {
+      // Add current device if not already in the list
+      const currentDeviceExists = initialUsers.some(user => user.deviceId === deviceId);
+      if (!currentDeviceExists) {
+        createDeviceUser(deviceId);
+      } else {
+        setUsers(initialUsers);
+      }
     } else {
-      // Create demo devices for testing
-      const demoDevices: DeviceUser[] = [
-        {
-          deviceId: 'demo-1',
-          name: 'جهاز احمد',
-          avatar: '💻',
-          score: 850,
-          rank: 1,
-          studyTime: 7200, // 2 hours
-          createdAt: new Date().toISOString(),
-          lastActive: new Date().toISOString()
-        },
-        {
-          deviceId: 'demo-2', 
-          name: 'جهاز محمد',
-          avatar: '📱',
-          score: 650,
-          rank: 2,
-          studyTime: 5400, // 1.5 hours
-          createdAt: new Date().toISOString(),
-          lastActive: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
-        },
-        {
-          deviceId: 'demo-3',
-          name: 'جهاز فاطمة',
-          avatar: '🎮',
-          score: 420,
-          rank: 3,
-          studyTime: 3600, // 1 hour
-          createdAt: new Date().toISOString(),
-          lastActive: new Date(Date.now() - 60 * 60 * 1000).toISOString() // 1 hour ago
-        }
-      ];
-      setUsers(demoDevices);
-      createDeviceUser(deviceId); // Also create current device
+      // No saved users, show demo devices + create current device
+      setUsers(allUsers);
+      createDeviceUser(deviceId);
     }
   }, []);
 
