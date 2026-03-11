@@ -4,7 +4,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { getDeviceId, getDeviceInfo } from '@/utils/deviceId';
 import { useGamification } from '@/contexts/GamificationContext';
 import { createClient } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase'; // Future database integration
+
+const supabaseUrl = 'https://czyytoahcjntfsovwqho.supabase.co';
+const supabaseKey = 'sb_publishable_OU8bwDURR2L2zMsKeshkiw_14NJsSh3';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface DeviceUser {
   deviceId: string;
