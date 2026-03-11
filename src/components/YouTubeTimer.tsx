@@ -24,7 +24,7 @@ export function YouTubeTimer() {
 
   // Get embed URL from video ID
   const getEmbedUrl = (videoId: string) => {
-    return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&origin=${window.location.origin}`;
+    return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0&hl=ar&fs=1&autohide=1&showinfo=0`;
   };
 
   useEffect(() => {
@@ -139,7 +139,6 @@ export function YouTubeTimer() {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
               className="rounded-lg"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
             />
           </div>
         </div>
