@@ -1,10 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { getDeviceId, getDeviceInfo } from '@/utils/deviceId';
 import { useGamification } from '@/contexts/GamificationContext';
-import { createClient } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { formatStudyTime } from '@/utils/timeFormat';
+import { dbClientOperations } from '@/lib/sqlite-client';
 
 interface DeviceUser {
   deviceId: string;
@@ -13,6 +13,7 @@ interface DeviceUser {
   score: number;
   rank: number;
   studyTime: number; // in seconds
+  studyTimeFormatted?: string; // formatted time for display
   createdAt: string;
   lastActive: string;
 }
@@ -35,174 +36,137 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<DeviceUser[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  
+  // WebSocket client reference
+  const wsClientRef = useRef<any>(null);
+  const dbSyncAccumulator = useRef(0);
 
   useEffect(() => {
     // Get device ID
     const deviceId = getDeviceId();
     setCurrentDeviceId(deviceId);
     
-    // Load users from Supabase
-    loadUsersFromDatabase();
+    // Initialize WebSocket connection
+    initializeWebSocket();
     
-    // Set up real-time subscription
-    const subscription = supabase
-      .channel('devices')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'devices' },
-        (payload) => {
-          console.log('Real-time update:', payload);
-          loadUsersFromDatabase();
-        }
-      )
-      .subscribe();
-
     return () => {
-      subscription.unsubscribe();
+      // Cleanup WebSocket on unmount
+      if (wsClientRef.current) {
+        wsClientRef.current.disconnect();
+      }
     };
   }, []);
 
-  const loadUsersFromDatabase = async () => {
+  const initializeWebSocket = async () => {
     try {
-      const { data, error } = await supabase
-        .from('devices')
-        .select('*')
-        .order('score', { ascending: false });
+      // Import WebSocketClient dynamically to avoid SSR issues
+      const { WebSocketClient } = await import('@/lib/websocket-client');
+      const wsClient = new WebSocketClient('ws://localhost:8080');
+      wsClientRef.current = wsClient;
 
-      if (error) {
-        console.error('Error loading devices:', error);
-        // Fallback to demo devices if database fails
-        loadDemoDevices();
-        return;
-      }
+      // Connect to WebSocket
+      await wsClient.connect();
+      console.log('WebSocket connected successfully');
 
-      if (data && data.length > 0) {
-        const deviceUsers: DeviceUser[] = data.map((dbDevice: any) => ({
+      // Set up message handler
+      wsClient.onMessage((leaderboardData: any[]) => {
+        console.log('Received WebSocket message:', leaderboardData);
+        const deviceUsers: DeviceUser[] = leaderboardData.map((dbDevice: any) => ({
           deviceId: dbDevice.id,
           name: dbDevice.name,
           avatar: dbDevice.avatar || '🖥️',
           score: dbDevice.score,
           rank: dbDevice.rank,
           studyTime: dbDevice.study_time,
+          studyTimeFormatted: formatStudyTime(dbDevice.study_time),
+          createdAt: dbDevice.created_at,
+          lastActive: dbDevice.last_active
+        }));
+        
+        // Update state without overwriting local timer progress
+        setUsers(prevUsers => {
+          const currentDevice = prevUsers.find(u => u.deviceId === currentDeviceId);
+          
+          return deviceUsers.map(user => {
+            // Preserve local study time for current device
+            if (user.deviceId === currentDeviceId && currentDevice) {
+              return {
+                ...user,
+                studyTime: currentDevice.studyTime,
+                studyTimeFormatted: formatStudyTime(currentDevice.studyTime)
+              };
+            }
+            return user;
+          });
+        });
+      });
+
+      // Load initial leaderboard
+      await loadInitialLeaderboard();
+    } catch (error) {
+      console.error('Failed to initialize WebSocket:', error);
+      console.log('Falling back to local device creation');
+      // Fallback to local device creation
+      createCurrentDevice();
+    }
+  };
+
+  const loadInitialLeaderboard = async () => {
+    try {
+      const devices = await dbClientOperations.getAllDevices();
+      if (devices && devices.length > 0) {
+        const deviceUsers: DeviceUser[] = devices.map((dbDevice: any) => ({
+          deviceId: dbDevice.id,
+          name: dbDevice.name,
+          avatar: dbDevice.avatar || '🖥️',
+          score: dbDevice.score,
+          rank: dbDevice.rank,
+          studyTime: dbDevice.study_time,
+          studyTimeFormatted: formatStudyTime(dbDevice.study_time),
           createdAt: dbDevice.created_at,
           lastActive: dbDevice.last_active
         }));
         setUsers(deviceUsers);
       } else {
-        // No devices in database, create demo devices
-        loadDemoDevices();
+        createCurrentDevice();
       }
     } catch (error) {
-      console.error('Database error:', error);
-      loadDemoDevices();
+      console.error('Error loading initial leaderboard:', error);
+      createCurrentDevice();
     }
   };
 
-  const loadDemoDevices = async () => {
-    const demoDevices: DeviceUser[] = [
-      {
-        deviceId: 'demo-1',
-        name: 'جهاز احمد',
-        avatar: '💻',
-        score: 850,
-        rank: 1,
-        studyTime: 7200, // 2 hours
-        createdAt: new Date().toISOString(),
-        lastActive: new Date().toISOString()
-      },
-      {
-        deviceId: 'demo-2', 
-        name: 'جهاز محمد',
-        avatar: '📱',
-        score: 750,
-        rank: 2,
-        studyTime: 5400, // 1.5 hours
-        createdAt: new Date().toISOString(),
-        lastActive: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
-      },
-      {
-        deviceId: 'demo-3',
-        name: 'جهاز فاطمة',
-        avatar: '🎮',
-        score: 420,
-        rank: 3,
-        studyTime: 3600, // 1 hour
-        createdAt: new Date().toISOString(),
-        lastActive: new Date(Date.now() - 60 * 60 * 1000).toISOString() // 1 hour ago
-      }
-    ];
-    
-    // Save demo devices to database
-    for (const device of demoDevices) {
-      await saveDeviceToDatabase(device);
-    }
-    
-    // Also create current device
+  const createCurrentDevice = async () => {
     const deviceId = getDeviceId();
     const currentDevice: DeviceUser = {
       deviceId,
       name: `جهاز ${deviceId.slice(-6)}`,
       avatar: '🖥️',
       score: 0,
-      rank: 4,
+      rank: 1,
       studyTime: 0,
+      studyTimeFormatted: formatStudyTime(0),
       createdAt: new Date().toISOString(),
       lastActive: new Date().toISOString()
     };
     await saveDeviceToDatabase(currentDevice);
-    
-    setUsers([...demoDevices, currentDevice]);
+    setUsers([currentDevice]);
   };
 
   const saveDeviceToDatabase = async (deviceUser: DeviceUser) => {
     try {
-      // Check if Supabase is properly configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://your-project.supabase.co') {
-        return; // Silently skip if not configured
-      }
-
-      const { error } = await supabase
-        .from('devices')
-        .upsert({
-          id: deviceUser.deviceId,
-          name: deviceUser.name,
-          avatar: deviceUser.avatar,
-          score: deviceUser.score,
-          rank: deviceUser.rank,
-          study_time: deviceUser.studyTime,
-          created_at: deviceUser.createdAt,
-          last_active: deviceUser.lastActive
-        });
-
-      // Only log errors that have actual content
-      if (error && error.message) {
-        console.error('Error saving device:', error.message);
-      }
+      await dbClientOperations.upsertDevice({
+        id: deviceUser.deviceId,
+        name: deviceUser.name,
+        avatar: deviceUser.avatar,
+        score: deviceUser.score,
+        rank: deviceUser.rank,
+        study_time: deviceUser.studyTime,
+        created_at: deviceUser.createdAt,
+        last_active: deviceUser.lastActive
+      });
     } catch (error) {
-      // Silently handle database errors when not configured
-    }
-  };
-
-  const updateDeviceInDatabase = async (deviceId: string, updates: Partial<DeviceUser>) => {
-    try {
-      // Check if Supabase is properly configured
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://your-project.supabase.co') {
-        return; // Silently skip if not configured
-      }
-
-      const { error } = await supabase
-        .from('devices')
-        .update({
-          ...updates,
-          last_active: new Date().toISOString()
-        })
-        .eq('id', deviceId);
-
-      // Only log errors that have actual content
-      if (error && error.message) {
-        console.error('Error updating device:', error.message);
-      }
-    } catch (error) {
-      // Silently handle database errors when not configured
+      console.error('Error saving device:', error);
     }
   };
 
@@ -224,8 +188,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return newUsers;
     });
     
-    // Update in database
-    updateDeviceInDatabase(currentDeviceId, { name });
+    // Send update via WebSocket
+    if (wsClientRef.current) {
+      wsClientRef.current.sendMessage({
+        type: 'update_device',
+        deviceId: currentDeviceId,
+        updates: { name }
+      });
+    }
   };
 
   const updateDeviceUserAvatar = (avatar: string) => {
@@ -241,24 +211,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return newUsers;
     });
     
-    // Update in database
-    updateDeviceInDatabase(currentDeviceId, { avatar });
+    // Send update via WebSocket
+    if (wsClientRef.current) {
+      wsClientRef.current.sendMessage({
+        type: 'update_device',
+        deviceId: currentDeviceId,
+        updates: { avatar }
+      });
+    }
   };
 
-  const updateDeviceStudyTime = (additionalTime: number) => {
+  const updateDeviceStudyTime = async (additionalTime: number) => {
     if (!currentDeviceId) return;
-    
+
+    const pointsEarned = Math.floor(additionalTime / 10); // 1 point per 10 seconds
+
+    // Accumulate time for database sync
+    dbSyncAccumulator.current += additionalTime;
+
     setUsers(prevUsers => {
       const newUsers = prevUsers.map(user => {
         if (user.deviceId === currentDeviceId) {
-          const pointsEarned = Math.floor(additionalTime / 10); // 1 point per 10 seconds
-          addCoins(pointsEarned); // Add coins to gamification system
-          
           return {
             ...user,
             studyTime: user.studyTime + additionalTime,
             score: user.score + pointsEarned,
-            lastActive: new Date().toISOString()
+            lastActive: new Date().toISOString(),
+            studyTimeFormatted: formatStudyTime(user.studyTime + additionalTime)
           };
         }
         return user;
@@ -270,21 +249,49 @@ export function UserProvider({ children }: { children: ReactNode }) {
         user.rank = index + 1;
       });
 
+      // Send to database every 10 seconds
+      if (dbSyncAccumulator.current >= 10) {
+        const currentUser = newUsers.find(u => u.deviceId === currentDeviceId);
+        if (currentUser) {
+          // Save directly to database via API
+          dbClientOperations.updateDevice(currentDeviceId, {
+            study_time: currentUser.studyTime,
+            score: currentUser.score,
+            rank: currentUser.rank
+          }).then(() => {
+            console.log('Device study time saved to database');
+          }).catch(error => {
+            console.error('Error saving device study time:', error);
+          });
+          
+          // Also send via WebSocket for real-time updates
+          if (wsClientRef.current) {
+            wsClientRef.current.sendMessage({
+              type: 'update_device',
+              deviceId: currentDeviceId,
+              updates: {
+                study_time: currentUser.studyTime,
+                score: currentUser.score,
+                rank: currentUser.rank
+              }
+            });
+          }
+        }
+        dbSyncAccumulator.current = 0;
+      }
+
       return newUsers;
     });
-    
-    // Update in database
-    const currentUser = users.find(u => u.deviceId === currentDeviceId);
-    if (currentUser) {
-      updateDeviceInDatabase(currentDeviceId, {
-        studyTime: currentUser.studyTime + additionalTime,
-        score: currentUser.score + Math.floor(additionalTime / 10)
-      });
-    }
+
+    // Add coins to gamification system
+    addCoins(pointsEarned);
   };
 
   const getAllDeviceUsers = (): DeviceUser[] => {
-    return users.sort((a, b) => b.score - a.score);
+    return users.map(user => ({
+      ...user,
+      studyTimeFormatted: formatStudyTime(user.studyTime)
+    })).sort((a, b) => b.score - a.score);
   };
 
   const setTimerActive = (isActive: boolean) => {

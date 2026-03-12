@@ -6,13 +6,19 @@
     "dev": "TURBOPACK=0 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ws-server": "node scripts/start-websocket-server.js"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.0",
     "@supabase/supabase-js": "^2.99.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.6.2",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "ws": "^8.16.0",
+    "@types/ws": "^8.5.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

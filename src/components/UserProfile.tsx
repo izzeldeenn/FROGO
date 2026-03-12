@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useGamification } from '@/contexts/GamificationContext';
 import { useUser } from '@/contexts/UserContext';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
-const AVATARS = ['😀', '😎', '🤓', '🦄', '🚀', '⭐', '🌟', '💫', '🔥', '⚡', '🎯', '🏆', '🎨', '🎭', '🎪', '🎯'];
+const AVATARS = ['😀', '😎', '🤓', '🦄', '🚀', '⭐', '🌟', '💫', '🔥', '⚡', '🎯', '🏆', '🎨', '🎭', '🎪'];
 
 export function UserProfile() {
   const { theme } = useTheme();
@@ -69,7 +70,7 @@ export function UserProfile() {
       </button>
 
       {showSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className={`p-6 border-2 rounded-lg max-w-md w-full mx-4 ${
             theme === 'light'
               ? 'border-gray-300 bg-white'
@@ -97,6 +98,17 @@ export function UserProfile() {
                       : 'border-gray-600 bg-black text-white focus:border-white'
                   }`}
                 />
+              </div>
+              
+              <div>
+                <label className={`block mb-2 text-sm font-medium ${
+                  theme === 'light' ? 'text-black' : 'text-white'
+                }`}>
+                  المظهر
+                </label>
+                <div className="flex items-center justify-center p-2 border-2 rounded-lg">
+                  <ThemeToggle />
+                </div>
               </div>
               
               <div>
