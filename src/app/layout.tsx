@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { GamificationProvider } from "@/contexts/GamificationContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
             </UserProvider>
           </GamificationProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
