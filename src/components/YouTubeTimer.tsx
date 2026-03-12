@@ -27,6 +27,27 @@ export function YouTubeTimer() {
     return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0&hl=ar&fs=1&autohide=1&showinfo=0`;
   };
 
+  // Check fullscreen status and stop timer if not in fullscreen
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isRunning) {
+        setIsRunning(false);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [isRunning]);
+
   useEffect(() => {
     if (isRunning) {
       setTimerActive(true);
@@ -128,38 +149,38 @@ export function YouTubeTimer() {
         
         {/* Control Buttons */}
         {videoUrl && videoId && (
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 space-x-reverse">
             <button
               onClick={handleStart}
               disabled={isRunning}
-              className={`px-3 py-1 border-2 rounded-lg font-semibold transition-colors backdrop-blur-sm text-sm ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
                 theme === 'light'
-                  ? 'border-black bg-white/80 text-black hover:bg-black hover:text-white disabled:bg-gray-100 disabled:border-gray-400 disabled:text-gray-400'
-                  : 'border-white bg-black/80 text-white hover:bg-white hover:text-black disabled:bg-gray-900 disabled:border-gray-700 disabled:text-gray-700'
-              } disabled:cursor-not-allowed`}
+                  ? 'bg-black/10 text-black hover:bg-black/20'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
             >
-              بدء
+              ▶️
             </button>
             <button
               onClick={handleStop}
               disabled={!isRunning}
-              className={`px-3 py-1 border-2 rounded-lg font-semibold transition-colors backdrop-blur-sm text-sm ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
                 theme === 'light'
-                  ? 'border-black bg-white/80 text-black hover:bg-black hover:text-white disabled:bg-gray-100 disabled:border-gray-400 disabled:text-gray-400'
-                  : 'border-white bg-black/80 text-white hover:bg-white hover:text-black disabled:bg-gray-900 disabled:border-gray-700 disabled:text-gray-700'
-              } disabled:cursor-not-allowed`}
+                  ? 'bg-black/10 text-black hover:bg-black/20'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
             >
-              إيقاف
+              ⏸️
             </button>
             <button
               onClick={handleReset}
-              className={`px-3 py-1 border-2 rounded-lg font-semibold transition-colors backdrop-blur-sm text-sm ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-200 hover:scale-110 ${
                 theme === 'light'
-                  ? 'border-black bg-white/80 text-black hover:bg-black hover:text-white'
-                  : 'border-white bg-black/80 text-white hover:bg-white hover:text-black'
+                  ? 'bg-black/10 text-black hover:bg-black/20'
+                  : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              إعادة تعيين
+              🔄
             </button>
           </div>
         )}

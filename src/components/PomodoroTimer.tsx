@@ -28,6 +28,27 @@ export function PomodoroTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Check fullscreen status and stop timer if not in fullscreen
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isRunning) {
+        setIsRunning(false);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [isRunning]);
+
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       setTimerActive(true);
@@ -149,48 +170,48 @@ export function PomodoroTimer() {
         {formatTime(timeLeft)}
       </h1>
 
-      <div className="space-x-4 mb-6">
+      <div className="flex justify-center items-center space-x-4 space-x-reverse mb-6">
         <button
           onClick={handleStart}
           disabled={isRunning}
-          className={`px-6 py-3 border-2 rounded-lg font-semibold transition-colors ${
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
             theme === 'light'
-              ? 'border-black bg-white text-black hover:bg-black hover:text-white disabled:bg-gray-100 disabled:border-gray-400 disabled:text-gray-400'
-              : 'border-white bg-black text-white hover:bg-white hover:text-black disabled:bg-gray-800 disabled:border-gray-600 disabled:text-gray-600'
-          } disabled:cursor-not-allowed`}
+              ? 'bg-black/10 text-black hover:bg-black/20'
+              : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
         >
-          بدء
+          ▶️
         </button>
         <button
           onClick={handleStop}
           disabled={!isRunning}
-          className={`px-6 py-3 border-2 rounded-lg font-semibold transition-colors ${
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 ${
             theme === 'light'
-              ? 'border-black bg-white text-black hover:bg-black hover:text-white disabled:bg-gray-100 disabled:border-gray-400 disabled:text-gray-400'
-              : 'border-white bg-black text-white hover:bg-white hover:text-black disabled:bg-gray-800 disabled:border-gray-600 disabled:text-gray-600'
-          } disabled:cursor-not-allowed`}
+              ? 'bg-black/10 text-black hover:bg-black/20'
+              : 'bg-white/10 text-white hover:bg-white/20'
+          }`}
         >
-          إيقاف
+          ⏸️
         </button>
         <button
           onClick={handleReset}
-          className={`px-6 py-3 border-2 rounded-lg font-semibold transition-colors ${
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 ${
             theme === 'light'
-              ? 'border-black bg-white text-black hover:bg-black hover:text-white'
-              : 'border-white bg-black text-white hover:bg-white hover:text-black'
+              ? 'bg-black/10 text-black hover:bg-black/20'
+              : 'bg-white/10 text-white hover:bg-white/20'
           }`}
         >
-          إعادة تعيين
+          🔄
         </button>
         <button
           onClick={handleSkip}
-          className={`px-6 py-3 border-2 rounded-lg font-semibold transition-colors ${
+          className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 ${
             theme === 'light'
-              ? 'border-black bg-white text-black hover:bg-black hover:text-white'
-              : 'border-white bg-black text-white hover:bg-white hover:text-black'
+              ? 'bg-black/10 text-black hover:bg-black/20'
+              : 'bg-white/10 text-white hover:bg-white/20'
           }`}
         >
-          تخطي
+          ⏭️
         </button>
       </div>
 

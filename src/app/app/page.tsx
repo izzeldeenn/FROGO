@@ -9,14 +9,142 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { CoinsButton } from '@/components/CoinsButton';
 import { UserProfile } from '@/components/UserProfile';
 import { useUser } from '@/contexts/UserContext';
+import { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
   const { theme } = useTheme();
+  const { language } = useLanguage();
+  const [showFullscreenPrompt, setShowFullscreenPrompt] = useState(false);
+
+  useEffect(() => {
+    const requestFullscreen = async () => {
+      try {
+        const elem = document.documentElement;
+        
+        // Check if fullscreen is already active
+        if (document.fullscreenElement) {
+          setShowFullscreenPrompt(false);
+          return;
+        }
+
+        // Try to request fullscreen with user gesture
+        if (elem.requestFullscreen) {
+          await elem.requestFullscreen();
+        } else if ((elem as any).webkitRequestFullscreen) {
+          await (elem as any).webkitRequestFullscreen();
+        } else if ((elem as any).msRequestFullscreen) {
+          await (elem as any).msRequestFullscreen();
+        }
+        
+        setShowFullscreenPrompt(false);
+      } catch (error) {
+        console.log('Fullscreen request failed:', error);
+        // Keep showing prompt if failed
+      }
+    };
+
+    // Show fullscreen prompt after a short delay
+    const timer = setTimeout(() => {
+      if (!document.fullscreenElement) {
+        setShowFullscreenPrompt(true);
+      }
+    }, 1000);
+
+    // Add click listener to request fullscreen on first user interaction
+    const handleFirstInteraction = () => {
+      if (showFullscreenPrompt) {
+        requestFullscreen();
+      }
+    };
+
+    // Listen for fullscreen changes
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        // User exited fullscreen, show prompt again
+        setShowFullscreenPrompt(true);
+      } else {
+        // User entered fullscreen, hide prompt
+        setShowFullscreenPrompt(false);
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [showFullscreenPrompt]);
 
   return (
     <div className={`flex h-screen overflow-hidden ${
       theme === 'light' ? 'bg-white' : 'bg-black'
     }`}>
+      {/* Fullscreen Prompt Modal */}
+      {showFullscreenPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999] backdrop-blur-sm">
+          <div className={`max-w-md mx-4 p-8 rounded-2xl border-2 shadow-2xl transform transition-all duration-300 ${
+            theme === 'light' 
+              ? 'bg-white border-gray-300' 
+              : 'bg-black border-gray-700'
+          }`}>
+            <div className="text-center">
+              <h2 className={`text-2xl font-bold mb-6 ${
+                theme === 'light' ? 'text-gray-800' : 'text-white'
+              }`}>
+                {language === 'ar' ? 'تفعيل وضع ملء الشاشة' : 'Enable Fullscreen Mode'}
+              </h2>
+              <p className={`text-base mb-8 leading-relaxed ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+              }`}>
+                {language === 'ar' 
+                  ? 'لضمان تجربة دراسة مركزة ومنع الغش، يرجى تفعيل وضع ملء الشاشة. هذا يساعد على الحفاظ على تركيزك وتجنب الإلهاءات.'
+                  : 'To ensure a focused study experience and prevent cheating, please enable fullscreen mode. This helps maintain your concentration and avoid distractions.'
+                }
+              </p>
+              <div className="flex justify-center">
+                <button
+                  onClick={async () => {
+                    try {
+                      const elem = document.documentElement;
+                      if (elem.requestFullscreen) {
+                        await elem.requestFullscreen();
+                      } else if ((elem as any).webkitRequestFullscreen) {
+                        await (elem as any).webkitRequestFullscreen();
+                      } else if ((elem as any).msRequestFullscreen) {
+                        await (elem as any).msRequestFullscreen();
+                      }
+                      setShowFullscreenPrompt(false);
+                    } catch (error) {
+                      console.log('Fullscreen request failed:', error);
+                    }
+                  }}
+                  className={`px-6 py-3 rounded-lg font-semibold text-base transition-all duration-200 shadow-lg ${
+                    theme === 'light'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
+                >
+                  {language === 'ar' ? 'تفعيل ملء الشاشة' : 'Enable Fullscreen'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Desktop Layout - Side by side */}
       <div className="hidden md:flex w-full h-full">
         {/* Left section - 1/4 width */}
