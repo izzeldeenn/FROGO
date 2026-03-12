@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Timer } from './Timer';
 import { PomodoroTimer } from './PomodoroTimer';
 import { CountdownTimer } from './CountdownTimer';
@@ -11,6 +12,7 @@ type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube';
 
 export function TimerSelector() {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const [activeTimer, setActiveTimer] = useState<TimerType>('stopwatch');
 
   const renderTimer = () => {
@@ -29,10 +31,10 @@ export function TimerSelector() {
   };
 
   const timerButtons = [
-    { type: 'stopwatch' as TimerType, label: 'ساعة إيقاف', icon: '⏱️' },
-    { type: 'pomodoro' as TimerType, label: 'بومودورو', icon: '🍅' },
-    { type: 'countdown' as TimerType, label: 'عد تنازلي', icon: '⏰' },
-    { type: 'youtube' as TimerType, label: 'مؤقت يوتيوب', icon: '▶️' }
+    { type: 'stopwatch' as TimerType, label: t.stopwatch, icon: '⏱️' },
+    { type: 'pomodoro' as TimerType, label: t.pomodoro, icon: '🍅' },
+    { type: 'countdown' as TimerType, label: t.countdown, icon: '⏰' },
+    { type: 'youtube' as TimerType, label: t.youtube, icon: '▶️' }
   ];
 
   return (

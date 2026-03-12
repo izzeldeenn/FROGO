@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 
 interface DeviceUser {
@@ -17,6 +18,7 @@ interface DeviceUser {
 
 export function UserRankings() {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const { getAllDeviceUsers, isTimerActive } = useUser();
   const [displayUsers, setDisplayUsers] = useState<DeviceUser[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -72,14 +74,14 @@ export function UserRankings() {
     <div className="flex-1">
       <h2 className={`text-xl font-bold mb-4 text-center ${
         theme === 'light' ? 'text-black' : 'text-white'
-      }`}>الترتيب</h2>
+      }`}>{t.rankings}</h2>
       <div className="h-96 overflow-y-auto border rounded-lg p-2">
         <div className="space-y-2">
           {displayUsers.length === 0 ? (
             <p className={`text-center py-8 ${
               theme === 'light' ? 'text-gray-500' : 'text-gray-400'
             }`}>
-              لا يوجد أجهزة بعد
+              {t.noDevices}
             </p>
           ) : (
             displayUsers.map((user) => {
@@ -125,7 +127,7 @@ export function UserRankings() {
                               ? 'bg-green-500 text-white'
                               : 'bg-green-600 text-white'
                           }`}>
-                            نشط
+                            {t.active}
                           </span>
                         )}
                       </div>
@@ -147,7 +149,7 @@ export function UserRankings() {
                       <div className={
                         theme === 'light' ? 'text-blue-600' : 'text-blue-400'
                       }>
-                        اليوم
+                        {t.timeToday}
                       </div>
                     </div>
                     <div className={`p-2 rounded ${
@@ -156,12 +158,12 @@ export function UserRankings() {
                       <div className={`font-semibold ${
                         theme === 'light' ? 'text-yellow-700' : 'text-yellow-300'
                       }`}>
-                        +{todayCoins} عملة
+                        +{todayCoins} {t.coins}
                       </div>
                       <div className={
                         theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'
                       }>
-                        اليوم
+                        {t.coinsToday}
                       </div>
                     </div>
                   </div>

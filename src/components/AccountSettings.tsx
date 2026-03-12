@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useGamification } from '@/contexts/GamificationContext';
 import { useUser } from '@/contexts/UserContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function AccountSettings() {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const { coins, level, experience } = useGamification();
   const { getCurrentDeviceUser } = useUser();
   const [showSettings, setShowSettings] = useState(false);
@@ -43,12 +45,12 @@ export function AccountSettings() {
           <div className={`text-sm ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
-            الجهاز:
+            Device:
           </div>
           <div className={`font-medium ${
             theme === 'light' ? 'text-black' : 'text-white'
           }`}>
-            {currentUser ? currentUser.name : 'غير محدد'}
+            {currentUser ? currentUser.name : 'Unknown'}
           </div>
         </div>
         <button
@@ -59,7 +61,7 @@ export function AccountSettings() {
               : 'border-blue-500 bg-blue-500 text-white hover:bg-blue-600'
           }`}
         >
-          ⚙️ إعدادات
+          ⚙️ {t.settings}
         </button>
       </div>
 
@@ -71,7 +73,7 @@ export function AccountSettings() {
       }`}>
         <h4 className={`font-bold mb-2 text-center ${
           theme === 'light' ? 'text-black' : 'text-white'
-        }`}>إحصائص سريعة</h4>
+        }`}>Quick Stats</h4>
         <div className="grid grid-cols-2 gap-2 text-center text-sm">
           <div>
             <div className={`font-bold ${
@@ -79,7 +81,7 @@ export function AccountSettings() {
             }`}>{coins}</div>
             <div className={
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-            }>عملات</div>
+            }>{t.coins}</div>
           </div>
           <div>
             <div className={`font-bold ${
@@ -87,7 +89,7 @@ export function AccountSettings() {
             }`}>{level}</div>
             <div className={
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-            }>مستوى</div>
+            }>{t.level}</div>
           </div>
         </div>
       </div>
@@ -102,20 +104,20 @@ export function AccountSettings() {
           }`}>
             <h3 className={`text-lg font-bold mb-4 ${
               theme === 'light' ? 'text-black' : 'text-white'
-            }`}>إعدادات الجهاز</h3>
+            }`}>{t.settings}</h3>
             
             <div className="space-y-4">
               <div>
                 <label className={`block mb-2 text-sm font-medium ${
                   theme === 'light' ? 'text-black' : 'text-white'
                 }`}>
-                  اسم الجهاز
+                  {t.deviceName}
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="أدخل اسم الجهاز"
+                  placeholder={t.enterDeviceName}
                   className={`w-full px-3 py-2 border-2 rounded focus:outline-none ${
                     theme === 'light'
                       ? 'border-gray-300 bg-white text-black focus:border-black'
@@ -128,7 +130,7 @@ export function AccountSettings() {
                 <label className={`block mb-2 text-sm font-medium ${
                   theme === 'light' ? 'text-black' : 'text-white'
                 }`}>
-                  البريد الإلكتروني
+                  Email
                 </label>
                 <input
                   type="email"
@@ -153,7 +155,7 @@ export function AccountSettings() {
                     : 'border-gray-600 bg-black text-white hover:bg-gray-800'
                 }`}
               >
-                إلغاء
+                {t.cancel}
               </button>
               <button
                 onClick={handleSaveSettings}
@@ -163,7 +165,7 @@ export function AccountSettings() {
                     : 'border-green-500 bg-green-500 text-white hover:bg-green-600'
                 }`}
               >
-                حفظ
+                {t.saveChanges}
               </button>
             </div>
           </div>

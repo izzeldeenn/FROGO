@@ -2,57 +2,73 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageLayout } from '@/components/LanguageLayout';
 import { Logo } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function LandingPage() {
   const { theme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [email, setEmail] = useState('');
 
   const features = [
     {
       icon: '⏱️',
-      title: 'مؤقت ذكي',
-      description: 'تتبع وقت الدراسة بدقة مع حفظ تلقائي'
+      title: language === 'ar' ? 'مؤقت ذكي' : 'Smart Timer',
+      description: language === 'ar' 
+        ? 'تتبع وقت الدراسة بدقة مع حفظ تلقائي' 
+        : 'Track study time accurately with automatic saving'
     },
     {
       icon: '🏆',
-      title: 'نظام نقاط',
-      description: 'اجمع العملات وارتفع في المستويات'
+      title: language === 'ar' ? 'نظام نقاط' : 'Points System',
+      description: language === 'ar' 
+        ? 'اجمع العملات وارتفع في المستويات' 
+        : 'Collect coins and level up'
     },
     {
       icon: '📊',
-      title: 'لوحة متصدرين',
-      description: 'تنافس مع الأصدقاء وتتبع تقدمك'
+      title: language === 'ar' ? 'لوحة متصدرين' : 'Leaderboard',
+      description: language === 'ar' 
+        ? 'تنافس مع الأصدقاء وتتبع تقدمك' 
+        : 'Compete with friends and track your progress'
     },
     {
       icon: '🎨',
-      title: 'تخصيص',
-      description: 'اختر أفاتارك وشخصّن تجربتك'
+      title: language === 'ar' ? 'تخصيص' : 'Customization',
+      description: language === 'ar' 
+        ? 'اختر أفاتارك وشخصّن تجربتك' 
+        : 'Choose your avatar and personalize your experience'
     },
     {
       icon: '📱',
-      title: 'متعدد المنصات',
-      description: 'يعمل على جميع الأجهزة'
+      title: language === 'ar' ? 'متعدد المنصات' : 'Multi-Platform',
+      description: language === 'ar' 
+        ? 'يعمل على جميع الأجهزة' 
+        : 'Works on all devices'
     },
     {
       icon: '🔄',
-      title: 'مزامنة فورية',
-      description: 'بياناتك محفوظة ومتزامنة دائماً'
+      title: language === 'ar' ? 'مزامنة فورية' : 'Real-time Sync',
+      description: language === 'ar' 
+        ? 'بياناتك محفوظة ومتزامنة دائماً' 
+        : 'Your data is always saved and synchronized'
     }
   ];
 
   const stats = [
-    { number: '10K+', label: 'مستخدم نشط' },
-    { number: '50K+', label: 'ساعة دراسة' },
-    { number: '100+', label: 'مستوى' },
-    { number: '24/7', label: 'متاح' }
+    { number: '10K+', label: language === 'ar' ? 'مستخدم نشط' : 'Active Users' },
+    { number: '50K+', label: language === 'ar' ? 'ساعة دراسة' : 'Study Hours' },
+    { number: '100+', label: language === 'ar' ? 'مستوى' : 'Levels' },
+    { number: '24/7', label: language === 'ar' ? 'متاح' : 'Available' }
   ];
 
   return (
-    <div className={`min-h-screen ${
-      theme === 'light' ? 'bg-white' : 'bg-black'
-    }`}>
+    <LanguageLayout>
+      <div className={`min-h-screen ${
+        theme === 'light' ? 'bg-white' : 'bg-black'
+      }`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 border-b ${
         theme === 'light' 
@@ -63,6 +79,18 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-16">
             <Logo />
             <div className="flex items-center space-x-4 space-x-reverse">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
+                className={`px-3 py-2 border-2 rounded-lg text-sm font-medium transition-colors ${
+                  theme === 'light'
+                    ? 'border-gray-300 bg-white text-black hover:border-gray-400'
+                    : 'border-gray-600 bg-black text-white hover:border-gray-500'
+                }`}
+              >
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+              </select>
               <ThemeToggle />
               <a 
                 href="/app"
@@ -72,7 +100,7 @@ export default function LandingPage() {
                     : 'bg-blue-500 text-white hover:bg-blue-600'
                 }`}
               >
-                ابدأ الدراسة
+                {language === 'ar' ? 'ابدأ الدراسة' : 'Start Studying'}
               </a>
             </div>
           </div>
@@ -85,19 +113,21 @@ export default function LandingPage() {
           <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 ${
             theme === 'light' ? 'text-black' : 'text-white'
           }`}>
-            دراسة ذكية
+            {language === 'ar' ? 'دراسة ذكية' : 'Smart Study'}
             <span className={`block ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'
             }`}>
-              بأسلوب جديد
+              {language === 'ar' ? 'بأسلوب جديد' : 'In a New Way'}
             </span>
           </h1>
           
           <p className={`text-xl sm:text-2xl mb-8 max-w-3xl mx-auto ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
-            نظام متكامل لتتبع وقت الدراسة، تحصيل نقاط، والتنافس مع الأصدقاء. 
-            حوّل وقت الدراسة إلى تجربة ممتعة ومجزية.
+            {language === 'ar' 
+              ? 'نظام متكامل لتتبع وقت الدراسة، تحصيل نقاط، والتنافس مع الأصدقاء. حوّل وقت الدراسة إلى تجربة ممتعة ومجزية.'
+              : 'A comprehensive system for tracking study time, earning points, and competing with friends. Turn study time into a fun and rewarding experience.'
+            }
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -109,14 +139,14 @@ export default function LandingPage() {
                   : 'bg-blue-500 text-white hover:bg-blue-600'
               }`}
             >
-              ابدأ الدراسة الآن
+              {language === 'ar' ? 'ابدأ الدراسة الآن' : 'Start Studying Now'}
             </a>
             <button className={`px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:scale-105 ${
               theme === 'light'
                 ? 'border-black text-black hover:bg-black hover:text-white'
                 : 'border-white text-white hover:bg-white hover:text-black'
             }`}>
-              تعرف أكثر
+              {language === 'ar' ? 'تعرف أكثر' : 'Learn More'}
             </button>
           </div>
 
@@ -129,14 +159,14 @@ export default function LandingPage() {
             <h3 className={`text-lg font-bold mb-4 ${
               theme === 'light' ? 'text-black' : 'text-white'
             }`}>
-              احصل على تحديثات جديدة
+              {language === 'ar' ? 'احصل على تحديثات جديدة' : 'Get New Updates'}
             </h3>
             <div className="flex gap-2">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="بريدك الإلكتروني"
+                placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Your email'}
                 className={`flex-1 px-4 py-2 rounded-lg border-2 focus:outline-none ${
                   theme === 'light'
                     ? 'bg-white border-gray-300 text-black focus:border-blue-500'
@@ -148,7 +178,7 @@ export default function LandingPage() {
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-blue-500 text-white hover:bg-blue-600'
               }`}>
-                اشترك
+                {language === 'ar' ? 'اشترك' : 'Subscribe'}
               </button>
             </div>
           </div>
@@ -186,12 +216,15 @@ export default function LandingPage() {
             <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${
               theme === 'light' ? 'text-black' : 'text-white'
             }`}>
-              مميزات رائعة
+              {language === 'ar' ? 'مميزات رائعة' : 'Amazing Features'}
             </h2>
             <p className={`text-xl max-w-2xl mx-auto ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
             }`}>
-              كل ما تحتاجه لتجربة دراسة مثالية في مكان واحد
+              {language === 'ar' 
+                ? 'كل ما تحتاجه لتجربة دراسة مثالية في مكان واحد' 
+                : 'Everything you need for a perfect study experience in one place'
+            }
             </p>
           </div>
 
@@ -227,12 +260,15 @@ export default function LandingPage() {
           <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${
             theme === 'light' ? 'text-black' : 'text-white'
           }`}>
-            هل أنت مستعد للبدء؟
+            {language === 'ar' ? 'هل أنت مستعد للبدء؟' : 'Ready to Start?'}
           </h2>
           <p className={`text-xl mb-8 ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
-            ابدأ دراستك الآن بدون تسجيل أو إنشاء حساب
+            {language === 'ar' 
+              ? 'ابدأ دراستك الآن بدون تسجيل أو إنشاء حساب' 
+              : 'Start studying now without registration or account creation'
+            }
           </p>
           <a 
             href="/app"
@@ -242,7 +278,7 @@ export default function LandingPage() {
                 : 'bg-blue-500 text-white hover:bg-blue-600'
             }`}
           >
-            ابدأ الدراسة فوراً
+            {language === 'ar' ? 'ابدأ الدراسة فوراً' : 'Start Studying Now'}
           </a>
         </div>
       </section>
@@ -260,7 +296,10 @@ export default function LandingPage() {
               <p className={`mt-4 text-sm ${
                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
               }`}>
-                نظام ذكي لإدارة وقت الدراسة وتحسين الأداء
+                {language === 'ar' 
+                  ? 'نظام ذكي لإدارة وقت الدراسة وتحسين الأداء' 
+                  : 'Smart system for managing study time and improving performance'
+                }
               </p>
             </div>
             
@@ -268,15 +307,15 @@ export default function LandingPage() {
               <h4 className={`font-bold mb-4 ${
                 theme === 'light' ? 'text-black' : 'text-white'
               }`}>
-                المنتج
+                {language === 'ar' ? 'المنتج' : 'Product'}
               </h4>
               <ul className={`space-y-2 text-sm ${
                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
               }`}>
-                <li>المميزات</li>
-                <li>الأسعار</li>
-                <li>المدونة</li>
-                <li>الدعم</li>
+                <li>{language === 'ar' ? 'المميزات' : 'Features'}</li>
+                <li>{language === 'ar' ? 'الأسعار' : 'Pricing'}</li>
+                <li>{language === 'ar' ? 'المدونة' : 'Blog'}</li>
+                <li>{language === 'ar' ? 'الدعم' : 'Support'}</li>
               </ul>
             </div>
             
@@ -284,15 +323,15 @@ export default function LandingPage() {
               <h4 className={`font-bold mb-4 ${
                 theme === 'light' ? 'text-black' : 'text-white'
               }`}>
-                الشركة
+                {language === 'ar' ? 'الشركة' : 'Company'}
               </h4>
               <ul className={`space-y-2 text-sm ${
                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
               }`}>
-                <li>من نحن</li>
-                <li>الفريق</li>
-                <li>الوظائف</li>
-                <li>اتصل بنا</li>
+                <li>{language === 'ar' ? 'من نحن' : 'About Us'}</li>
+                <li>{language === 'ar' ? 'الفريق' : 'Team'}</li>
+                <li>{language === 'ar' ? 'الوظائف' : 'Careers'}</li>
+                <li>{language === 'ar' ? 'اتصل بنا' : 'Contact'}</li>
               </ul>
             </div>
             
@@ -300,7 +339,7 @@ export default function LandingPage() {
               <h4 className={`font-bold mb-4 ${
                 theme === 'light' ? 'text-black' : 'text-white'
               }`}>
-                متابعة
+                {language === 'ar' ? 'متابعة' : 'Follow'}
               </h4>
               <div className="flex space-x-4 space-x-reverse text-2xl">
                 <span>📱</span>
@@ -316,10 +355,11 @@ export default function LandingPage() {
               ? 'border-gray-200 text-gray-600' 
               : 'border-gray-800 text-gray-400'
           }`}>
-            © 2024 فهمان هب. جميع الحقوق محفوظة.
+            © 2024 {language === 'ar' ? 'فهمان هب. جميع الحقوق محفوظة.' : 'Fahman Hub. All rights reserved.'}
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </LanguageLayout>
   );
 }

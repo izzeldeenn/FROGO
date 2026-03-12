@@ -2,10 +2,12 @@
 
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function CurrentUserSelector() {
   const { theme } = useTheme();
   const { getCurrentDeviceUser, isTimerActive } = useUser();
+  const { language, t } = useLanguage();
   
   const currentUser = getCurrentDeviceUser();
   const isActive = isTimerActive();
@@ -14,7 +16,7 @@ export function CurrentUserSelector() {
     <div className="mb-6">
       <h3 className={`text-lg font-bold mb-3 ${
         theme === 'light' ? 'text-black' : 'text-white'
-      }`}>الجهاز الحالي</h3>
+      }`}>{language === 'ar' ? 'الجهاز الحالي' : 'Current Device'}</h3>
       
       {currentUser ? (
         <div className={`p-3 border-2 rounded-lg ${
@@ -34,21 +36,21 @@ export function CurrentUserSelector() {
                   ? 'bg-green-500 text-white'
                   : 'bg-green-600 text-white'
               }`}>
-                نشط
+                {t.active}
               </span>
             )}
           </div>
           <div className={`text-xs mt-1 ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
-            نقاط: {currentUser.score} | وقت الدراسة: {Math.floor(currentUser.studyTime / 60)} دقيقة
+            {language === 'ar' ? 'نقاط' : 'Points'}: {currentUser.score} | {language === 'ar' ? 'وقت الدراسة' : 'Study Time'}: {Math.floor(currentUser.studyTime / 60)} {language === 'ar' ? 'دقيقة' : 'minutes'}
           </div>
         </div>
       ) : (
         <p className={`text-sm ${
           theme === 'light' ? 'text-gray-600' : 'text-gray-400'
         }`}>
-          جهاز غير معروف
+          {language === 'ar' ? 'جهاز غير معروف' : 'Unknown Device'}
         </p>
       )}
     </div>

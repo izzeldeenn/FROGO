@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useGamification } from '@/contexts/GamificationContext';
 import { useUser } from '@/contexts/UserContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 const AVATARS = ['😀', '😎', '🤓', '🦄', '🚀', '⭐', '🌟', '💫', '🔥', '⚡', '🎯', '🏆', '🎨', '🎭', '🎪'];
@@ -12,6 +13,7 @@ export function UserProfile() {
   const { theme } = useTheme();
   const { coins, level, experience } = useGamification();
   const { getCurrentDeviceUser, updateDeviceUserName, updateDeviceUserAvatar } = useUser();
+  const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
@@ -58,12 +60,12 @@ export function UserProfile() {
           <div className={`text-base font-semibold ${
             theme === 'light' ? 'text-gray-800' : 'text-gray-200'
           }`}>
-            {currentUser ? currentUser.name : 'جهاز غير معروف'}
+            {currentUser ? currentUser.name : t.unknownDevice}
           </div>
           <div className={`text-sm ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
-            مستوى {level} • {coins} 🪙
+            {t.levelText} {level} • {coins} 🪙
           </div>
         </div>
 
@@ -78,7 +80,7 @@ export function UserProfile() {
 
       {showSettings && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-          <div className={`p-8 rounded-3xl max-w-2xl w-full mx-4 shadow-2xl transform transition-all ${
+          <div className={`p-8 rounded-3xl max-w-2xl w-full mx-4 shadow-2xl transform transition-all max-h-[90vh] overflow-y-auto ${
             theme === 'light'
               ? 'bg-white border border-gray-200'
               : 'bg-gray-900 border border-gray-700'
@@ -87,7 +89,7 @@ export function UserProfile() {
               <h3 className={`text-2xl font-bold ${
                 theme === 'light' ? 'text-gray-800' : 'text-gray-200'
               }`}>
-                إعدادات الملف الشخصي
+                {t.settings}
               </h3>
               <button
                 onClick={() => setShowSettings(false)}
@@ -101,19 +103,19 @@ export function UserProfile() {
               </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-8">
               <div className="space-y-6">
                 <div>
                   <label className={`block mb-3 text-lg font-medium ${
                     theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                   }`}>
-                    اسم الجهاز
+                    {t.deviceName}
                   </label>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="أدخل اسم الجهاز"
+                    placeholder={t.enterDeviceName}
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors text-lg ${
                       theme === 'light'
                         ? 'border-gray-300 bg-white text-black focus:border-blue-500'
@@ -126,11 +128,31 @@ export function UserProfile() {
                   <label className={`block mb-3 text-lg font-medium ${
                     theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                   }`}>
-                    المظهر
+                    {t.appearance}
                   </label>
                   <div className="flex items-center justify-center p-4 border-2 rounded-xl">
                     <ThemeToggle />
                   </div>
+                </div>
+
+                <div>
+                  <label className={`block mb-3 text-lg font-medium ${
+                    theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                  }`}>
+                    {t.language}
+                  </label>
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors text-lg ${
+                      theme === 'light'
+                        ? 'border-gray-300 bg-white text-black focus:border-blue-500'
+                        : 'border-gray-600 bg-gray-800 text-white focus:border-blue-400'
+                    }`}
+                  >
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                  </select>
                 </div>
               </div>
               
@@ -139,7 +161,7 @@ export function UserProfile() {
                   <label className={`block mb-3 text-lg font-medium ${
                     theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                   }`}>
-                    الأفاتار
+                    {t.avatar}
                   </label>
                   <div className="grid grid-cols-5 gap-2">
                     {AVATARS.map((avatar) => (
@@ -171,7 +193,7 @@ export function UserProfile() {
             }`}>
               <h4 className={`font-bold text-xl mb-6 text-center ${
                 theme === 'light' ? 'text-gray-800' : 'text-gray-200'
-              }`}>إحصائيات الجهاز</h4>
+              }`}>{t.statistics}</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div className={`p-4 rounded-xl ${
                   theme === 'light' ? 'bg-white/80' : 'bg-gray-800/50'
@@ -181,7 +203,7 @@ export function UserProfile() {
                   }`}>{coins}</div>
                   <div className={`text-sm ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                  }`}>🪙 عملات</div>
+                  }`}>🪙 {t.coins}</div>
                 </div>
                 <div className={`p-4 rounded-xl ${
                   theme === 'light' ? 'bg-white/80' : 'bg-gray-800/50'
@@ -191,7 +213,7 @@ export function UserProfile() {
                   }`}>{level}</div>
                   <div className={`text-sm ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                  }`}>🎯 مستوى</div>
+                  }`}>🎯 {t.level}</div>
                 </div>
                 <div className={`p-4 rounded-xl ${
                   theme === 'light' ? 'bg-white/80' : 'bg-gray-800/50'
@@ -201,7 +223,7 @@ export function UserProfile() {
                   }`}>{experience}</div>
                   <div className={`text-sm ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                  }`}>⚡ خبرة</div>
+                  }`}>⚡ {t.experience}</div>
                 </div>
                 <div className={`p-4 rounded-xl ${
                   theme === 'light' ? 'bg-white/80' : 'bg-gray-800/50'
@@ -211,12 +233,12 @@ export function UserProfile() {
                   }`}>{currentUser?.rank || 1}</div>
                   <div className={`text-sm ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                  }`}>🏆 ترتيب</div>
+                  }`}>🏆 {t.rank}</div>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3 space-x-reverse mt-8">
+            <div className="flex justify-end space-x-3 space-x-reverse mt-8 sticky bottom-0 bg-inherit py-4">
               <button
                 onClick={() => setShowSettings(false)}
                 className={`px-6 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-lg ${
@@ -225,7 +247,7 @@ export function UserProfile() {
                     : 'border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
               >
-                إلغاء
+                {t.cancel}
               </button>
               <button
                 onClick={handleSaveSettings}
@@ -235,7 +257,7 @@ export function UserProfile() {
                     : 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30'
                 }`}
               >
-                حفظ التغييرات
+                {t.saveChanges}
               </button>
             </div>
           </div>
