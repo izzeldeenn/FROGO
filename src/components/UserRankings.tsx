@@ -5,9 +5,11 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 
-interface DeviceUser {
-  deviceId: string;
-  name: string;
+interface UserAccount {
+  accountId: string;
+  username: string;
+  email: string;
+  hashKey: string;
   avatar?: string;
   score: number;
   rank: number;
@@ -19,23 +21,23 @@ interface DeviceUser {
 export function UserRankings() {
   const { theme } = useTheme();
   const { t } = useLanguage();
-  const { getAllDeviceUsers, isTimerActive } = useUser();
-  const [displayUsers, setDisplayUsers] = useState<DeviceUser[]>([]);
+  const { users, isTimerActive } = useUser();
+  const [displayUsers, setDisplayUsers] = useState<UserAccount[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    setDisplayUsers(getAllDeviceUsers());
-  }, [getAllDeviceUsers]);
+    setDisplayUsers(users);
+  }, [users]);
 
   useEffect(() => {
     // Update rankings every second for live changes
     const interval = setInterval(() => {
-      setDisplayUsers(getAllDeviceUsers());
+      setDisplayUsers(users);
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [getAllDeviceUsers]);
+  }, [users]);
 
   const formatStudyTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -44,7 +46,7 @@ export function UserRankings() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getTodayStudyTime = (user: DeviceUser) => {
+  const getTodayStudyTime = (user: UserAccount) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const lastActiveDate = new Date(user.lastActive);
@@ -64,10 +66,9 @@ export function UserRankings() {
     return Math.floor(studySeconds / 600);
   };
 
-  const isCurrentUserActive = (user: DeviceUser) => {
-    // Check if this is the current device and timer is active
-    const currentUser = displayUsers.find(u => u.deviceId === user.deviceId);
-    return currentUser && isTimerActive();
+  const isCurrentUserActive = (user: UserAccount) => {
+    // Check if this is the current account and timer is active
+    return isTimerActive();
   };
 
   return (
@@ -92,7 +93,7 @@ export function UserRankings() {
               
               return (
                 <div
-                  key={user.deviceId}
+                  key={user.accountId}
                   className={`p-3 border rounded-lg transition-all duration-300 ${
                     user.rank === 1
                       ? theme === 'light' 
@@ -120,7 +121,7 @@ export function UserRankings() {
                       <div className="flex items-center space-x-2">
                         <span className={`font-medium ${
                           theme === 'light' ? 'text-black' : 'text-white'
-                        }`}>{user.name}</span>
+                        }`}>{user.username}</span>
                         {userIsActive && (
                           <span className={`px-2 py-1 text-xs rounded-full animate-pulse ${
                             theme === 'light'

@@ -6,7 +6,6 @@ import { UserRankings } from '@/components/UserRankings';
 import { CurrentUserSelector } from '@/components/CurrentUserSelector';
 import { TimerSelector } from '@/components/TimerSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { CoinsButton } from '@/components/CoinsButton';
 import { UserProfile } from '@/components/UserProfile';
 import { useUser } from '@/contexts/UserContext';
 import { useEffect, useState } from 'react';

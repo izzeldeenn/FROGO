@@ -6,17 +6,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export function CurrentUserSelector() {
   const { theme } = useTheme();
-  const { getCurrentDeviceUser, isTimerActive } = useUser();
+  const { getCurrentUser, isTimerActive } = useUser();
   const { language, t } = useLanguage();
   
-  const currentUser = getCurrentDeviceUser();
+  const currentUser = getCurrentUser();
   const isActive = isTimerActive();
 
   return (
     <div className="mb-6">
       <h3 className={`text-lg font-bold mb-3 ${
         theme === 'light' ? 'text-black' : 'text-white'
-      }`}>{language === 'ar' ? 'الجهاز الحالي' : 'Current Device'}</h3>
+      }`}>{language === 'ar' ? 'الحساب الحالي' : 'Current Account'}</h3>
       
       {currentUser ? (
         <div className={`p-3 border-2 rounded-lg ${
@@ -28,7 +28,7 @@ export function CurrentUserSelector() {
             <span className={`font-medium ${
               theme === 'light' ? 'text-black' : 'text-white'
             }`}>
-              {currentUser.name}
+              {currentUser.username}
             </span>
             {isActive && (
               <span className={`text-xs px-2 py-1 rounded-full animate-pulse ${
@@ -50,7 +50,7 @@ export function CurrentUserSelector() {
         <p className={`text-sm ${
           theme === 'light' ? 'text-gray-600' : 'text-gray-400'
         }`}>
-          {language === 'ar' ? 'جهاز غير معروف' : 'Unknown Device'}
+          {language === 'ar' ? 'حساب غير معروف' : 'Unknown Account'}
         </p>
       )}
     </div>

@@ -12,27 +12,27 @@ const AVATARS = ['😀', '😎', '🤓', '🦄', '🚀', '⭐', '🌟', '💫', 
 export function UserProfile() {
   const { theme } = useTheme();
   const { coins, level, experience } = useGamification();
-  const { getCurrentDeviceUser, updateDeviceUserName, updateDeviceUserAvatar } = useUser();
+  const { getCurrentUser, updateUserName, updateUserAvatar } = useUser();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
 
-  const currentUser = getCurrentDeviceUser();
+  const currentUser = getCurrentUser();
 
   const handleSaveSettings = () => {
     if (username.trim()) {
-      updateDeviceUserName(username.trim());
+      updateUserName(username.trim());
     }
     if (selectedAvatar) {
-      updateDeviceUserAvatar(selectedAvatar);
+      updateUserAvatar(selectedAvatar);
     }
     setShowSettings(false);
   };
 
   const handleLoadSettings = () => {
     if (currentUser) {
-      setUsername(currentUser.name || '');
+      setUsername(currentUser.username || '');
       setSelectedAvatar(currentUser.avatar || '👤');
     }
     setShowSettings(true);
@@ -53,14 +53,14 @@ export function UserProfile() {
             ? 'from-blue-400 to-purple-500 text-white'
             : 'from-blue-600 to-purple-700 text-white'
         }`}>
-          {currentUser?.avatar || currentUser?.name?.charAt(0).toUpperCase() || '👤'}
+          {currentUser?.avatar || currentUser?.username?.charAt(0).toUpperCase() || '👤'}
         </div>
         
         <div className="text-right flex-1">
           <div className={`text-base font-semibold ${
             theme === 'light' ? 'text-gray-800' : 'text-gray-200'
           }`}>
-            {currentUser ? currentUser.name : t.unknownDevice}
+            {currentUser ? currentUser.username : t.unknownDevice}
           </div>
           <div className={`text-sm ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'

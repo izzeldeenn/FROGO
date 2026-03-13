@@ -1,14 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
-import { getDeviceId, getDeviceInfo } from '@/utils/deviceId';
+import { getAccountId, getAccountInfo } from '@/utils/deviceId';
 import { useGamification } from '@/contexts/GamificationContext';
 import { formatStudyTime } from '@/utils/timeFormat';
-import { dbClientOperations } from '@/lib/sqlite-client';
+import { userDB, UserAccountRecord, isPocketBaseAvailable } from '@/lib/pocketbase';
 
-interface DeviceUser {
-  deviceId: string;
-  name: string;
+interface UserAccount {
+  accountId: string;
+  username: string;
+  email: string;
+  hashKey: string;
   avatar?: string;
   score: number;
   rank: number;
@@ -19,13 +21,15 @@ interface DeviceUser {
 }
 
 interface UserContextType {
-  users: DeviceUser[];
-  getCurrentDeviceUser: () => DeviceUser | null;
-  updateDeviceUserName: (name: string) => void;
-  updateDeviceUserAvatar: (avatar: string) => void;
-  updateDeviceStudyTime: (additionalTime: number) => void;
-  getAllDeviceUsers: () => DeviceUser[];
-  setTimerActive: (isActive: boolean) => void;
+  users: UserAccount[];
+  currentAccountId: string;
+  isTimerRunning: boolean;
+  getCurrentUser: () => UserAccount | null;
+  updateUserName: (name: string) => void;
+  updateUserAvatar: (avatar: string) => void;
+  updateUserStudyTime: (additionalTime: number) => void;
+  updateUserScore: (additionalScore: number) => void;
+  setTimerActive: (active: boolean) => void;
   isTimerActive: () => boolean;
 }
 
@@ -33,177 +37,175 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const { addCoins } = useGamification();
-  const [users, setUsers] = useState<DeviceUser[]>([]);
-  const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
+  const [users, setUsers] = useState<UserAccount[]>([]);
+  const [currentAccountId, setCurrentAccountId] = useState<string>('');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   
-  // WebSocket client reference
-  const wsClientRef = useRef<any>(null);
   const dbSyncAccumulator = useRef(0);
 
   useEffect(() => {
-    // Get device ID
-    const deviceId = getDeviceId();
-    setCurrentDeviceId(deviceId);
-    
-    // Initialize WebSocket connection
-    initializeWebSocket();
-    
-    return () => {
-      // Cleanup WebSocket on unmount
-      if (wsClientRef.current) {
-        wsClientRef.current.disconnect();
+    const initializeApp = async () => {
+      // Get account ID
+      const accountId = getAccountId();
+      setCurrentAccountId(accountId);
+      
+      // Load initial leaderboard
+      await loadInitialLeaderboard();
+      
+      // Set up real-time updates
+      try {
+        const pocketBaseReady = await isPocketBaseAvailable();
+        if (pocketBaseReady) {
+          userDB.subscribeToUsers((updatedUsers: UserAccountRecord[]) => {
+            const userAccounts: UserAccount[] = updatedUsers.map((dbUser: UserAccountRecord) => ({
+              accountId: dbUser.accountId,
+              username: dbUser.username,
+              email: dbUser.email,
+              hashKey: dbUser.hashKey,
+              avatar: dbUser.avatar || '👤',
+              score: dbUser.score,
+              rank: dbUser.rank,
+              studyTime: dbUser.studyTime,
+              studyTimeFormatted: formatStudyTime(dbUser.studyTime),
+              createdAt: dbUser.createdAt,
+              lastActive: dbUser.lastActive
+            }));
+            setUsers(userAccounts);
+          });
+        } else {
+          console.log('🔄 Real-time updates disabled (PocketBase not available)');
+        }
+      } catch (error) {
+        console.log('🔄 Real-time subscription failed, using fallback mode');
+        // Continue without real-time updates
       }
+    };
+    
+    initializeApp();
+    
+    // Cleanup subscription on unmount
+    return () => {
+      userDB.unsubscribeFromUsers();
     };
   }, []);
 
-  const initializeWebSocket = async () => {
-    try {
-      // Import WebSocketClient dynamically to avoid SSR issues
-      const { WebSocketClient } = await import('@/lib/websocket-client');
-      const wsClient = new WebSocketClient('ws://localhost:8080');
-      wsClientRef.current = wsClient;
-
-      // Connect to WebSocket
-      await wsClient.connect();
-      console.log('WebSocket connected successfully');
-
-      // Set up message handler
-      wsClient.onMessage((leaderboardData: any[]) => {
-        console.log('Received WebSocket message:', leaderboardData);
-        const deviceUsers: DeviceUser[] = leaderboardData.map((dbDevice: any) => ({
-          deviceId: dbDevice.id,
-          name: dbDevice.name,
-          avatar: dbDevice.avatar || '🖥️',
-          score: dbDevice.score,
-          rank: dbDevice.rank,
-          studyTime: dbDevice.study_time,
-          studyTimeFormatted: formatStudyTime(dbDevice.study_time),
-          createdAt: dbDevice.created_at,
-          lastActive: dbDevice.last_active
-        }));
-        
-        // Update state without overwriting local timer progress
-        setUsers(prevUsers => {
-          const currentDevice = prevUsers.find(u => u.deviceId === currentDeviceId);
-          
-          return deviceUsers.map(user => {
-            // Preserve local study time for current device
-            if (user.deviceId === currentDeviceId && currentDevice) {
-              return {
-                ...user,
-                studyTime: currentDevice.studyTime,
-                studyTimeFormatted: formatStudyTime(currentDevice.studyTime)
-              };
-            }
-            return user;
-          });
-        });
-      });
-
-      // Load initial leaderboard
-      await loadInitialLeaderboard();
-    } catch (error) {
-      console.error('Failed to initialize WebSocket:', error);
-      console.log('Falling back to local device creation');
-      // Fallback to local device creation
-      createCurrentDevice();
-    }
-  };
 
   const loadInitialLeaderboard = async () => {
     try {
-      const devices = await dbClientOperations.getAllDevices();
-      if (devices && devices.length > 0) {
-        const deviceUsers: DeviceUser[] = devices.map((dbDevice: any) => ({
-          deviceId: dbDevice.id,
-          name: dbDevice.name,
-          avatar: dbDevice.avatar || '🖥️',
-          score: dbDevice.score,
-          rank: dbDevice.rank,
-          studyTime: dbDevice.study_time,
-          studyTimeFormatted: formatStudyTime(dbDevice.study_time),
-          createdAt: dbDevice.created_at,
-          lastActive: dbDevice.last_active
-        }));
-        setUsers(deviceUsers);
+      // Check if PocketBase is available
+      const pocketBaseReady = await isPocketBaseAvailable();
+      
+      if (pocketBaseReady) {
+        console.log('🗄️ Using PocketBase database');
+        // Try PocketBase first
+        const users = await userDB.getAllUsers();
+        
+        if (users && users.length > 0) {
+          const userAccounts: UserAccount[] = users.map((dbUser: UserAccountRecord) => ({
+            accountId: dbUser.accountId,
+            username: dbUser.username,
+            email: dbUser.email,
+            hashKey: dbUser.hashKey,
+            avatar: dbUser.avatar || '👤',
+            score: dbUser.score,
+            rank: dbUser.rank,
+            studyTime: dbUser.studyTime,
+            studyTimeFormatted: formatStudyTime(dbUser.studyTime),
+            createdAt: dbUser.createdAt,
+            lastActive: dbUser.lastActive
+          }));
+          setUsers(userAccounts);
+        } else {
+          createCurrentAccount();
+        }
       } else {
-        createCurrentDevice();
+        console.log('💾 Using in-memory storage (PocketBase not available)');
+        // Fallback to in-memory storage
+        createCurrentAccount();
       }
     } catch (error) {
-      console.error('Error loading initial leaderboard:', error);
-      createCurrentDevice();
+      console.log('💾 Using in-memory storage (PocketBase error)');
+      // Fallback to in-memory storage until PocketBase is set up
+      createCurrentAccount();
     }
   };
 
-  const createCurrentDevice = async () => {
-    const deviceId = getDeviceId();
-    const currentDevice: DeviceUser = {
-      deviceId,
-      name: `جهاز ${deviceId.slice(-6)}`,
-      avatar: '🖥️',
+  const createCurrentAccount = async () => {
+    const accountInfo = getAccountInfo();
+    
+    const currentAccount: UserAccount = {
+      accountId: accountInfo.accountId,
+      username: accountInfo.username,
+      email: accountInfo.email,
+      hashKey: accountInfo.hashKey,
+      avatar: '�',
       score: 0,
       rank: 1,
       studyTime: 0,
       studyTimeFormatted: formatStudyTime(0),
-      createdAt: new Date().toISOString(),
-      lastActive: new Date().toISOString()
+      createdAt: accountInfo.createdAt,
+      lastActive: accountInfo.lastLogin
     };
-    await saveDeviceToDatabase(currentDevice);
-    setUsers([currentDevice]);
+    await saveAccountToDatabase(currentAccount);
+    setUsers([currentAccount]);
   };
 
-  const saveDeviceToDatabase = async (deviceUser: DeviceUser) => {
+  const saveAccountToDatabase = async (userAccount: UserAccount) => {
     try {
-      await dbClientOperations.upsertDevice({
-        id: deviceUser.deviceId,
-        name: deviceUser.name,
-        avatar: deviceUser.avatar,
-        score: deviceUser.score,
-        rank: deviceUser.rank,
-        study_time: deviceUser.studyTime,
-        created_at: deviceUser.createdAt,
-        last_active: deviceUser.lastActive
+      console.log('💾 Saving account to PocketBase:', userAccount.accountId);
+      // Save account to PocketBase
+      await userDB.upsertUser({
+        accountId: userAccount.accountId,
+        username: userAccount.username,
+        email: userAccount.email,
+        hashKey: userAccount.hashKey,
+        avatar: userAccount.avatar,
+        score: userAccount.score,
+        rank: userAccount.rank,
+        studyTime: userAccount.studyTime,
+        createdAt: userAccount.createdAt,
+        lastActive: userAccount.lastActive
       });
-    } catch (error) {
-      console.error('Error saving device:', error);
+      console.log('✅ Account saved successfully');
+    } catch (error: any) {
+      console.error('❌ Error saving account:', error);
     }
   };
 
-  const getCurrentDeviceUser = (): DeviceUser | null => {
-    if (!currentDeviceId) return null;
-    return users.find(user => user.deviceId === currentDeviceId) || null;
+  const getCurrentUser = (): UserAccount | null => {
+    if (!currentAccountId) return null;
+    return users.find(user => user.accountId === currentAccountId) || null;
   };
 
-  const updateDeviceUserName = (name: string) => {
-    if (!currentDeviceId) return;
+  const updateUserName = (name: string) => {
+    if (!currentAccountId) return;
     
     setUsers(prevUsers => {
       const newUsers = prevUsers.map(user => {
-        if (user.deviceId === currentDeviceId) {
-          return { ...user, name, lastActive: new Date().toISOString() };
+        if (user.accountId === currentAccountId) {
+          return { ...user, username: name, lastActive: new Date().toISOString() };
         }
         return user;
       });
       return newUsers;
     });
     
-    // Send update via WebSocket
-    if (wsClientRef.current) {
-      wsClientRef.current.sendMessage({
-        type: 'update_device',
-        deviceId: currentDeviceId,
-        updates: { name }
-      });
-    }
+    // Update in PocketBase if available
+    isPocketBaseAvailable().then(available => {
+      if (available) {
+        userDB.updateUserProfile(currentAccountId, name).catch((error: any) => {
+          console.error('Error updating username:', error);
+        });
+      }
+    });
   };
 
-  const updateDeviceUserAvatar = (avatar: string) => {
-    if (!currentDeviceId) return;
+  const updateUserAvatar = (avatar: string) => {
+    if (!currentAccountId) return;
     
     setUsers(prevUsers => {
       const newUsers = prevUsers.map(user => {
-        if (user.deviceId === currentDeviceId) {
+        if (user.accountId === currentAccountId) {
           return { ...user, avatar, lastActive: new Date().toISOString() };
         }
         return user;
@@ -211,18 +213,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return newUsers;
     });
     
-    // Send update via WebSocket
-    if (wsClientRef.current) {
-      wsClientRef.current.sendMessage({
-        type: 'update_device',
-        deviceId: currentDeviceId,
-        updates: { avatar }
+    // Update in PocketBase if available
+    const currentUser = users.find(u => u.accountId === currentAccountId);
+    if (currentUser) {
+      isPocketBaseAvailable().then(available => {
+        if (available) {
+          userDB.updateUserProfile(currentAccountId, currentUser.username, avatar).catch((error: any) => {
+            console.error('Error updating avatar:', error);
+          });
+        }
       });
     }
   };
 
-  const updateDeviceStudyTime = async (additionalTime: number) => {
-    if (!currentDeviceId) return;
+  const updateUserStudyTime = async (additionalTime: number) => {
+    if (!currentAccountId) return;
 
     const pointsEarned = Math.floor(additionalTime / 10); // 1 point per 10 seconds
 
@@ -231,7 +236,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     setUsers(prevUsers => {
       const newUsers = prevUsers.map(user => {
-        if (user.deviceId === currentDeviceId) {
+        if (user.accountId === currentAccountId) {
           return {
             ...user,
             studyTime: user.studyTime + additionalTime,
@@ -251,31 +256,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       // Send to database every 10 seconds
       if (dbSyncAccumulator.current >= 10) {
-        const currentUser = newUsers.find(u => u.deviceId === currentDeviceId);
+        const currentUser = newUsers.find(u => u.accountId === currentAccountId);
         if (currentUser) {
-          // Save directly to database via API
-          dbClientOperations.updateDevice(currentDeviceId, {
-            study_time: currentUser.studyTime,
-            score: currentUser.score,
-            rank: currentUser.rank
-          }).then(() => {
-            console.log('Device study time saved to database');
-          }).catch(error => {
-            console.error('Error saving device study time:', error);
+          // Check if PocketBase is available before saving
+          isPocketBaseAvailable().then(available => {
+            if (available) {
+              userDB.updateUserStudyTime(
+                currentAccountId,
+                currentUser.studyTime,
+                currentUser.score
+              ).then(() => {
+                console.log('💾 User study time saved to PocketBase');
+              }).catch((error: any) => {
+                console.error('Error saving user study time:', error);
+              });
+            } else {
+              console.log('💾 PocketBase not available, using in-memory storage');
+            }
           });
-          
-          // Also send via WebSocket for real-time updates
-          if (wsClientRef.current) {
-            wsClientRef.current.sendMessage({
-              type: 'update_device',
-              deviceId: currentDeviceId,
-              updates: {
-                study_time: currentUser.studyTime,
-                score: currentUser.score,
-                rank: currentUser.rank
-              }
-            });
-          }
         }
         dbSyncAccumulator.current = 0;
       }
@@ -287,7 +285,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
     addCoins(pointsEarned);
   };
 
-  const getAllDeviceUsers = (): DeviceUser[] => {
+  const updateUserScore = async (additionalScore: number) => {
+    if (!currentAccountId) return;
+
+    setUsers(prevUsers => {
+      const newUsers = prevUsers.map(user => {
+        if (user.accountId === currentAccountId) {
+          return { ...user, score: user.score + additionalScore, lastActive: new Date().toISOString() };
+        }
+        return user;
+      });
+      return newUsers;
+    });
+  };
+
+  const getAllDeviceUsers = (): UserAccount[] => {
     return users.map(user => ({
       ...user,
       studyTimeFormatted: formatStudyTime(user.studyTime)
@@ -305,11 +317,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
   return (
     <UserContext.Provider value={{
       users,
-      getCurrentDeviceUser,
-      updateDeviceUserName,
-      updateDeviceUserAvatar,
-      updateDeviceStudyTime,
-      getAllDeviceUsers,
+      currentAccountId,
+      isTimerRunning,
+      getCurrentUser,
+      updateUserName,
+      updateUserAvatar,
+      updateUserStudyTime,
+      updateUserScore,
       setTimerActive,
       isTimerActive
     }}>

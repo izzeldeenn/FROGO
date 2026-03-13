@@ -7,19 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "ws-server": "node scripts/start-websocket-server.js"
+    "pocketbase:setup": "node scripts/setup-pocketbase.js",
+    "pocketbase:init": "node scripts/init-pocketbase.js",
+    "pocketbase:start": "./pocketbase serve --http=0.0.0.0:8090"
   },
   "dependencies": {
-    "@libsql/client": "^0.17.0",
-    "@supabase/supabase-js": "^2.99.1",
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/ws": "^8.5.10",
     "@vercel/analytics": "^2.0.0",
-    "better-sqlite3": "^12.6.2",
     "next": "16.1.6",
+    "pocketbase": "^0.21.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "ws": "^8.16.0"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -30,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yauzl": "^2.10.0"
   }
 }
