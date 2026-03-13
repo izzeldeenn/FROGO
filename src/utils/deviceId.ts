@@ -5,28 +5,76 @@ import crypto from 'crypto';
 // Generate or retrieve a unique user account ID based on device
 export function getAccountId(): string {
   if (typeof window === 'undefined') {
+    console.log('🖥️ Server environment detected');
     return 'server-account';
   }
 
-  // Check if account ID already exists in localStorage
+  console.log('🔍 Getting account ID...');
+  
+  // Try to get from localStorage first
   let accountId = localStorage.getItem('fahman_hub_account_id');
+  console.log('📦 LocalStorage account ID:', accountId);
   
   if (!accountId) {
-    // Generate a new unique account ID with hash key
-    accountId = generateAccountId();
-    localStorage.setItem('fahman_hub_account_id', accountId);
+    // Try session storage (for private browsing)
+    try {
+      accountId = sessionStorage.getItem('fahman_hub_account_id');
+      console.log('📦 SessionStorage account ID:', accountId);
+    } catch (error) {
+      console.log('❌ Session storage not available:', error);
+    }
   }
   
+  if (!accountId) {
+    console.log('🔄 No account ID found, generating new one...');
+    // Generate a new unique account ID with hash key
+    accountId = generateAccountId();
+    console.log('🆕 Generated account ID:', accountId);
+    
+    // Try to save to localStorage
+    try {
+      localStorage.setItem('fahman_hub_account_id', accountId);
+      console.log('✅ Saved to localStorage');
+    } catch (error) {
+      console.log('❌ LocalStorage failed:', error);
+      // Private browsing mode, try session storage
+      try {
+        sessionStorage.setItem('fahman_hub_account_id', accountId);
+        console.log('✅ Saved to sessionStorage');
+      } catch (sessionError) {
+        console.log('❌ SessionStorage also failed:', sessionError);
+        console.log('💾 Using in-memory account ID for private browsing');
+      }
+    }
+  }
+  
+  console.log('✅ Final account ID:', accountId);
   return accountId;
 }
 
 function generateAccountId(): string {
-  // Create a unique hash based on device fingerprint
-  const deviceFingerprint = createDeviceFingerprint();
-  const hash = crypto.createHash('sha256').update(deviceFingerprint).digest('hex');
-  const timestamp = Date.now().toString(36);
-  
-  return `user_${hash.substring(0, 16)}_${timestamp}`;
+  console.log('🔄 Generating account ID...');
+  try {
+    console.log('🔍 Creating device fingerprint...');
+    // Create a unique hash based on device fingerprint
+    const deviceFingerprint = createDeviceFingerprint();
+    console.log('📱 Device fingerprint:', deviceFingerprint);
+    
+    const hash = crypto.createHash('sha256').update(deviceFingerprint).digest('hex');
+    const timestamp = Date.now().toString(36);
+    
+    const accountId = `user_${hash.substring(0, 16)}_${timestamp}`;
+    console.log('✅ Generated normal account ID:', accountId);
+    return accountId;
+  } catch (error) {
+    console.log('❌ Error generating normal account ID:', error);
+    // Fallback for private browsing or restricted environments
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const fallbackId = `fallback_${timestamp}_${random}`;
+    console.log('🔄 Generated fallback account ID:', fallbackId);
+    return fallbackId;
+  }
 }
 
 function createDeviceFingerprint(): string {
@@ -59,35 +107,50 @@ export function getAccountInfo(): {
   createdAt: string;
   lastLogin: string;
 } {
-  if (typeof window === 'undefined') {
-    return {
-      accountId: 'server-account',
-      username: 'Server User',
-      email: 'server@fahman-hub.local',
-      hashKey: 'server-hash',
-      deviceInfo: {},
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString()
-    };
-  }
-
+  console.log('🔍 Getting account info...');
   const accountId = getAccountId();
+  const isFallback = accountId.startsWith('fallback_');
+  console.log('📊 Is fallback account:', isFallback);
   
   // Check if account info exists
   let accountInfo = localStorage.getItem('fahman_hub_account_info');
   
   if (accountInfo) {
+    console.log('📦 Found existing account info');
     const info = JSON.parse(accountInfo);
     // Update last login time
     info.lastLogin = new Date().toISOString();
-    localStorage.setItem('fahman_hub_account_info', JSON.stringify(info));
+    try {
+      localStorage.setItem('fahman_hub_account_info', JSON.stringify(info));
+      console.log('✅ Updated account info in localStorage');
+    } catch (error) {
+      console.log('❌ Failed to update localStorage:', error);
+    }
+    console.log('✅ Returning existing account info');
     return info;
   }
   
+  console.log('🔄 Creating new account info...');
   // Create new account info
-  const hashKey = generateHashKey(accountId);
-  const username = generateUsername(accountId);
-  const email = `${username}@fahman.local`;
+  let hashKey, username, email;
+  
+  if (isFallback) {
+    // Fallback account for private browsing
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    hashKey = `fallback_${timestamp}`;
+    username = `PrivateUser${random}`;
+    email = `private${random}@fahman.local`;
+    console.log('🔄 Created fallback account details');
+  } else {
+    // Regular account
+    hashKey = generateHashKey(accountId);
+    username = generateUsername(accountId);
+    email = `${username}@fahman.local`;
+    console.log('🔄 Created regular account details');
+  }
+  
+  console.log('📝 Creating account info object with:', { accountId, username, email, isFallback });
   
   const info = {
     accountId,
@@ -105,8 +168,24 @@ export function getAccountInfo(): {
     lastLogin: new Date().toISOString()
   };
   
-  localStorage.setItem('fahman_hub_account_info', JSON.stringify(info));
+  console.log('💾 Attempting to save account info...');
+  // Try to save to localStorage, but handle private browsing gracefully
+  try {
+    localStorage.setItem('fahman_hub_account_info', JSON.stringify(info));
+    console.log('✅ Saved account info to localStorage');
+  } catch (error) {
+    console.log('❌ LocalStorage failed:', error);
+    // Fallback to session storage for private browsing
+    try {
+      sessionStorage.setItem('fahman_hub_account_info', JSON.stringify(info));
+      console.log('✅ Saved account info to sessionStorage');
+    } catch (sessionError) {
+      console.log('❌ SessionStorage also failed:', sessionError);
+      console.log('💾 Using in-memory storage only');
+    }
+  }
   
+  console.log('✅ Created and saved new account info');
   return info;
 }
 

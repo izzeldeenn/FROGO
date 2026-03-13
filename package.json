@@ -12,6 +12,7 @@
     "pocketbase:start": "./pocketbase serve --http=0.0.0.0:8090"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.1",
     "@vercel/analytics": "^2.0.0",
     "next": "16.1.6",
     "pocketbase": "^0.21.1",
