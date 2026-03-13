@@ -38,6 +38,7 @@ const translations = {
     levelText: 'Level',
     timeToday: 'Time Today',
     coinsToday: 'Coins Today',
+    points: 'Points',
     up: 'Up',
     down: 'Down'
   },
@@ -74,6 +75,7 @@ const translations = {
     levelText: 'مستوى',
     timeToday: 'وقت اليوم',
     coinsToday: 'عملات اليوم',
+    points: 'نقاط',
     up: 'صاعد',
     down: 'نازل'
   }

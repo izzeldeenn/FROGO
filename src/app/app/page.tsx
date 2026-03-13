@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Logo } from '@/components/Logo';
 import { UserRankings } from '@/components/UserRankings';
 import { CurrentUserSelector } from '@/components/CurrentUserSelector';
+import { SettingsButton } from '@/components/SettingsButton';
 import { TimerSelector } from '@/components/TimerSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { UserProfile } from '@/components/UserProfile';
@@ -152,20 +153,18 @@ export default function Home() {
             ? 'bg-white border-l border-gray-200' 
             : 'bg-black border-l border-gray-800'
         }`}>
-          <div className="flex justify-between items-start mb-8 flex-shrink-0">
+          <div className="flex justify-between items-start mb-6 flex-shrink-0">
             <Logo />
-      
+            <SettingsButton />
           </div>
-            <CurrentUserSelector />
-            <UserRankings />
+          <CurrentUserSelector />
+          <UserRankings />
         </div>
         
         {/* Right section - 3/4 width */}
         <div className="w-3/4 flex items-center justify-center p-8 relative h-full overflow-hidden">
           <div className="absolute top-4 left-4 flex items-center space-x-2 space-x-reverse z-[9998] flex-shrink-0">
-            <div className="relative">
-              <UserProfile />
-            </div>
+       
           </div>
           <TimerSelector />
         </div>

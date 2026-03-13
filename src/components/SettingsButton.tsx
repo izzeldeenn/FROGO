@@ -9,17 +9,16 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const AVATARS = ['😀', '😎', '🤓', '🦄', '🚀', '⭐', '🌟', '💫', '🔥', '⚡', '🎯', '🏆', '🎨', '🎭', '🎪'];
 
-export function CurrentUserSelector() {
+export function SettingsButton() {
   const { theme } = useTheme();
   const { coins, level, experience } = useGamification();
-  const { getCurrentUser, updateUserName, updateUserAvatar, isTimerActive } = useUser();
+  const { getCurrentUser, updateUserName, updateUserAvatar } = useUser();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
 
   const currentUser = getCurrentUser();
-  const isActive = isTimerActive();
 
   const handleSaveSettings = () => {
     if (username.trim()) {
@@ -40,113 +39,17 @@ export function CurrentUserSelector() {
   };
 
   return (
-    <div className="mb-3">
-      <div className={`text-center mb-2 relative`}>
-        <div className={`inline-block px-3 py-0.5 rounded-full text-xs font-medium ${
+    <>
+      <button
+        onClick={handleLoadSettings}
+        className={`p-2 rounded-xl transition-all duration-200 hover:scale-110 ${
           theme === 'light'
-            ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border border-blue-200'
-            : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 text-blue-200 border border-blue-700/50'
-        }`}>
-          {language === 'ar' ? 'الحساب الحالي' : 'Current Account'}
-        </div>
-      </div>
-      
-      {currentUser ? (
-        <div className={`relative overflow-hidden group ${
-          theme === 'light' ? 'bg-white' : 'bg-gray-900'
-        }`}>
-          <div className={`absolute inset-0 bg-gradient-to-r ${
-            theme === 'light'
-              ? 'from-blue-500/5 via-purple-500/5 to-pink-500/5'
-              : 'from-blue-500/10 via-purple-500/10 to-pink-500/10'
-          }`} />
-          
-          <div className="relative p-3">
-            <div className="flex flex-col items-center">
-              <div className="relative mb-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold bg-gradient-to-br ${
-                  theme === 'light'
-                    ? 'from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md'
-                    : 'from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg'
-                } transform transition-transform duration-300 group-hover:scale-110`}>
-                  {currentUser?.avatar || currentUser?.username?.charAt(0).toUpperCase() || '👤'}
-                </div>
-                
-                {isActive && (
-                  <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold animate-pulse shadow-md">
-                    ✓
-                  </div>
-                )}
-              </div>
-
-              <div className="text-center mb-2">
-                <h2 className={`text-base font-bold mb-0.5 ${
-                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-                }`}>
-                  {currentUser.username}
-                </h2>
-                
-                <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                  theme === 'light'
-                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200'
-                    : 'bg-gradient-to-r from-blue-900/30 to-indigo-900/30 text-blue-300 border border-blue-700/50'
-                }`}>
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-1 animate-pulse"></span>
-                  {t.levelText} {level} • {coins} 🪙
-                </div>
-              </div>
-
-              <div className={`w-full p-2 rounded-lg mb-2 ${
-                theme === 'light'
-                  ? 'bg-gradient-to-r from-gray-50 to-blue-50/30 border border-gray-200'
-                  : 'bg-gradient-to-r from-gray-800/50 to-blue-900/20 border border-gray-700'
-              }`}>
-                <div className="grid grid-cols-2 gap-2 text-center">
-                  <div>
-                    <div className={`text-sm font-bold mb-0.5 ${
-                      theme === 'light' ? 'text-orange-600' : 'text-orange-400'
-                    }`}>
-                      {currentUser.score}
-                    </div>
-                    <div className={`text-xs font-medium ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {language === 'ar' ? 'النقاط' : 'Points'}
-                    </div>
-                  </div>
-                  <div>
-                    <div className={`text-sm font-bold mb-0.5 ${
-                      theme === 'light' ? 'teal-600' : 'teal-400'
-                    }`}>
-                      {Math.floor(currentUser.studyTime / 60)}m
-                    </div>
-                    <div className={`text-xs font-medium ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {language === 'ar' ? 'وقت الدراسة' : 'Study Time'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className={`text-center p-4 rounded-xl border-2 border-dashed ${
-          theme === 'light'
-            ? 'border-gray-300 bg-gray-50'
-            : 'border-gray-700 bg-gray-800/50'
-        }`}>
-          <div className="text-3xl mb-1.5 opacity-50">👤</div>
-          <p className={`text-xs font-medium ${
-            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-          }`}>
-            {language === 'ar' ? 'حساب غير معروف' : 'Unknown Account'}
-          </p>
-        </div>
-      )}
+            ? 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            : 'bg-gray-800 hover:bg-gray-700 text-gray-400'
+        }`}
+      >
+        ⚙️
+      </button>
 
       {showSettings && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
@@ -341,7 +244,6 @@ export function CurrentUserSelector() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
- 
