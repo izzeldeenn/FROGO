@@ -44,8 +44,8 @@ export function CurrentUserSelector() {
       <div className={`text-center mb-2 relative`}>
         <div className={`inline-block px-3 py-0.5 rounded-full text-xs font-medium ${
           theme === 'light'
-            ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border border-blue-200'
-            : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 text-blue-200 border border-blue-700/50'
+            ? 'bg-gradient-to-r from-yellow-100 to-green-100 text-green-800 border border-yellow-200'
+            : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-200 border border-yellow-700/50'
         }`}>
           {language === 'ar' ? 'الحساب الحالي' : 'Current Account'}
         </div>
@@ -57,8 +57,8 @@ export function CurrentUserSelector() {
         }`}>
           <div className={`absolute inset-0 bg-gradient-to-r ${
             theme === 'light'
-              ? 'from-blue-500/5 via-purple-500/5 to-pink-500/5'
-              : 'from-blue-500/10 via-purple-500/10 to-pink-500/10'
+              ? 'from-green-500/5 via-yellow-500/5 to-green-500/5'
+              : 'from-green-500/10 via-yellow-500/10 to-green-500/10'
           }`} />
           
           <div className="relative p-3">
@@ -66,8 +66,8 @@ export function CurrentUserSelector() {
               <div className="relative mb-2">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold bg-gradient-to-br ${
                   theme === 'light'
-                    ? 'from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md'
-                    : 'from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg'
+                    ? 'from-green-500 via-yellow-500 to-green-600 text-white shadow-md'
+                    : 'from-green-600 via-yellow-600 to-green-700 text-white shadow-lg'
                 } transform transition-transform duration-300 group-hover:scale-110`}>
                   {currentUser?.avatar || currentUser?.username?.charAt(0).toUpperCase() || '👤'}
                 </div>
@@ -88,23 +88,23 @@ export function CurrentUserSelector() {
                 
                 <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                   theme === 'light'
-                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200'
-                    : 'bg-gradient-to-r from-blue-900/30 to-indigo-900/30 text-blue-300 border border-blue-700/50'
+                    ? 'bg-gradient-to-r from-yellow-50 to-green-50 text-green-700 border border-yellow-200'
+                    : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-300 border border-yellow-700/50'
                 }`}>
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-1 animate-pulse"></span>
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-1 animate-pulse"></span>
                   {t.levelText} {level} • {coins} 🪙
                 </div>
               </div>
 
               <div className={`w-full p-2 rounded-lg mb-2 ${
                 theme === 'light'
-                  ? 'bg-gradient-to-r from-gray-50 to-blue-50/30 border border-gray-200'
-                  : 'bg-gradient-to-r from-gray-800/50 to-blue-900/20 border border-gray-700'
+                  ? 'bg-gradient-to-r from-yellow-50 to-green-50/30 border border-yellow-200'
+                  : 'bg-gradient-to-r from-yellow-950/50 to-green-950/20 border border-yellow-800'
               }`}>
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div>
                     <div className={`text-sm font-bold mb-0.5 ${
-                      theme === 'light' ? 'text-orange-600' : 'text-orange-400'
+                      theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'
                     }`}>
                       {currentUser.score}
                     </div>
@@ -116,7 +116,7 @@ export function CurrentUserSelector() {
                   </div>
                   <div>
                     <div className={`text-sm font-bold mb-0.5 ${
-                      theme === 'light' ? 'teal-600' : 'teal-400'
+                      theme === 'light' ? 'text-green-600' : 'text-green-400'
                     }`}>
                       {Math.floor(currentUser.studyTime / 60)}m
                     </div>
@@ -136,8 +136,8 @@ export function CurrentUserSelector() {
       ) : (
         <div className={`text-center p-4 rounded-xl border-2 border-dashed ${
           theme === 'light'
-            ? 'border-gray-300 bg-gray-50'
-            : 'border-gray-700 bg-gray-800/50'
+            ? 'border-yellow-300 bg-yellow-50'
+            : 'border-yellow-700 bg-yellow-950/50'
         }`}>
           <div className="text-3xl mb-1.5 opacity-50">👤</div>
           <p className={`text-xs font-medium ${
@@ -151,10 +151,10 @@ export function CurrentUserSelector() {
       {showSettings && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
           <div className={`w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl ${
-            theme === 'light' ? 'bg-white' : 'bg-gray-900'
+            theme === 'light' ? 'bg-white border border-yellow-200' : 'bg-black border border-yellow-800'
           }`}>
             <div className={`p-6 border-b ${
-              theme === 'light' ? 'border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50' : 'border-gray-700 bg-gradient-to-r from-blue-900/20 to-purple-900/20'
+              theme === 'light' ? 'border-yellow-200 bg-gradient-to-r from-yellow-50 to-green-50' : 'border-yellow-800 bg-gradient-to-r from-yellow-950/20 to-green-950/20'
             }`}>
               <div className="flex items-center justify-between">
                 <h3 className={`text-2xl font-bold ${
@@ -166,8 +166,8 @@ export function CurrentUserSelector() {
                   onClick={() => setShowSettings(false)}
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                     theme === 'light'
-                      ? 'hover:bg-gray-200 text-gray-600'
-                      : 'hover:bg-gray-700 text-gray-400'
+                      ? 'hover:bg-yellow-100 text-yellow-700'
+                      : 'hover:bg-yellow-900 text-yellow-300'
                   }`}
                 >
                   ✕
@@ -191,8 +191,8 @@ export function CurrentUserSelector() {
                       placeholder={t.enterDeviceName}
                       className={`w-full px-4 py-3 rounded-2xl focus:outline-none transition-all text-lg ${
                         theme === 'light'
-                          ? 'bg-gray-50 border-2 border-gray-200 text-gray-800 focus:border-blue-500 focus:bg-white'
-                          : 'bg-gray-800 border-2 border-gray-700 text-gray-100 focus:border-blue-400 focus:bg-gray-750'
+                          ? 'bg-yellow-50 border-2 border-yellow-200 text-gray-800 focus:border-green-500 focus:bg-white'
+                          : 'bg-yellow-950 border-2 border-yellow-800 text-gray-100 focus:border-green-400 focus:bg-black'
                       }`}
                     />
                   </div>
@@ -204,7 +204,7 @@ export function CurrentUserSelector() {
                       {t.appearance}
                     </label>
                     <div className={`p-4 rounded-2xl ${
-                      theme === 'light' ? 'bg-gray-50 border-2 border-gray-200' : 'bg-gray-800 border-2 border-gray-700'
+                      theme === 'light' ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-yellow-950 border-2 border-yellow-800'
                     }`}>
                       <ThemeToggle />
                     </div>

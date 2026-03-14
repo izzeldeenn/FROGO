@@ -6,11 +6,22 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageLayout } from '@/components/LanguageLayout';
 import { Logo } from '@/components/Logo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
+import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 
 export default function LandingPage() {
+  return (
+    <CustomThemeProvider>
+      <LandingPageContent />
+    </CustomThemeProvider>
+  );
+}
+
+function LandingPageContent() {
   const { theme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [email, setEmail] = useState('');
+  const customTheme = useCustomThemeClasses();
 
   const features = [
     {
@@ -78,11 +89,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Logo />
-            <div className="flex items-center space-x-4 space-x-reverse">
+            <div className="flex items-center gap-6 space-x-reverse">
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                className={`px-3 py-2 border-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 border-2 rounded-lg text-sm font-medium transition-colors min-w-[100px] ${
                   theme === 'light'
                     ? 'border-gray-300 bg-white text-black hover:border-gray-400'
                     : 'border-gray-600 bg-black text-white hover:border-gray-500'
@@ -94,11 +105,20 @@ export default function LandingPage() {
               <ThemeToggle />
               <a 
                 href="/app"
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  theme === 'light'
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
+                className="px-6 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
+                style={{
+                  backgroundColor: customTheme.colors.primary,
+                  color: '#ffffff',
+                  border: `2px solid ${customTheme.colors.primary}`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.accent;
+                  e.currentTarget.style.borderColor = customTheme.colors.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                  e.currentTarget.style.borderColor = customTheme.colors.primary;
+                }}
               >
                 {language === 'ar' ? 'ابدأ الدراسة' : 'Start Studying'}
               </a>
@@ -114,9 +134,7 @@ export default function LandingPage() {
             theme === 'light' ? 'text-black' : 'text-white'
           }`}>
             {language === 'ar' ? 'دراسة ذكية' : 'Smart Study'}
-            <span className={`block ${
-              theme === 'light' ? 'text-blue-600' : 'text-blue-400'
-            }`}>
+            <span className="block" style={{ color: customTheme.colors.primary }}>
               {language === 'ar' ? 'بأسلوب جديد' : 'In a New Way'}
             </span>
           </h1>
@@ -133,29 +151,51 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <a 
               href="/app"
-              className={`px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 ${
-                theme === 'light'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{
+                backgroundColor: customTheme.colors.primary,
+                color: '#ffffff',
+                border: `2px solid ${customTheme.colors.primary}`
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = customTheme.colors.accent;
+                e.currentTarget.style.borderColor = customTheme.colors.accent;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                e.currentTarget.style.borderColor = customTheme.colors.primary;
+              }}
             >
               {language === 'ar' ? 'ابدأ الدراسة الآن' : 'Start Studying Now'}
             </a>
-            <button className={`px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:scale-105 ${
-              theme === 'light'
-                ? 'border-black text-black hover:bg-black hover:text-white'
-                : 'border-white text-white hover:bg-white hover:text-black'
-            }`}>
+            <button 
+              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:scale-105"
+              style={{
+                borderColor: customTheme.colors.border,
+                color: customTheme.colors.text,
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = customTheme.colors.border;
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = customTheme.colors.text;
+              }}
+            >
               {language === 'ar' ? 'تعرف أكثر' : 'Learn More'}
             </button>
           </div>
 
           {/* Get Updates */}
-          <div className={`max-w-md mx-auto p-6 rounded-2xl border-2 ${
-            theme === 'light'
-              ? 'bg-gray-50 border-gray-200'
-              : 'bg-gray-900 border-gray-700'
-          }`}>
+          <div 
+            className="max-w-md mx-auto p-6 rounded-2xl border-2"
+            style={{
+              backgroundColor: customTheme.colors.surface,
+              borderColor: customTheme.colors.border
+            }}
+          >
             <h3 className={`text-lg font-bold mb-4 ${
               theme === 'light' ? 'text-black' : 'text-white'
             }`}>
@@ -167,17 +207,35 @@ export default function LandingPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Your email'}
-                className={`flex-1 px-4 py-2 rounded-lg border-2 focus:outline-none ${
-                  theme === 'light'
-                    ? 'bg-white border-gray-300 text-black focus:border-blue-500'
-                    : 'bg-black border-gray-600 text-white focus:border-blue-400'
-                }`}
+                className="flex-1 px-4 py-2 rounded-lg border-2 focus:outline-none"
+                style={{
+                  backgroundColor: theme === 'light' ? '#ffffff' : '#000000',
+                  borderColor: customTheme.colors.border,
+                  color: customTheme.colors.text
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = customTheme.colors.primary;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = customTheme.colors.border;
+                }}
               />
-              <button className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                theme === 'light'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}>
+              <button 
+                className="px-6 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: customTheme.colors.primary,
+                  color: '#ffffff',
+                  border: `2px solid ${customTheme.colors.primary}`
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.accent;
+                  e.currentTarget.style.borderColor = customTheme.colors.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                  e.currentTarget.style.borderColor = customTheme.colors.primary;
+                }}
+              >
                 {language === 'ar' ? 'اشترك' : 'Subscribe'}
               </button>
             </div>
@@ -186,16 +244,15 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className={`py-16 px-4 sm:px-6 lg:px-8 ${
-        theme === 'light' ? 'bg-gray-50' : 'bg-gray-900'
-      }`}>
+      <section 
+        className="py-16 px-4 sm:px-6 lg:px-8"
+        style={{ backgroundColor: customTheme.colors.surface }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
             {stats.map((stat, index) => (
               <div key={index}>
-                <div className={`text-3xl sm:text-4xl font-bold mb-2 ${
-                  theme === 'light' ? 'text-blue-600' : 'text-blue-400'
-                }`}>
+                <div className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: customTheme.colors.primary }}>
                   {stat.number}
                 </div>
                 <div className={`text-sm sm:text-base ${
@@ -216,33 +273,42 @@ export default function LandingPage() {
             <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${
               theme === 'light' ? 'text-black' : 'text-white'
             }`}>
-              {language === 'ar' ? 'مميزات رائعة' : 'Amazing Features'}
+              {language === 'ar' ? 'المميزات' : 'Features'}
             </h2>
-            <p className={`text-xl max-w-2xl mx-auto ${
+            <p className={`text-xl ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
             }`}>
               {language === 'ar' 
-                ? 'كل ما تحتاجه لتجربة دراسة مثالية في مكان واحد' 
-                : 'Everything you need for a perfect study experience in one place'
-            }
+                ? 'كل ما تحتاجه لدراسة أفضل وأكثر فعالية'
+                : 'Everything you need for better and more effective study'
+              }
             </p>
           </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className={`p-6 rounded-2xl border-2 transition-all hover:scale-105 ${
-                theme === 'light'
-                  ? 'bg-white border-gray-200 hover:border-blue-500'
-                  : 'bg-black border-gray-700 hover:border-blue-400'
-              }`}>
+              <div 
+                key={index}
+                className="p-8 rounded-2xl border-2 transition-all hover:scale-105"
+                style={{
+                  backgroundColor: theme === 'light' ? '#ffffff' : '#000000',
+                  borderColor: customTheme.colors.border
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = customTheme.colors.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = customTheme.colors.border;
+                }}
+              >
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className={`text-xl font-bold mb-2 ${
                   theme === 'light' ? 'text-black' : 'text-white'
                 }`}>
                   {feature.title}
                 </h3>
-                <p className={`${
-                  theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                <p className={`
+                  ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}
                 }`}>
                   {feature.description}
                 </p>
@@ -253,9 +319,10 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className={`py-20 px-4 sm:px-6 lg:px-8 ${
-        theme === 'light' ? 'bg-blue-50' : 'bg-blue-900/20'
-      }`}>
+      <section 
+        className="py-20 px-4 sm:px-6 lg:px-8"
+        style={{ backgroundColor: customTheme.colors.background }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={`text-4xl sm:text-5xl font-bold mb-4 ${
             theme === 'light' ? 'text-black' : 'text-white'
@@ -272,11 +339,20 @@ export default function LandingPage() {
           </p>
           <a 
             href="/app"
-            className={`inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 ${
-              theme === 'light'
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
-            }`}
+            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+            style={{
+              backgroundColor: customTheme.colors.primary,
+              color: '#ffffff',
+              border: `2px solid ${customTheme.colors.primary}`
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = customTheme.colors.accent;
+              e.currentTarget.style.borderColor = customTheme.colors.accent;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+              e.currentTarget.style.borderColor = customTheme.colors.primary;
+            }}
           >
             {language === 'ar' ? 'ابدأ الدراسة فوراً' : 'Start Studying Now'}
           </a>
@@ -284,11 +360,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className={`py-12 px-4 sm:px-6 lg:px-8 border-t ${
-        theme === 'light' 
-          ? 'bg-gray-50 border-gray-200' 
-          : 'bg-black border-gray-800'
-      }`}>
+      <footer 
+        className="py-12 px-4 sm:px-6 lg:px-8 border-t"
+        style={{
+          backgroundColor: customTheme.colors.surface,
+          borderColor: customTheme.colors.border
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
