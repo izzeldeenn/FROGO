@@ -355,7 +355,7 @@ export default function LandingPage() {
               ? 'border-gray-200 text-gray-600' 
               : 'border-gray-800 text-gray-400'
           }`}>
-            © 2024 {language === 'ar' ? 'فهمان هب. جميع الحقوق محفوظة.' : 'Fahman Hub. All rights reserved.'}
+            © 2024 {language === 'ar' ? 'فروجو. جميع الحقوق محفوظة.' : 'Frogo. All rights reserved.'}
           </div>
         </div>
       </footer>

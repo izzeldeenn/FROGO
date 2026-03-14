@@ -1,241 +1,313 @@
-# 🎯 FamanHub- نظام إدارة الوقت والدراسة الذكي
+# 🐸 Frogo - Focus, Rise, Organize, Grow, Overcome
 
-تطبيق ويب حديث لإدارة وقت الدراسة مع لوحة متصدرات rel-time،مبني بـ  و WbSocke
+A smart study time management platform inspired by the wisdom of Mr. Frogo.
 
-##✨ المميزات الرئيسية
+## 📖 The Story of Mr. Frogo
 
-### 📊 **لوحة المتصدرات Ral-ime**
--**WeScke-bs**- تحديثات فورية بدون pollng
-- **SatePocion**  حماية الـ locl imer من التعارض
-- **Auo-yc** - حفظ تلقائي كل 10 ثواني
-- **Ral-ime cllabrton**  تحديثات فورية لجميع المستخدمين
+On a quiet night beside a small pond, there was a frog different from all the others.
 
-### ⏱️ **نظام المؤقت الذكي**
-- **Multipl tim typs** - YouTub, Pomodoo, Cusom
-- **Tim tracking**  تتبع دقيق للوقت بالثواني
-- **Pois system**  نقاط لكل 10 ثواني دراسة
-- **Formtted dislay** - عرض الوقت بالساعات والدقائق والثواني#🎮 **نظام amificao**
--**Coins** - عملات ذهبية كمكافآت
-- **Achievemens** - إنجازات عند تحقيق أهداف
-- **Ledrboar** - تنافس مع المستخدمين الآخرين- **Avata syem** - صور شخصية قابلة للتخصيص
+While other frogs jumped aimlessly, this frog sat on a stone near the water, holding a warm cup of coffee and staring at the sky, deep in thought.
 
-### 💾 **نظامالبيانات**
--**SQLi** - قاعدة بيانات محلية سريعة
--**Dice idntificatin** - تعريف فريد لكل جهاز
-- **Data ersistenc** - حفظ البيانات بشكل دائم
-- **API igation** - واجهة برمجية كاملة
+His name was Mr. Frogo.
 
-## 🚀 البدء السريع
+Frogo didn't like chaos or wasting time.
+He believed that every jump should be toward a goal.
 
-### المتطلبات
-- Nod.js 18+
-- npm/yan/pnpm
-### التثبيت
-# استنساخ المشروعgit cloe <reositoy-rl>
-cd fahma-hub
- تثبيتالاعتمادياتpminstall
- تشغيلWebScket serve runws-srer
- تشغيل التطبيق
-npm
-### الوصول للتطبيق- **التطبيق:**
-- **WebSocke Server:** ws88
+As time passed, Frogo discovered a simple secret:
+The mind is like a pond... if it's calm and clear, you can see everything perfectly.
 
-## 🏗️ البنية التقنية
+But when the pond fills with noise, vision disappears.
+
+That's why Frogo started his own method:
+sit calmly, drink his coffee, think, then make one focused jump toward a single goal.
+
+And with every jump, he became better.
+
+After years, others started asking:
+"How can you focus like that?"
+
+Frogo smiled and said:
+
+"The secret isn't in jumping a lot...
+The secret is in jumping in the right direction."
+
+And from there, the FROGO platform was born.
+
+A place that helps people to:
+
+**Focus**
+**Rise** 
+**Organize**
+**Grow**
+**Overcome**
+
+And now, every time you enter the platform, you'll find Mr. Frogo sitting with his coffee, waiting for you to say:
+
+"Ready for the next jump?"
+
+## ✨ Key Features
+
+### 📊 **Real-time Leaderboard**
+- **WebSocket-based** - Real-time updates without polling
+- **State Protection** - Protects local timer from conflicts
+- **Auto-sync** - Automatic save every 10 seconds
+- **Real-time collaboration** - Instant updates for all users
+
+### ⏱️ **Smart Timer System**
+- **Multiple timer types** - YouTube, Pomodoro, Custom
+- **Time tracking** - Accurate time tracking to the second
+- **Points system** - Points for every 10 seconds of study
+- **Formatted display** - Time display in hours, minutes, and seconds
+
+### 🎮 **Gamification System**
+- **Coins** - Gold coins as rewards
+- **Achievements** - Achievements when reaching goals
+- **Leaderboard** - Compete with other users
+- **Avatar system** - Customizable profile pictures
+
+### 💾 **Data System**
+- **SQLite** - Fast local database
+- **Device identification** - Unique ID for each device
+- **Data persistence** - Permanent data storage
+- **API integration** - Complete API interface
+
+## 🚀 Quick Start
+
+### Requirements
+- Node.js 18+
+- npm/yarn/pnpm
+
+### Installation
+```bash
+# Clone the project
+git clone <repository-url>
+cd frogo
+
+# Install dependencies
+npm install
+
+# Run WebSocket server
+npm run ws-server
+
+# Run the app
+npm run dev
+```
+
+### Access the application
+- **App:** http://localhost:3000
+- **WebSocket Server:** ws://localhost:8080
+
+## 🏗️ Technical Architecture
 
 ### Frontend
-- **Next.js 16** - Reactframeork مع AppRte
--**TypeScipt** - أمان الأنواع
-- **Tailind CSS** - تصميم عصري
-- **RactContex** - إدارة الحالة العامة
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Modern styling
+- **React Context** - Global state management
 
 ### Backend
-- **WebScket Server** - اتصالاتreal-tim
-- **SQLitDaabas**- تخزين محلي
-- **Nxt.j API Roes** - RESTful API- **Nde.jsRutime**- ever-side operaions
+- **WebSocket Server** - Real-time communications
+- **SQLite Database** - Local storage
+- **Next.js API Routes** - RESTful API
+- **Node.js Runtime** - Server-side operations
 
-###المميزات التقنية
-- **Ral-tme Updaes** - بدون poll
--**SatMnament**- حماية الحالة المحلية
-- **Dataase Snc**- مزامنة ذكية
-- **Errr Hanl**- معالجة أخطاء قوية
+### Technical Features
+- **Real-time Updates** - No polling required
+- **State Management** - Local state protection
+- **Database Sync** - Smart synchronization
+- **Error Handling** - Robust error management
 
-## 📱 واجهة الاستخدام
+## 📱 User Interface
 
-### الصفحة الرئيسية
-- **Timr conrol**- بدء/إيقاف المؤقت
-- **imdisly** عرض الوقت المنقضي
-- **Sty mod**- اختيار نمط الدراسة
-- **Quick stt**-إحصائيات سريعة
+### Main Page
+- **Timer control** - Start/stop timer
+- **Time display** - Show elapsed time
+- **Study mode** - Choose study style
+- **Quick stats** - Quick statistics
 
-### لوحة المتصدرات
-- **Ral-imeranking** - ترتيب مباشر
-- **Usrpros** - معلومات المستخدمين- **Study statistics** - إحصائيات الدراسة- **Acevement badge**- شارات الإنجازات
+### Leaderboard
+- **Real-time ranking** - Live ranking
+- **User profiles** - User information
+- **Study statistics** - Study statistics
+- **Achievement badges** - Achievement badges
 
-### الإعدادات
-- **Dvie name** - اسم الجهاز
-- **Avaarlci** - اختيار الصورة الشخصية
-- **Teme seing** - إعدادات المظهر
-- **Data maagmen** - إدارة البيانات
+### Settings
+- **Device name** - Device name
+- **Avatar selection** - Choose profile picture
+- **Theme settings** - Appearance settings
+- **Data management** - Data management
 
-## 🔧 التطوير
+## 🔧 Development
 
-### هيكل الملفات
+### File Structure
+```
+src/
+├── app/                 # Next.js App Router
+│   ├── api/             # API routes
+│   ├── page.tsx         # Main page
+│   └── layout.tsx       # Global layout
+├── components/          # React components
+│   ├── Timer/           # Timer components
+│   ├── Leaderboard/     # Leaderboard components
+│   └── UI/              # UI components
+├── contexts/            # React Context
+│   ├── UserContext.tsx  # User management
+│   └── GamificationContext.tsx
+├── lib/                 # Helper libraries
+│   ├── sqlite.ts        # Database operations
+│   ├── websocket-server.ts # WebSocket server
+│   └── utils/           # Helper functions
+└── utils/               # Utilities
+    ├── deviceId.ts      # Device identification
+    └── timeFormat.ts    # Time formatting
 ```
 
-├──                  # Next.js App Rte
-│   ├── i/             # API routes
-│   ├── age.tsx         # الصفحة الرئيسية
-│   └── yout.sx       # التخطيط العام
-├── compnets          # مكونات Reac
-│   ├── Ter/           # مكونات المؤقت
-│   ├── Leaderboard/     # مكونات لوحة المتصدرات
-│   └── UI/             # مكونات واجهة المستخدم
-├── cotexts            # React Ctex
-│   ├──UserContext.sx  # إدارة المستخدمين
-│   └──GificonContext.tsx
-├── ib/                # المكتبات المساعدة
-│   ├── sqite.ts        # عمليات قاعدة البيانات
-│   ├──webscke-servr.ts#WebScketservr
-│   └── utl/          # دوال مساعدة
-└── uil              # أدوات مساعدة
-    ├── deiIdts      # تعريف الجهاز
-    └── timeFrat.s    # تنسيقالوقت
+### Available Commands
+```bash
+# Development
+npm run dev              # Run development server
+npm run build           # Build production version
+npm run start           # Run production server
+npm run ws-server       # Run WebSocket server
+
+# Code quality
+npm run lint            # Check code
 ```
 
-### الأوامر المتاحة
-```bsh
-#تطوير
-pmrudev          # تشغيل خادم التطوير
-np run bud       # بناء نسخة الإنتاج
-npm unstat        # تشغيل خادم الإنتاجWbSocket
-npm uws-server    # تشغيل WebScket sevr#جودة الكود
-npm ulint         # فحص الكود
-```
+## 🎯 Core Concepts
 
-## 🎯 المفاهيم الأساسية
+### **Real-time Architecture**
+- **WebSocket Connection** - Persistent connection
+- **Event Broadcasting** - Send to everyone
+- **State Synchronization** - State sync
+- **Conflict Resolution** - Conflict handling
 
-### **Real-tie Achitcture**
--**WeSckeConncion** - اتصال دائم
-- **Event Broadcating**- إرسال للجميع
-- **StSynchroniztion**- مزامنة الحالة
-- **Confict Reslutin**- حل التعارضات
+### **Data Flow**
+1. **Local Update** - Instant UI updates
+2. **Accumulation** - Batch updates
+3. **Batch Sync** - Periodic database save
+4. **Broadcast** - Send to other clients
 
-### **DaF**
-1.**Lal Updat** تحديثات فورية في الـ UI
-2**Acul** - تجميع التحديثات
-3. **Bach Syc** - حفظ دوري لقاعدة البيانات
-4 **Badat**إرسال للعملاء الآخرين
+### **State Protection**
+- **Local First** - Priority to local state
+- **Selective Sync** - Selective synchronization
+- **Conflict Handling** - Conflict handling
+- **Data Integrity** - Data integrity
 
-### **Stte Potectio**
--**Locl First** - الأولوية للـ lcal sate
--**SleciveSync** - مزامنة انتقائية
-- **ConlicHling** - معالجةالتعارضات**Dat Itgriy** - سلامة البيانات
+## 🛠️ Customization
 
-## 🛠️ التخصيص
-
-### إضافة مؤقت جديد
-```yecript
- في compon/Time
-intrfce TimerPops {
-  oStart: ( => void;
-oStop: () =>vod;
-  oTimUpd:(scond:nmber) => vd;
+### Adding a new timer
+```typescript
+// in components/Timer
+interface TimerProps {
+  onStart: () => void;
+  onStop: () => void;
+  onTimeUpdate: (seconds: number) => void;
 }
-```###تعديلWbSoemessages
-```ypscript
-// فيlib/websock-servert
-nerface CstomMessage {
- typ: 'custm_acton';
-  daa: an;
+```
+
+### Modifying WebSocket messages
+```typescript
+// in lib/websocket-server.ts
+interface CustomMessage {
+  type: 'custom_action';
+  data: any;
 }
 ```
 
-### إضافة acievemens
-```yecript
- في ntexts/GaifiationCott
+### Adding achievements
+```typescript
+// in contexts/GamificationContext.tsx
 interface Achievement {
- id:sting;
- nam: string;
-  esription:strig;
- i: sing;
-  cond: (stat:UserStts) =>booan;
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  condition: (stats: UserStats) => boolean;
 }
 ```
 
-## 🐛 حل المشاكل# مشاكل شائعة
--**WebSockt لا يعمل** - تحقق من rt 8080
-- **الوقت لا يحفظ** - تأكد منتشغيلws-serv
-- **State onficts** - أعد تشغيل التطبيق- **Databasrror** - تحقق من صلاحيات الملفات
+## 🐛 Troubleshooting
 
-### Dbugging
-```bah
-#تشغيلمع lgging
-DEBUG=*npm run v
+### Common Issues
+- **WebSocket not working** - Check port 8080
+- **Time not saving** - Make sure ws-server is running
+- **State conflicts** - Restart the app
+- **Database error** - Check file permissions
 
-# فحص WebScketcnnection
-cl-i - -H "Conncion:Upgrde" \
-     -H "Ugrade:webcket"\
-     -H "Sc-WebSocket-Key:st"\
-     -H "S-WbScket-Vesion: 13" \
-     oalhst:8080ws
+### Debugging
+```bash
+# Run with logging
+DEBUG=* npm run dev
+
+# Check WebSocket connection
+curl -i -N \
+     -H "Connection: Upgrade" \
+     -H "Upgrade: websocket" \
+     -H "Sec-WebSocket-Key: test" \
+     -H "Sec-WebSocket-Version: 13" \
+     http://localhost:8080/ws
 ```
 
-## 📈 الأداء
+## 📈 Performance
 
-### التحسينات
-- **Lazy Loadig** - تحميل عند الحاجة
-- **Dboncing** - تقليل الطلبات
-- **Caching** - تخزين مؤقت
-- **Opistic Upes**  تحديثات تفاؤلية
+### Optimizations
+- **Lazy Loading** - Load on demand
+- **Debouncing** - Reduce requests
+- **Caching** - Temporary storage
+- **Optimistic Updates** - Optimistic updates
 
-### المقاييس
-- **WebSocke Latncy** - < 50s
-- **Dabas Opaion** - < 100
-- **UI Respns Tim** - < 16ms
-- **Memory Usg**  < 100MB
+### Metrics
+- **WebSocket Latency** - < 50ms
+- **Database Operation** - < 100ms
+- **UI Response Time** - < 16ms
+- **Memory Usage** - < 100MB
 
-## 🔒 الأمان
+## 🔒 Security
 
-### الحماية
- **In Vlidto** - التحقق من المدخلات
-- **SQL Injetion Pvention** - منع حقن SQL
-- **R Limiting**  تحديد الطلبات
-- **Data Saiization**  تنظيف البيانات
+### Protection
+- **Input Validation** - Input validation
+- **SQL Injection Prevention** - Prevent SQL injection
+- **Rate Limiting** - Rate limiting
+- **Data Sanitization** - Data sanitization
 
-### الخصوصية
-- **Local Storge** - تخزين محلي فقط
- **No Tacking** - بدون تتبع
-- **DatContl** - تحكم المستخدم
-- **MinialDaa** - بيانات ضرورية فقط
+### Privacy
+- **Local Storage** - Local storage only
+- **No Tracking** - No tracking
+- **Data Control** - User control
+- **Minimal Data** - Minimal data only
 
-## 🤝 المساهمة
+## 🤝 Contributing
 
-### كيف تساهم
-1. **Fork** المشروع
-2.**Ce Banch** لـaure
-3 **Code angs** معtess
-4.**PllRequs** معscriti
-5.**Coe Reviw** من em
+### How to contribute
+1. **Fork** the project
+2. **Create Branch** for feature
+3. **Code Changes** with tests
+4. **Pull Request** with description
+5. **Code Review** from team
 
-### المعايير
-- **TypeScrip** - أنواع قوية
-- **ESL** - كود نظيف
-- **Tess** - تغطية كاملة
-- **Doc** - توثيق واضح
+### Standards
+- **TypeScript** - Strong types
+- **ESLint** - Clean code
+- **Tests** - Full coverage
+- **Docs** - Clear documentation
 
-## 📄 الترخيص
+## 📄 License
 
-MIT Licese - حرية للاستخدام والتعديل والتوزيع
+MIT License - Freedom to use, modify, and distribute
 
-## 🙏 الشكر
+## 🙏 Acknowledgments
 
-- **N. Team** - Framewk رائع
-- **WebSket Commnty**  تقنية e-time
-- **SQLte Team** - قاعدة بيانات سريعة
-- **Rea Cmmuity** - csstem غني
+- **Next.js Team** - Amazing framework
+- **WebSocket Community** - Real-time technology
+- **SQLite Team** - Fast database
+- **React Community** - Rich ecosystem
 
 ---
 
-**🚀 تم تطويره بـ ❤️ لمساعدة الطلاب على إدارة وقت دراستهم بذكاء!**
+**🚀 Developed with ❤️ to help students manage their study time wisely!**
 
-**📧 للتواصل والدعم:**[YuCnctIo]
+**📞 For contact and support:**
+Find Mr. Frogo sitting by his pond, always ready for the next focused jump.
+
+*"The secret isn't in jumping a lot... The secret is in jumping in the right direction."* - Mr. Frogo

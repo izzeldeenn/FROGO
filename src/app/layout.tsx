@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fahman Hub",
+  title: "Frogo",
   description: "تطبيق ويب للترتيب والمؤقت",
 };
 
