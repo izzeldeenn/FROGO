@@ -74,18 +74,24 @@ class VirtualUsersManager {
     
     if (savedState && savedState.length > 0) {
       // Load from saved state
-      this.virtualUsers = savedState.map((savedUser, index) => ({
-        id: savedUser.id || `virtual-${index + 1}`,
-        username: savedUser.username || 'Unknown User',
-        avatar: savedUser.avatar || '👤',
-        studyTime: savedUser.studyTime || 1800,
-        isActive: false,
-        lastStudyTime: savedUser.lastStudyTime || Date.now() - 3600000,
-        studyPattern: savedUser.studyPattern || 'consistent',
-        nextStudyTime: now + Math.floor(seededRandom() * 3600000), // Reset next study time
-        studyDuration: this.getStudyDuration(savedUser.studyPattern || 'consistent')
-      }));
+      console.log('🔄 Restoring virtual users from saved state:', savedState.length);
+      this.virtualUsers = savedState.map((savedUser, index) => {
+        const user: VirtualUser = {
+          id: savedUser.id || `virtual-${index + 1}`,
+          username: savedUser.username || 'Unknown User',
+          avatar: savedUser.avatar || '👤',
+          studyTime: typeof savedUser.studyTime === 'number' && !isNaN(savedUser.studyTime) && savedUser.studyTime > 0 ? savedUser.studyTime : 1800,
+          isActive: false,
+          lastStudyTime: typeof savedUser.lastStudyTime === 'number' && savedUser.lastStudyTime > 0 ? savedUser.lastStudyTime : Date.now() - 3600000,
+          studyPattern: savedUser.studyPattern || 'consistent',
+          nextStudyTime: now + Math.floor(seededRandom() * 3600000), // Reset next study time
+          studyDuration: this.getStudyDuration(savedUser.studyPattern || 'consistent')
+        };
+        console.log(`✅ Restored user: ${user.username} with ${user.studyTime}s study time`);
+        return user;
+      });
     } else {
+      console.log('🆕 Creating new virtual users...');
       // Create new virtual users
       this.virtualUsers = Array.from({ length: totalVirtualUsers }, (_, index) => {
         const nameIndex = Math.floor(seededRandom() * allNames.length);
@@ -106,6 +112,22 @@ class VirtualUsersManager {
           studyDuration: this.getStudyDuration(studyPattern)
         };
       });
+      console.log(`✅ Created ${this.virtualUsers.length} new virtual users`);
+    }
+    
+    // Final validation - ensure we have valid users
+    const validUsers = this.virtualUsers.filter(user => 
+      user && 
+      user.id && 
+      user.username && 
+      typeof user.studyTime === 'number' && 
+      !isNaN(user.studyTime) && 
+      user.studyTime >= 0
+    );
+    
+    if (validUsers.length !== this.virtualUsers.length) {
+      console.warn(`⚠️ Final validation: ${this.virtualUsers.length - validUsers.length} invalid users found, keeping only ${validUsers.length}`);
+      this.virtualUsers = validUsers;
     }
   }
 
@@ -119,12 +141,41 @@ class VirtualUsersManager {
           const saveTime = parsed.timestamp || 0;
           const now = Date.now();
           if (now - saveTime < 7 * 24 * 60 * 60 * 1000) { // 7 days
-            return parsed.users || [];
+            const users = parsed.users || [];
+            // Validate loaded data
+            const validUsers = users.filter((user: any) => 
+              user && 
+              user.id && 
+              user.username && 
+              typeof user.studyTime === 'number' && 
+              !isNaN(user.studyTime) && 
+              user.studyTime >= 0
+            );
+            
+            if (validUsers.length !== users.length) {
+              console.warn(`⚠️ Loaded ${users.length} users but only ${validUsers.length} are valid`);
+              // Clean up corrupted data
+              const cleanState = {
+                timestamp: Date.now(),
+                users: validUsers
+              };
+              localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cleanState));
+            }
+            
+            console.log('📦 Loaded virtual users from localStorage:', validUsers.length);
+            return validUsers;
+          } else {
+            console.log('🕐 Saved data is too old, creating new users');
+            localStorage.removeItem(this.STORAGE_KEY); // Clean up old data
           }
         }
       }
     } catch (error) {
       console.warn('Failed to load virtual users state:', error);
+      // Clean up corrupted data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(this.STORAGE_KEY);
+      }
     }
     return null;
   }
@@ -132,9 +183,25 @@ class VirtualUsersManager {
   private saveVirtualUsersState() {
     try {
       if (typeof window !== 'undefined') {
+        // Validate all users before saving
+        const validUsers = this.virtualUsers.filter(user => 
+          user && 
+          user.id && 
+          user.username && 
+          typeof user.studyTime === 'number' && 
+          !isNaN(user.studyTime) && 
+          user.studyTime >= 0
+        );
+        
+        if (validUsers.length !== this.virtualUsers.length) {
+          console.warn(`⚠️ Found ${this.virtualUsers.length - validUsers.length} invalid users, only saving ${validUsers.length} valid ones`);
+          // Replace invalid users with fresh ones
+          this.virtualUsers = validUsers;
+        }
+        
         const stateToSave = {
           timestamp: Date.now(),
-          users: this.virtualUsers.map(user => ({
+          users: validUsers.map(user => ({
             id: user.id,
             username: user.username,
             avatar: user.avatar,
@@ -144,6 +211,7 @@ class VirtualUsersManager {
           }))
         };
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(stateToSave));
+        console.log(`💾 Saved ${validUsers.length} valid virtual users to localStorage`);
       }
     } catch (error) {
       console.warn('Failed to save virtual users state:', error);
@@ -210,20 +278,31 @@ class VirtualUsersManager {
 
   public getVirtualUsers(): UserAccountFrontend[] {
     const now = Date.now();
-    return this.virtualUsers.map(user => ({
-      id: user.id,
-      accountId: user.id,
-      username: user.username,
-      email: '',
-      hashKey: '',
-      avatar: user.avatar,
-      score: Math.floor(user.studyTime / 600), // 1 point per 10 minutes
-      rank: 0, // Will be calculated later
-      studyTime: user.studyTime,
-      studyTimeFormatted: formatStudyTime(user.studyTime),
-      createdAt: new Date(now - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random within last 30 days
-      lastActive: new Date(typeof user.lastStudyTime === 'number' && user.lastStudyTime > 0 ? user.lastStudyTime : now - 3600000).toISOString() // Fallback to 1 hour ago if invalid
-    }));
+    const virtualUsers = this.virtualUsers.map(user => {
+      // Validate user data before mapping
+      if (!user.username || !user.id || typeof user.studyTime !== 'number' || user.studyTime < 0) {
+        console.warn('⚠️ Invalid virtual user data:', user);
+        return null;
+      }
+      
+      return {
+        id: user.id,
+        accountId: user.id,
+        username: user.username,
+        email: '',
+        hashKey: '',
+        avatar: user.avatar,
+        score: Math.floor(user.studyTime / 600), // 1 point per 10 minutes
+        rank: 0, // Will be calculated later
+        studyTime: user.studyTime,
+        studyTimeFormatted: formatStudyTime(user.studyTime),
+        createdAt: new Date(now - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random within last 30 days
+        lastActive: new Date(typeof user.lastStudyTime === 'number' && user.lastStudyTime > 0 ? user.lastStudyTime : now - 3600000).toISOString() // Fallback to 1 hour ago if invalid
+      };
+    }).filter(Boolean) as UserAccountFrontend[]; // Filter out null values
+    
+    console.log(`📊 Returning ${virtualUsers.length} valid virtual users`);
+    return virtualUsers;
   }
 
   public isVirtualUser(accountId: string): boolean {
