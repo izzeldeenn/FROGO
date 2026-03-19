@@ -372,34 +372,16 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
       console.error('❌ Error message:', error.message);
       console.error('❌ Error details:', error.details);
       
-      // If table creation fails, just send a message directly
-      console.log('🔍 Debug - Table creation failed, sending message directly...');
-      const welcomeMessage = "مرحباً! 👋";
-      const messageResult = await messageDB.sendMessage(currentUserId, friendId, welcomeMessage);
-      
-      if (messageResult) {
-        console.log('✅ Message sent successfully, conversation created implicitly');
-        await loadConversations();
-        return true;
-      } else {
-        console.error('❌ Failed to send message as fallback');
-        return false;
-      }
+      // If table creation fails, just reload conversations
+      console.log('🔍 Debug - Table creation failed, reloading conversations...');
+      await loadConversations();
+      return true;
     }
     
     console.log('✅ Conversation created successfully:', data);
     
-    // Send a welcome message to make the conversation visible
-    const welcomeMessage = "مرحباً! 👋";
-    const messageResult = await messageDB.sendMessage(currentUserId, friendId, welcomeMessage);
-    
-    if (messageResult) {
-      console.log('🔍 Debug - Welcome message sent successfully');
-    } else {
-      console.error('❌ Failed to send welcome message');
-    }
-    
-    // Reload conversations to get the new one with the message
+    // Don't send automatic welcome message
+    // Just reload conversations to get the new one
     await loadConversations();
     return true;
   } catch (error) {

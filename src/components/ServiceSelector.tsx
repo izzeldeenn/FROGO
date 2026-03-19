@@ -11,6 +11,9 @@ import { YouTubeTimer } from './YouTubeTimer';
 import { UserActivityDashboard } from './UserActivityDashboard';
 import FriendshipManager from './FriendshipManager';
 import MessagingSystem from './MessagingSystem';
+import { messageDB } from '@/lib/friendship';
+import { supabase } from '@/lib/supabase';
+import { useUser } from '@/contexts/UserContext';
 
 type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'friends' | 'messages';
 
@@ -18,8 +21,10 @@ export function ServiceSelector() {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const customTheme = useCustomThemeClasses();
+  const { getCurrentUser } = useUser();
   const [activeTimer, setActiveTimer] = useState<TimerType>('stopwatch');
   const [selectedFriendForMessaging, setSelectedFriendForMessaging] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   
   // Refs for scroll containers
   const mobileScrollRef = useRef<HTMLDivElement>(null);
@@ -34,6 +39,9 @@ export function ServiceSelector() {
     setSelectedFriendForMessaging(friendId);
     setActiveTimer('messages');
     console.log('🔍 ServiceSelector - Set activeTimer to messages, friendId:', friendId);
+    
+    // Reset unread count when opening messages
+    setUnreadCount(0);
   };
 
   const renderTimer = () => {
@@ -116,7 +124,7 @@ export function ServiceSelector() {
     }
   };
 
-  // Setup scroll listeners
+  // Setup scroll listeners and unread count
   useEffect(() => {
     const mobileRef = mobileScrollRef.current;
     const desktopRef = desktopScrollRef.current;
@@ -146,6 +154,116 @@ export function ServiceSelector() {
       }
     };
   }, []);
+
+  // Fetch unread message count with realtime updates
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        console.log('🔍 fetchUnreadCount - No current user');
+        return;
+      }
+      
+      try {
+        console.log('🔍 fetchUnreadCount - Current user:', currentUser);
+        
+        // Try different ID properties
+        const userId = currentUser.id || currentUser.accountId;
+        console.log('🔍 fetchUnreadCount - Extracted user ID:', userId);
+        
+        if (!userId) {
+          console.error('❌ No valid user ID found');
+          setUnreadCount(0);
+          return;
+        }
+        
+        console.log('🔍 fetchUnreadCount - messageDB:', messageDB);
+        console.log('🔍 fetchUnreadCount - messageDB.getUnreadCount:', messageDB.getUnreadCount);
+        
+        if (typeof messageDB.getUnreadCount === 'function') {
+          const count = await messageDB.getUnreadCount(userId);
+          console.log('🔍 fetchUnreadCount - Received count:', count);
+          setUnreadCount(count);
+        } else {
+          console.error('❌ getUnreadCount is not a function on messageDB');
+          setUnreadCount(0);
+        }
+      } catch (error) {
+        console.error('❌ Error in fetchUnreadCount:', error);
+        console.error('❌ Error details:', JSON.stringify(error, null, 2));
+        setUnreadCount(0);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // Update count every 30 seconds as fallback
+    const interval = setInterval(fetchUnreadCount, 30000);
+    
+    return () => clearInterval(interval);
+  }, [getCurrentUser]);
+
+  // Realtime subscription for new messages
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+
+    const userId = currentUser.id || currentUser.accountId;
+    if (!userId) return;
+
+    console.log('🔍 Setting up realtime subscription for unread count...');
+
+    const subscription = supabase
+      .channel('unread-count')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          console.log('🔍 New message received:', payload);
+          
+          const newMessage = payload.new as any;
+          
+          // Check if this message is for the current user
+          if (newMessage.receiver_id === userId && !newMessage.read_at) {
+            console.log('🔍 New unread message for current user');
+            setUnreadCount(prev => prev + 1);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          console.log('🔍 Message updated:', payload);
+          
+          const updatedMessage = payload.new as any;
+          
+          // Check if this message was read and was for the current user
+          if (updatedMessage.receiver_id === userId && 
+              updatedMessage.read_at && 
+              !payload.old.read_at) {
+            console.log('🔍 Message marked as read, updating count');
+            setUnreadCount(prev => Math.max(0, prev - 1));
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('🔍 Unread count subscription status:', status);
+      });
+
+    return () => {
+      console.log('🔍 Unsubscribing from unread count changes');
+      subscription.unsubscribe();
+    };
+  }, [getCurrentUser]);
 
   return (
     <div className="w-full h-full flex flex-col md:flex-row">
@@ -200,6 +318,12 @@ export function ServiceSelector() {
                   {/* Active Indicator */}
                   {activeTimer === button.type && (
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border-2 border-white"></div>
+                  )}
+                  {/* Unread Count Badge */}
+                  {button.type === 'messages' && unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center px-1.5 border-2 border-white animate-pulse">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
                   )}
                 </button>
               ))}

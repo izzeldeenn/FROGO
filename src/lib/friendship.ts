@@ -437,6 +437,8 @@ export class MessageDB {
   // Get unread messages count for a user
   async getUnreadCount(userId: string): Promise<number> {
     try {
+      console.log('🔍 getUnreadCount called for userId:', userId);
+      
       const { data, error } = await supabase
         .from('messages')
         .select('id')
@@ -444,10 +446,20 @@ export class MessageDB {
         .is('read_at', null)
         .eq('is_deleted', false);
 
-      if (error) throw error;
-      return data?.length || 0;
+      console.log('🔍 getUnreadCount - data:', data);
+      console.log('🔍 getUnreadCount - error:', error);
+
+      if (error) {
+        console.error('❌ Supabase error in getUnreadCount:', error);
+        throw error;
+      }
+      
+      const count = data?.length || 0;
+      console.log('🔍 getUnreadCount - returning count:', count);
+      return count;
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      console.error('❌ Error fetching unread count:', error);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       return 0;
     }
   }
