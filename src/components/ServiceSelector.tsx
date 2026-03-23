@@ -270,7 +270,7 @@ export function ServiceSelector() {
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Active Timer - Scrollable Container */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto flex items-center justify-center">
           {renderTimer()}
         </div>
       </div>
