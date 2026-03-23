@@ -20,16 +20,7 @@ export function Timer() {
     }
     return 0;
   });
-  const [isRunning, setIsRunning] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('timer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.isRunning || false;
-      }
-    }
-    return false;
-  });
+  const [isRunning, setIsRunning] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
   const realtimeUpdateRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -42,12 +33,11 @@ export function Timer() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const state = {
-        time,
-        isRunning
+        time
       };
       localStorage.setItem('timer_state', JSON.stringify(state));
     }
-  }, [time, isRunning]);
+  }, [time]);
 
   // Clear saved state
   const clearSavedState = () => {
