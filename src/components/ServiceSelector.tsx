@@ -11,11 +11,12 @@ import { YouTubeTimer } from './YouTubeTimer';
 import { UserActivityDashboard } from './UserActivityDashboard';
 import FriendshipManager from './FriendshipManager';
 import MessagingSystem from './MessagingSystem';
+import { PDFStudyTimer } from './PDFStudyTimer';
 import { messageDB } from '@/lib/friendship';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
 
-type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'friends' | 'messages';
+type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'friends' | 'messages' | 'pdf';
 
 export function ServiceSelector() {
   const { theme } = useTheme();
@@ -60,6 +61,8 @@ export function ServiceSelector() {
         return <FriendshipManager onSwitchToMessaging={handleSwitchToMessaging} />;
       case 'messages':
         return <MessagingSystem selectedFriendId={selectedFriendForMessaging} />;
+      case 'pdf':
+        return <PDFStudyTimer />;
       default:
         return <Timer />;
     }
@@ -73,7 +76,8 @@ export function ServiceSelector() {
     { id: 'youtube', type: 'youtube' as TimerType, label: t.youtube, icon: '🎬' },
     { id: 'dashboard', type: 'dashboard' as TimerType, label: t.rank === 'ترتيب' ? 'لوحة التحكم' : 'Dashboard', icon: '📈' },
     { id: 'friends', type: 'friends' as TimerType, label: t.rank === 'ترتيب' ? 'الأصدقاء' : 'Friends', icon: '👥' },
-    { id: 'messages', type: 'messages' as TimerType, label: t.rank === 'ترتيب' ? 'الرسائل' : 'Messages', icon: '💬' }
+    { id: 'messages', type: 'messages' as TimerType, label: t.rank === 'ترتيب' ? 'الرسائل' : 'Messages', icon: '💬' },
+    { id: 'pdf', type: 'pdf' as TimerType, label: t.rank === 'ترتيب' ? 'دراسة PDF' : 'PDF Study', icon: '📚' }
   ];
 
   // Check scroll position for mobile

@@ -75,6 +75,7 @@ function HomeContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [studyStreak, setStudyStreak] = useState(0);
   const [wakeLock, setWakeLock] = useState<any>(null);
+  const [isLeftSectionCollapsed, setIsLeftSectionCollapsed] = useState(false);
 
   // Calculate study streak based on user activity (matching ActivityGraph logic)
   const calculateStudyStreak = () => {
@@ -151,6 +152,12 @@ function HomeContent() {
   // Wake Lock functionality to prevent screen from locking
   const requestWakeLock = async () => {
     try {
+      // Check if document is visible and in focus
+      if (document.hidden || !document.hasFocus()) {
+        console.warn('⚠️ Document is hidden or not in focus, skipping Wake Lock request');
+        return;
+      }
+
       if ('wakeLock' in navigator && 'request' in (navigator as any).wakeLock) {
         const wakeLockSentinel = await (navigator as any).wakeLock.request('screen');
         setWakeLock(wakeLockSentinel);
@@ -165,7 +172,11 @@ function HomeContent() {
         console.warn('⚠️ Wake Lock API not supported on this device');
       }
     } catch (error) {
-      console.error('❌ Error requesting Wake Lock:', error);
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        console.warn('⚠️ Wake Lock request denied - document may be hidden or not in focus');
+      } else {
+        console.error('❌ Error requesting Wake Lock:', error);
+      }
     }
   };
 
@@ -190,6 +201,22 @@ function HomeContent() {
       releaseWakeLock();
     };
   }, []); // Empty dependency array, will be called on mount and unmount only
+
+  // Handle visibility changes to retry wake lock when document becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isTimerActive()) {
+        // Document became visible and timer is active, try to request wake lock
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isTimerActive]);
 
   // Separate effect to handle timer state changes
   useEffect(() => {
@@ -216,11 +243,17 @@ function HomeContent() {
       setSelectedBackground(event.detail);
     };
 
+    // Listen for left section collapse events from fullscreen context
+    const handleSetLeftSectionCollapsed = (event: CustomEvent) => {
+      setIsLeftSectionCollapsed(event.detail);
+    };
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     window.addEventListener('backgroundChange', handleBackgroundChange as EventListener);
+    window.addEventListener('setLeftSectionCollapsed', handleSetLeftSectionCollapsed as EventListener);
 
     // Load saved background
     const savedBackground = localStorage.getItem('selectedBackground');
@@ -234,6 +267,7 @@ function HomeContent() {
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
       window.removeEventListener('backgroundChange', handleBackgroundChange as EventListener);
+      window.removeEventListener('setLeftSectionCollapsed', handleSetLeftSectionCollapsed as EventListener);
     };
   }, [setTimerActive]);
 
@@ -249,17 +283,17 @@ function HomeContent() {
       <div className="hidden md:flex w-full h-full">
         {/* Left section - 1/4 width */}
         <div 
-          className="w-1/4 p-6 flex flex-col h-full overflow-y-auto"
+          className={`${isLeftSectionCollapsed ? 'w-16' : 'w-1/4'} p-6 flex flex-col h-full overflow-y-auto transition-all duration-300`}
           style={{
             backgroundColor: customTheme.colors.surface,
             borderLeft: `2px solid ${customTheme.colors.border}`
           }}
         >
           <div className="flex justify-between items-start mb-6 flex-shrink-0">
-            <Logo />
+            {!isLeftSectionCollapsed && <Logo />}
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setShowThemeSelector(true)}
+                onClick={() => setIsLeftSectionCollapsed(!isLeftSectionCollapsed)}
                 className="p-2 rounded-lg transition-colors"
                 style={{
                   backgroundColor: 'transparent',
@@ -273,20 +307,47 @@ function HomeContent() {
                   e.currentTarget.style.backgroundColor = 'transparent';
                   e.currentTarget.style.color = customTheme.colors.text;
                 }}
-                title={language === 'ar' ? 'تخصيص الثيم' : 'Customize Theme'}
+                title={language === 'ar' ? (isLeftSectionCollapsed ? 'فتح القائمة' : 'إغلاق القائمة') : (isLeftSectionCollapsed ? 'Open Menu' : 'Close Menu')}
               >
-                🎨
+                {isLeftSectionCollapsed ? '☰' : '✕'}
               </button>
-              <SettingsButton />
+              {!isLeftSectionCollapsed && (
+                <>
+                  <button
+                    onClick={() => setShowThemeSelector(true)}
+                    className="p-2 rounded-lg transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: customTheme.colors.text
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                      e.currentTarget.style.color = '#ffffff';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = customTheme.colors.text;
+                    }}
+                    title={language === 'ar' ? 'تخصيص الثيم' : 'Customize Theme'}
+                  >
+                    🎨
+                  </button>
+                  <SettingsButton />
+                </>
+              )}
             </div>
           </div>
-          <CurrentUserSelector studyStreak={studyStreak} />
-          <UserRankings />
+          {!isLeftSectionCollapsed && (
+            <>
+              <CurrentUserSelector studyStreak={studyStreak} />
+              <UserRankings />
+            </>
+          )}
         </div>
         
-        {/* Right section - 3/4 width */}
+        {/* Right section - 3/4 width or full width when left is collapsed */}
         <div 
-          className="w-3/4 flex items-center justify-center p-8 relative h-full overflow-hidden"
+          className={`${isLeftSectionCollapsed ? 'w-full' : 'w-3/4'} flex items-center justify-center p-8 relative h-full overflow-hidden transition-all duration-300`}
           style={getBackgroundStyles(selectedBackground)}
         >
           <ServiceSelector />
