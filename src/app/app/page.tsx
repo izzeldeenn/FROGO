@@ -68,11 +68,85 @@ const BACKGROUNDS = [
 function HomeContent() {
   const { theme } = useTheme();
   const { language } = useLanguage();
-  const { setTimerActive } = useUser();
+  const { setTimerActive, getCurrentUser } = useUser();
   const customTheme = useCustomThemeClasses();
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [selectedBackground, setSelectedBackground] = useState('default');
   const [isLoading, setIsLoading] = useState(true);
+  const [studyStreak, setStudyStreak] = useState(0);
+
+  // Calculate study streak based on user activity
+  const calculateStudyStreak = () => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return 0;
+    
+    // Get user activities from localStorage or user data
+    const activitiesKey = `user_activities_${currentUser.id}`;
+    const storedActivities = localStorage.getItem(activitiesKey);
+    
+    if (!storedActivities) {
+      // If no activities stored, check if user has any activity today
+      const today = new Date().toDateString();
+      const lastActivity = localStorage.getItem(`last_activity_${currentUser.id}`);
+      
+      if (lastActivity) {
+        const lastActivityDate = new Date(lastActivity).toDateString();
+        if (lastActivityDate === today) {
+          return 1; // Active today, streak of 1 day
+        }
+      }
+      return 0;
+    }
+    
+    try {
+      const activities = JSON.parse(storedActivities);
+      if (!Array.isArray(activities) || activities.length === 0) return 0;
+      
+      // Sort activities by date (most recent first)
+      activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      let streak = 0;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      for (let i = 0; i < activities.length; i++) {
+        const activityDate = new Date(activities[i].date);
+        activityDate.setHours(0, 0, 0, 0);
+        
+        const daysDiff = Math.floor((today.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff === streak) {
+          // This activity is part of the consecutive streak
+          if (activities[i].duration > 0) { // Only count if there was actual study time
+            streak++;
+          } else {
+            break; // Break if no study time on this day
+          }
+        } else {
+          break; // Break if gap in consecutive days
+        }
+      }
+      
+      return streak;
+    } catch (error) {
+      console.error('Error calculating study streak:', error);
+      return 0;
+    }
+  };
+
+  useEffect(() => {
+    // Calculate initial streak
+    const streak = calculateStudyStreak();
+    setStudyStreak(streak);
+    
+    // Update streak daily
+    const streakInterval = setInterval(() => {
+      const newStreak = calculateStudyStreak();
+      setStudyStreak(newStreak);
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(streakInterval);
+  }, [getCurrentUser]);
 
   useEffect(() => {
     // Listen for fullscreen changes
@@ -161,12 +235,12 @@ function HomeContent() {
           className="w-3/4 flex items-center justify-center p-8 relative h-full overflow-hidden"
           style={getBackgroundStyles(selectedBackground)}
         >
-          <div className="absolute top-4 left-4 flex items-center space-x-2 space-x-reverse z-[9998] flex-shrink-0">
-            {selectedBackground !== 'default' && (
-              <div className="text-xs bg-black/50 text-white px-2 py-1 rounded">
-                {BACKGROUNDS.find(bg => bg.id === selectedBackground)?.name}
-              </div>
-            )}
+          <div className="absolute top-4 left-4 flex items-center space-x-3 space-x-reverse z-[9998] flex-shrink-0">
+            {/* Study Streak */}
+            <div className="flex items-center space-x-1 space-x-reverse bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full shadow-lg border border-white/30">
+              <span className="text-lg">🔥</span>
+              <span className="text-sm font-bold">{studyStreak} أيام</span>
+            </div>
           </div>
           <ServiceSelector />
         </div>
@@ -215,11 +289,11 @@ function HomeContent() {
             className="flex-1 flex items-center justify-center p-4 min-h-[60vh] flex-shrink-0 relative"
             style={getBackgroundStyles(selectedBackground)}
           >
-            {selectedBackground !== 'default' && (
-              <div className="absolute top-2 right-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
-                {BACKGROUNDS.find(bg => bg.id === selectedBackground)?.name}
-              </div>
-            )}
+            {/* Study Streak - Mobile */}
+            <div className="absolute top-2 left-2 flex items-center space-x-1 space-x-reverse bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full shadow-lg border border-white/30">
+              <span className="text-sm">🔥</span>
+              <span className="text-xs font-bold">{studyStreak} أيام</span>
+            </div>
             <ServiceSelector />
           </div>
 
