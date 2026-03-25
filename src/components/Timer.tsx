@@ -10,6 +10,14 @@ export function Timer() {
   const { theme } = useTheme();
   const { getCurrentUser, updateUserStudyTime, setTimerActive } = useUser();
   const { showFullscreenPrompt, setShowFullscreenPrompt, requestFullscreen } = useFullscreen();
+  
+  // Timer settings from localStorage
+  const [timerSettings, setTimerSettings] = useState({
+    color: '#ffffff',
+    font: 'font-mono',
+    design: 'minimal',
+    size: 'text-4xl'
+  });
   const [time, setTime] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('timer_state');
@@ -27,6 +35,69 @@ export function Timer() {
   // Handle hydration
   useEffect(() => {
     setHasHydrated(true);
+    
+    // Load timer settings from localStorage
+    if (typeof window !== 'undefined') {
+      const savedSettings = localStorage.getItem('timer_settings');
+      if (savedSettings) {
+        try {
+          const settings = JSON.parse(savedSettings);
+          setTimerSettings(settings);
+        } catch (error) {
+          console.error('Failed to load timer settings:', error);
+        }
+      }
+    }
+  }, []);
+
+  // Listen for timer settings changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'timer_settings' && e.newValue) {
+          try {
+            const settings = JSON.parse(e.newValue);
+            setTimerSettings(settings);
+          } catch (error) {
+            console.error('Failed to parse timer settings:', error);
+          }
+        }
+      };
+
+      // Listen for custom event from settings
+      const handleCustomEvent = (e: CustomEvent) => {
+        setTimerSettings(e.detail);
+      };
+
+      // Listen for storage changes
+      window.addEventListener('storage', handleStorageChange);
+      window.addEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
+
+      // Also check for direct localStorage changes (same tab)
+      const checkInterval = setInterval(() => {
+        const savedSettings = localStorage.getItem('timer_settings');
+        if (savedSettings) {
+          try {
+            const settings = JSON.parse(savedSettings);
+            setTimerSettings(prev => {
+              // Only update if actually different
+              if (JSON.stringify(prev) !== JSON.stringify(settings)) {
+                return settings;
+              }
+              return prev;
+            });
+          } catch (error) {
+            console.error('Failed to parse timer settings:', error);
+          }
+        }
+      }, 500);
+
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
+        clearInterval(checkInterval);
+      };
+    }
   }, []);
 
   // Save state to localStorage whenever it changes
@@ -161,19 +232,75 @@ export function Timer() {
     clearSavedState();
   };
 
+  // Get design-specific styles
+  const getDesignStyles = () => {
+    switch (timerSettings.design) {
+      case 'minimal':
+        return {
+          background: 'transparent',
+          padding: '0',
+          border: 'none',
+          boxShadow: 'none',
+          letterSpacing: '0.05em'
+        };
+      case 'modern':
+        return {
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+          padding: '20px 40px',
+          borderRadius: '20px',
+          border: '2px solid rgba(255,255,255,0.2)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          letterSpacing: '0.1em'
+        };
+      case 'classic':
+        return {
+          background: 'rgba(0,0,0,0.3)',
+          padding: '16px 32px',
+          borderRadius: '8px',
+          border: '1px solid rgba(255,255,255,0.3)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          fontFamily: 'Georgia, serif'
+        };
+      case 'digital':
+        return {
+          background: 'linear-gradient(135deg, #1a1a1a, #2d2d2d)',
+          padding: '24px 48px',
+          borderRadius: '12px',
+          border: '2px solid #333',
+          boxShadow: '0 0 20px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1)',
+          fontFamily: 'Courier New, monospace',
+          textShadow: '0 0 10px currentColor',
+          letterSpacing: '0.2em'
+        };
+      default:
+        return {
+          background: 'transparent',
+          padding: '0',
+          border: 'none',
+          boxShadow: 'none'
+        };
+    }
+  };
+
   return (
     <div className="text-center">
       {!hasHydrated ? (
-        <h1 className={`text-6xl font-bold mb-8 font-mono ${
-          theme === 'light' ? 'text-black' : 'text-white'
-        }`}>
+        <h1 className={`${timerSettings.size} font-bold mb-8 ${timerSettings.font}`}
+          style={{ 
+            color: timerSettings.color,
+            ...getDesignStyles()
+          }}
+        >
           00:00:00
         </h1>
       ) : (
         <>
-          <h1 className={`text-6xl font-bold mb-8 font-mono ${
-            theme === 'light' ? 'text-black' : 'text-white'
-          }`}>
+          <h1 className={`${timerSettings.size} font-bold mb-8 ${timerSettings.font}`}
+            style={{ 
+              color: timerSettings.color,
+              ...getDesignStyles()
+            }}
+          >
             {formatTime(time)}
           </h1>
           

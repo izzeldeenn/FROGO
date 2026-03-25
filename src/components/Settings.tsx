@@ -62,6 +62,8 @@ const SETTINGS_SECTIONS = [
   { id: 'profile', name: 'الملف الشخصي', icon: '👤' },
   { id: 'appearance', name: 'المظهر', icon: '🎨' },
   { id: 'themes', name: 'الثيمات', icon: '🎭' },
+  { id: 'timer', name: 'التايمر', icon: '⏱️' },
+  { id: 'countdown', name: 'العد التنازلي', icon: '⏳' },
   { id: 'account', name: 'الحساب', icon: '🔐' },
 ];
 
@@ -95,6 +97,18 @@ export function SettingsButton() {
   const [avatarPage, setAvatarPage] = useState(1);
   const [avatarSearch, setAvatarSearch] = useState('');
   const avatarsPerPage = 20;
+
+  // Timer settings
+  const [timerColor, setTimerColor] = useState('#ffffff');
+  const [timerFont, setTimerFont] = useState('font-mono');
+  const [timerDesign, setTimerDesign] = useState('minimal');
+  const [timerSize, setTimerSize] = useState('text-4xl');
+
+  // Countdown timer settings
+  const [countdownColor, setCountdownColor] = useState('#ffffff');
+  const [countdownFont, setCountdownFont] = useState('font-mono');
+  const [countdownDesign, setCountdownDesign] = useState('minimal');
+  const [countdownSize, setCountdownSize] = useState('text-4xl');
 
   const currentUser = getCurrentUser();
 
@@ -183,6 +197,29 @@ export function SettingsButton() {
     } else if (selectedAvatar) {
       updateUserAvatar(selectedAvatar);
     }
+    
+    // Save timer settings to localStorage
+    const timerSettings = {
+      color: timerColor,
+      font: timerFont,
+      design: timerDesign,
+      size: timerSize
+    };
+    localStorage.setItem('timer_settings', JSON.stringify(timerSettings));
+    
+    // Save countdown timer settings to localStorage
+    const countdownSettings = {
+      color: countdownColor,
+      font: countdownFont,
+      design: countdownDesign,
+      size: countdownSize
+    };
+    localStorage.setItem('countdown_timer_settings', JSON.stringify(countdownSettings));
+    
+    // Dispatch custom events to notify timer components
+    window.dispatchEvent(new CustomEvent('timerSettingsChanged', { detail: timerSettings }));
+    window.dispatchEvent(new CustomEvent('countdownTimerSettingsChanged', { detail: countdownSettings }));
+    
     setShowSettings(false);
   };
 
@@ -198,6 +235,37 @@ export function SettingsButton() {
         setCustomAvatarUrl('');
       }
     }
+    
+    // Load timer settings from localStorage
+    if (typeof window !== 'undefined') {
+      const savedSettings = localStorage.getItem('timer_settings');
+      if (savedSettings) {
+        try {
+          const settings = JSON.parse(savedSettings);
+          setTimerColor(settings.color || '#ffffff');
+          setTimerFont(settings.font || 'font-mono');
+          setTimerDesign(settings.design || 'minimal');
+          setTimerSize(settings.size || 'text-4xl');
+        } catch (error) {
+          console.error('Failed to load timer settings:', error);
+        }
+      }
+
+      // Load countdown timer settings from localStorage
+      const savedCountdownSettings = localStorage.getItem('countdown_timer_settings');
+      if (savedCountdownSettings) {
+        try {
+          const settings = JSON.parse(savedCountdownSettings);
+          setCountdownColor(settings.color || '#ffffff');
+          setCountdownFont(settings.font || 'font-mono');
+          setCountdownDesign(settings.design || 'minimal');
+          setCountdownSize(settings.size || 'text-4xl');
+        } catch (error) {
+          console.error('Failed to load countdown timer settings:', error);
+        }
+      }
+    }
+    
     setShowSettings(true);
   };
 
@@ -1303,6 +1371,382 @@ export function SettingsButton() {
                             </div>
                           </div>
                         )}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeSection === 'timer' && (
+                    <div className="space-y-6">
+                      <div 
+                        className="relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl"
+                        style={{
+                          background: `linear-gradient(135deg, ${customTheme.colors.surface}60, ${customTheme.colors.background}20)`,
+                          border: `1px solid ${customTheme.colors.border}20`,
+                          boxShadow: `0 8px 32px ${customTheme.colors.border}15`
+                        }}
+                      >
+                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20"
+                          style={{
+                            background: `radial-gradient(circle, ${customTheme.colors.primary}, transparent)`
+                          }}
+                        />
+                        
+                        <div className="relative">
+                          <div className="flex items-center space-x-reverse space-x-3 mb-6">
+                            <div 
+                              className="w-8 h-8 rounded-xl flex items-center justify-center"
+                              style={{
+                                background: `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`,
+                                boxShadow: `0 4px 16px ${customTheme.colors.primary}40`
+                              }}
+                            >
+                              <span className="text-white text-sm">⏱️</span>
+                            </div>
+                            <label className={`text-sm font-black uppercase tracking-wider ${
+                              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>
+                              إعدادات التايمر
+                            </label>
+                          </div>
+
+                          <div className="space-y-4">
+                            {/* Timer Color */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                لون التايمر
+                              </label>
+                              <div className="flex items-center space-x-reverse space-x-3">
+                                <input
+                                  type="color"
+                                  value={timerColor}
+                                  onChange={(e) => setTimerColor(e.target.value)}
+                                  className="w-12 h-12 rounded-xl cursor-pointer"
+                                  style={{
+                                    border: `2px solid ${customTheme.colors.border}`
+                                  }}
+                                />
+                                <input
+                                  type="text"
+                                  value={timerColor}
+                                  onChange={(e) => setTimerColor(e.target.value)}
+                                  className="flex-1 px-4 py-2 rounded-xl"
+                                  style={{
+                                    backgroundColor: customTheme.colors.surface + '40',
+                                    color: customTheme.colors.text,
+                                    border: `1px solid ${customTheme.colors.border}`
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Timer Font */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                نوع الخط
+                              </label>
+                              <select
+                                value={timerFont}
+                                onChange={(e) => setTimerFont(e.target.value)}
+                                className="w-full px-4 py-2 rounded-xl"
+                                style={{
+                                  backgroundColor: customTheme.colors.surface + '40',
+                                  color: customTheme.colors.text,
+                                  border: `1px solid ${customTheme.colors.border}`
+                                }}
+                              >
+                                <option value="font-mono">Monospace</option>
+                                <option value="font-sans">Sans Serif</option>
+                                <option value="font-serif">Serif</option>
+                                <option value="font-bold">Bold</option>
+                                <option value="font-light">Light</option>
+                              </select>
+                            </div>
+
+                            {/* Timer Design */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                التصميم
+                              </label>
+                              <div className="grid grid-cols-2 gap-3">
+                                {['minimal', 'modern', 'classic', 'digital'].map((design) => (
+                                  <button
+                                    key={design}
+                                    onClick={() => setTimerDesign(design)}
+                                    className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                                      timerDesign === design ? 'ring-2' : ''
+                                    }`}
+                                    style={{
+                                      backgroundColor: timerDesign === design 
+                                        ? customTheme.colors.primary 
+                                        : customTheme.colors.surface + '40',
+                                      color: timerDesign === design 
+                                        ? '#ffffff' 
+                                        : customTheme.colors.text,
+                                      borderColor: customTheme.colors.border,
+                                      outlineColor: timerDesign === design ? customTheme.colors.primary : 'transparent'
+                                    }}
+                                  >
+                                    {design === 'minimal' && 'بسيط'}
+                                    {design === 'modern' && 'حديث'}
+                                    {design === 'classic' && 'كلاسيكي'}
+                                    {design === 'digital' && 'رقمي'}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Timer Size */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                الحجم
+                              </label>
+                              <div className="grid grid-cols-3 gap-3">
+                                {[
+                                  { value: 'text-2xl', label: 'صغير' },
+                                  { value: 'text-4xl', label: 'متوسط' },
+                                  { value: 'text-6xl', label: 'كبير' }
+                                ].map((size) => (
+                                  <button
+                                    key={size.value}
+                                    onClick={() => setTimerSize(size.value)}
+                                    className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                                      timerSize === size.value ? 'ring-2' : ''
+                                    }`}
+                                    style={{
+                                      backgroundColor: timerSize === size.value 
+                                        ? customTheme.colors.primary 
+                                        : customTheme.colors.surface + '40',
+                                      color: timerSize === size.value 
+                                        ? '#ffffff' 
+                                        : customTheme.colors.text,
+                                      borderColor: customTheme.colors.border,
+                                      outlineColor: timerSize === size.value ? customTheme.colors.primary : 'transparent'
+                                    }}
+                                  >
+                                    {size.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Preview */}
+                            <div className="mt-6 p-4 rounded-xl"
+                              style={{
+                                backgroundColor: customTheme.colors.surface + '20',
+                                border: `1px solid ${customTheme.colors.border}`
+                              }}
+                            >
+                              <div className="text-center">
+                                <div className={`text-center ${timerFont} ${timerSize}`}
+                                  style={{ color: timerColor }}
+                                >
+                                  00:00:00
+                                </div>
+                                <p className={`text-xs mt-2 ${
+                                  theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                  معاينة التايمر
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeSection === 'countdown' && (
+                    <div className="space-y-6">
+                      <div 
+                        className="relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl"
+                        style={{
+                          background: `linear-gradient(135deg, ${customTheme.colors.surface}60, ${customTheme.colors.background}20)`,
+                          border: `1px solid ${customTheme.colors.border}20`,
+                          boxShadow: `0 8px 32px ${customTheme.colors.border}15`
+                        }}
+                      >
+                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20"
+                          style={{
+                            background: `radial-gradient(circle, ${customTheme.colors.primary}, transparent)`
+                          }}
+                        />
+                        
+                        <div className="relative">
+                          <div className="flex items-center space-x-reverse space-x-3 mb-6">
+                            <div 
+                              className="w-8 h-8 rounded-xl flex items-center justify-center"
+                              style={{
+                                background: `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`,
+                                boxShadow: `0 4px 16px ${customTheme.colors.primary}40`
+                              }}
+                            >
+                              <span className="text-white text-sm">⏳</span>
+                            </div>
+                            <label className={`text-sm font-black uppercase tracking-wider ${
+                              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>
+                              إعدادات العد التنازلي
+                            </label>
+                          </div>
+
+                          <div className="space-y-4">
+                            {/* Countdown Timer Color */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                لون العد التنازلي
+                              </label>
+                              <div className="flex items-center space-x-reverse space-x-3">
+                                <input
+                                  type="color"
+                                  value={countdownColor}
+                                  onChange={(e) => setCountdownColor(e.target.value)}
+                                  className="w-12 h-12 rounded-xl cursor-pointer"
+                                  style={{
+                                    border: `2px solid ${customTheme.colors.border}`
+                                  }}
+                                />
+                                <input
+                                  type="text"
+                                  value={countdownColor}
+                                  onChange={(e) => setCountdownColor(e.target.value)}
+                                  className="flex-1 px-4 py-2 rounded-xl"
+                                  style={{
+                                    backgroundColor: customTheme.colors.surface + '40',
+                                    color: customTheme.colors.text,
+                                    border: `1px solid ${customTheme.colors.border}`
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Countdown Timer Font */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                نوع الخط
+                              </label>
+                              <select
+                                value={countdownFont}
+                                onChange={(e) => setCountdownFont(e.target.value)}
+                                className="w-full px-4 py-2 rounded-xl"
+                                style={{
+                                  backgroundColor: customTheme.colors.surface + '40',
+                                  color: customTheme.colors.text,
+                                  border: `1px solid ${customTheme.colors.border}`
+                                }}
+                              >
+                                <option value="font-mono">Monospace</option>
+                                <option value="font-sans">Sans Serif</option>
+                                <option value="font-serif">Serif</option>
+                                <option value="font-bold">Bold</option>
+                                <option value="font-light">Light</option>
+                              </select>
+                            </div>
+
+                            {/* Countdown Timer Design */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                التصميم
+                              </label>
+                              <div className="grid grid-cols-2 gap-3">
+                                {['minimal', 'modern', 'classic', 'digital'].map((design) => (
+                                  <button
+                                    key={design}
+                                    onClick={() => setCountdownDesign(design)}
+                                    className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                                      countdownDesign === design ? 'ring-2' : ''
+                                    }`}
+                                    style={{
+                                      backgroundColor: countdownDesign === design 
+                                        ? customTheme.colors.primary 
+                                        : customTheme.colors.surface + '40',
+                                      color: countdownDesign === design 
+                                        ? '#ffffff' 
+                                        : customTheme.colors.text,
+                                      borderColor: customTheme.colors.border,
+                                      outlineColor: countdownDesign === design ? customTheme.colors.primary : 'transparent'
+                                    }}
+                                  >
+                                    {design === 'minimal' && 'بسيط'}
+                                    {design === 'modern' && 'حديث'}
+                                    {design === 'classic' && 'كلاسيكي'}
+                                    {design === 'digital' && 'رقمي'}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Countdown Timer Size */}
+                            <div>
+                              <label className={`block text-sm font-medium mb-2 ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                الحجم
+                              </label>
+                              <div className="grid grid-cols-3 gap-3">
+                                {[
+                                  { value: 'text-2xl', label: 'صغير' },
+                                  { value: 'text-4xl', label: 'متوسط' },
+                                  { value: 'text-6xl', label: 'كبير' }
+                                ].map((size) => (
+                                  <button
+                                    key={size.value}
+                                    onClick={() => setCountdownSize(size.value)}
+                                    className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                                      countdownSize === size.value ? 'ring-2' : ''
+                                    }`}
+                                    style={{
+                                      backgroundColor: countdownSize === size.value 
+                                        ? customTheme.colors.primary 
+                                        : customTheme.colors.surface + '40',
+                                      color: countdownSize === size.value 
+                                        ? '#ffffff' 
+                                        : customTheme.colors.text,
+                                      borderColor: customTheme.colors.border,
+                                      outlineColor: countdownSize === size.value ? customTheme.colors.primary : 'transparent'
+                                    }}
+                                  >
+                                    {size.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Preview */}
+                            <div className="mt-6 p-4 rounded-xl"
+                              style={{
+                                backgroundColor: customTheme.colors.surface + '20',
+                                border: `1px solid ${customTheme.colors.border}`
+                              }}
+                            >
+                              <div className="text-center">
+                                <div className={`text-center ${countdownFont} ${countdownSize}`}
+                                  style={{ color: countdownColor }}
+                                >
+                                  00:05:00
+                                </div>
+                                <p className={`text-xs mt-2 ${
+                                  theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                  معاينة العد التنازلي
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

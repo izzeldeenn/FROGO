@@ -159,16 +159,31 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     let streak = 0;
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day
+    const todayStr = today.toISOString().split('T')[0];
     let checkDate = new Date(today);
 
-    for (const contribution of sortedContributions) {
-      const contribDate = new Date(contribution.date);
-      const daysDiff = Math.floor((checkDate.getTime() - contribDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Check if there's a contribution for today
+    const todayContribution = contributions.find(c => c.date === todayStr && c.studyMinutes > 0);
+    if (!todayContribution) {
+      return 0; // No contribution today means streak is 0
+    }
+
+    // Start counting from today
+    streak = 1;
+    checkDate.setDate(checkDate.getDate() - 1);
+
+    // Count backwards through consecutive days
+    while (true) {
+      const checkDateStr = checkDate.toISOString().split('T')[0];
+      const hasContribution = contributions.some(c => 
+        c.date === checkDateStr && c.studyMinutes > 0
+      );
       
-      if (daysDiff === streak) {
+      if (hasContribution) {
         streak++;
-        checkDate = contribDate;
+        checkDate.setDate(checkDate.getDate() - 1);
       } else {
         break;
       }
