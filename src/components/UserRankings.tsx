@@ -211,10 +211,11 @@ export function UserRankings() {
                     : 'none'
                 }}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-2">
+                  {/* Top row: Rank, Avatar, and Name */}
                   <div className="flex items-center space-x-3">
                     <span 
-                      className="text-sm font-bold"
+                      className="text-sm font-bold flex-shrink-0"
                       style={{
                         color: (user.dailyRank || 0) === 1 
                           ? customTheme.colors.secondary
@@ -226,7 +227,7 @@ export function UserRankings() {
                       #{user.dailyRank || 999}
                     </span>
                     
-                    <div className="text-xl">
+                    <div className="text-xl flex-shrink-0">
                       {user.avatar?.startsWith('http') ? (
                         <img 
                           src={user.avatar} 
@@ -248,7 +249,8 @@ export function UserRankings() {
                     </div>
                   </div>
                   
-                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  {/* Bottom row: Study time indicator - always visible */}
+                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium self-start ${
                     theme === 'light'
                       ? 'bg-gradient-to-r from-yellow-50 to-green-50 text-green-700 border border-yellow-200'
                       : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-300 border border-yellow-700/50'

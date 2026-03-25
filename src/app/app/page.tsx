@@ -4,14 +4,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Logo } from '@/components/Logo';
 import { UserRankings } from '@/components/UserRankings';
 import { CurrentUserSelector } from '@/components/CurrentUserSelector';
-import { SettingsButton } from '@/components/SettingsButton';
+import { SettingsButton } from '@/components/Settings';
+import { SettingsMobileButton } from '@/components/SettingsMobile';
 import { ServiceSelector } from '@/components/ServiceSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { UserProfile } from '@/components/UserProfile';
 import { FullscreenPrompt } from '@/components/FullscreenPrompt';
 import { FullscreenProvider } from '@/contexts/FullscreenContext';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
-import { ThemeSelector } from '@/components/ThemeSelector';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { useUser } from '@/contexts/UserContext';
 import { useEffect, useState } from 'react';
@@ -70,7 +69,6 @@ function HomeContent() {
   const { language } = useLanguage();
   const { setTimerActive, isTimerActive, getCurrentUser } = useUser();
   const customTheme = useCustomThemeClasses();
-  const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [selectedBackground, setSelectedBackground] = useState('default');
   const [isLoading, setIsLoading] = useState(true);
   const [studyStreak, setStudyStreak] = useState(0);
@@ -113,21 +111,36 @@ function HomeContent() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       let checkDate = new Date(today);
-
-      for (const activity of studyActivities) {
+      
+      // Check if there's activity today
+      const todayActivity = studyActivities.find(activity => {
         const activityDate = new Date(activity.date);
         activityDate.setHours(0, 0, 0, 0);
+        return activityDate.getTime() === checkDate.getTime();
+      });
+      
+      if (!todayActivity) return 0; // No activity today, streak is 0
+      
+      streak = 1; // Today has activity, streak starts at 1
+      
+      // Check consecutive days going backwards
+      checkDate.setDate(checkDate.getDate() - 1);
+      
+      while (streak < studyActivities.length) {
+        const foundActivity = studyActivities.find(activity => {
+          const activityDate = new Date(activity.date);
+          activityDate.setHours(0, 0, 0, 0);
+          return activityDate.getTime() === checkDate.getTime();
+        });
         
-        const daysDiff = Math.floor((checkDate.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (daysDiff === streak) {
+        if (foundActivity) {
           streak++;
-          checkDate = activityDate;
+          checkDate.setDate(checkDate.getDate() - 1);
         } else {
-          break;
+          break; // Break streak if no activity found for this day
         }
       }
-
+      
       return streak;
     } catch (error) {
       console.error('Error calculating study streak:', error);
@@ -135,6 +148,7 @@ function HomeContent() {
     }
   };
 
+  // Update study streak
   useEffect(() => {
     // Calculate initial streak
     const streak = calculateStudyStreak();
@@ -149,7 +163,7 @@ function HomeContent() {
     return () => clearInterval(streakInterval);
   }, [getCurrentUser]);
 
-  // Wake Lock functionality to prevent screen from locking
+  // Wake lock functionality
   const requestWakeLock = async () => {
     try {
       // Check if document is visible and in focus
@@ -187,7 +201,7 @@ function HomeContent() {
     }
   };
 
-  // Handle Wake Lock based on timer state
+  // Request wake lock when timer starts
   useEffect(() => {
     const timerIsActive = isTimerActive();
     
@@ -239,14 +253,14 @@ function HomeContent() {
     };
 
     // Listen for background changes
-    const handleBackgroundChange = (event: CustomEvent) => {
-      setSelectedBackground(event.detail);
-    };
+  const handleBackgroundChange = (event: CustomEvent) => {
+    setSelectedBackground(event.detail);
+  };
 
     // Listen for left section collapse events from fullscreen context
-    const handleSetLeftSectionCollapsed = (event: CustomEvent) => {
-      setIsLeftSectionCollapsed(event.detail);
-    };
+  const handleSetLeftSectionCollapsed = (event: CustomEvent) => {
+    setIsLeftSectionCollapsed(event.detail);
+  };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -273,181 +287,110 @@ function HomeContent() {
 
   return (
     <>
-    <div className={`flex h-screen overflow-hidden ${
-      theme === 'light' ? 'bg-white' : 'bg-black'
-    }`}>
-      <FullscreenPrompt />
-      {isLoading && <LoadingSpinner onComplete={() => setIsLoading(false)} />}
-      
-      {/* Desktop Layout - Side by side */}
-      <div className="hidden md:flex w-full h-full">
-        {/* Left section - 1/4 width */}
-        <div 
-          className={`${isLeftSectionCollapsed ? 'w-16' : 'w-1/4'} p-6 flex flex-col h-full overflow-y-auto transition-all duration-300`}
-          style={{
-            backgroundColor: customTheme.colors.surface,
-            borderLeft: `2px solid ${customTheme.colors.border}`
-          }}
-        >
+      <div className={`flex h-screen overflow-hidden ${
+        theme === 'light' ? 'bg-white' : 'bg-black'
+      }`}>
+        <FullscreenPrompt />
+        {isLoading && <LoadingSpinner onComplete={() => setIsLoading(false)} />}
+        
+        {/* Desktop Layout - Side by side */}
+        <div className="hidden md:flex w-full h-full">
+          {/* Left section - 1/4 width */}
+          <div 
+            className={`${isLeftSectionCollapsed ? 'w-16' : 'w-1/4'} p-6 flex flex-col h-full overflow-y-auto transition-all duration-300`}
+            style={{
+              backgroundColor: customTheme.colors.surface,
+              borderLeft: `2px solid ${customTheme.colors.border}`
+            }}
+          >
           <div className="flex justify-between items-start mb-6 flex-shrink-0">
             {!isLeftSectionCollapsed && <Logo />}
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setIsLeftSectionCollapsed(!isLeftSectionCollapsed)}
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: customTheme.colors.text
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = customTheme.colors.primary;
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = customTheme.colors.text;
-                }}
-                title={language === 'ar' ? (isLeftSectionCollapsed ? 'فتح القائمة' : 'إغلاق القائمة') : (isLeftSectionCollapsed ? 'Open Menu' : 'Close Menu')}
-              >
-                {isLeftSectionCollapsed ? '☰' : '✕'}
-              </button>
-              {!isLeftSectionCollapsed && (
-                <>
-                  <button
-                    onClick={() => setShowThemeSelector(true)}
-                    className="p-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: customTheme.colors.text
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customTheme.colors.primary;
-                      e.currentTarget.style.color = '#ffffff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = customTheme.colors.text;
-                    }}
-                    title={language === 'ar' ? 'تخصيص الثيم' : 'Customize Theme'}
-                  >
-                    🎨
-                  </button>
-                  <SettingsButton />
-                </>
-              )}
+                <button
+                  onClick={() => setIsLeftSectionCollapsed(!isLeftSectionCollapsed)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: customTheme.colors.text
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = customTheme.colors.text;
+                  }}
+                  title={language === 'ar' ? (isLeftSectionCollapsed ? 'فتح القائمة' : 'إغلاق القائمة') : (isLeftSectionCollapsed ? 'Open Menu' : 'Close Menu')}
+                >
+                  {isLeftSectionCollapsed ? '☰' : '✕'}
+                </button>
+                {!isLeftSectionCollapsed && (
+                  <>
+                    <SettingsButton />
+                  </>
+                )}
+              </div>
             </div>
+            {!isLeftSectionCollapsed && (
+              <>
+                <CurrentUserSelector studyStreak={studyStreak} />
+                <UserRankings />
+              </>
+            )}
           </div>
-          {!isLeftSectionCollapsed && (
-            <>
-              <CurrentUserSelector studyStreak={studyStreak} />
-              <UserRankings />
-            </>
-          )}
-        </div>
         
-        {/* Right section - 3/4 width or full width when left is collapsed */}
-        <div 
-          className={`${isLeftSectionCollapsed ? 'w-full' : 'w-3/4'} flex items-center justify-center p-8 relative h-full overflow-hidden transition-all duration-300`}
-          style={getBackgroundStyles(selectedBackground)}
-        >
-          <ServiceSelector />
-        </div>
-      </div>
-
-      {/* Mobile Layout - Vertical */}
-      <div className="md:hidden flex flex-col w-full h-screen overflow-hidden">
-        {/* Mobile Header */}
-        <div 
-          className="flex justify-between items-center p-4 border-b sticky top-0 z-10 flex-shrink-0"
-          style={{
-            backgroundColor: customTheme.colors.surface,
-            borderColor: customTheme.colors.border
-          }}
-        >
-          <Logo />
-          <div className="flex items-center space-x-1 space-x-reverse">
-
-          <button
-                onClick={() => setShowThemeSelector(true)}
-                className="p-2 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: customTheme.colors.text
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = customTheme.colors.primary;
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = customTheme.colors.text;
-                }}
-                title={language === 'ar' ? 'تخصيص الثيم' : 'Customize Theme'}
-              >
-                🎨
-              </button>
-            <UserProfile />
-          </div>
-        </div>
-
-        {/* Mobile Content */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-          {/* Timer Section - Takes most space */}
+          {/* Right section - 3/4 width or full width when left is collapsed */}
           <div 
-            className="flex-1 flex items-center justify-center p-4 min-h-[60vh] flex-shrink-0 relative"
+            className={`${isLeftSectionCollapsed ? 'w-full' : 'w-3/4'} flex items-center justify-center p-8 relative h-full overflow-hidden transition-all duration-300`}
             style={getBackgroundStyles(selectedBackground)}
           >
             <ServiceSelector />
           </div>
+        </div>
 
-          {/* User Section - Bottom */}
+        {/* Mobile Layout - Vertical */}
+        <div className="md:hidden flex flex-col w-full h-screen overflow-hidden">
+          {/* Mobile Header */}
           <div 
-            className="p-4 border-t flex-shrink-0"
+            className="flex justify-between items-center p-4 border-b sticky top-0 z-10 flex-shrink-0"
             style={{
               backgroundColor: customTheme.colors.surface,
               borderColor: customTheme.colors.border
             }}
           >
-            <CurrentUserSelector studyStreak={studyStreak} />
-            <div className="mt-4">
-              <UserRankings />
+            <Logo />
+            <div className="flex items-center space-x-1 space-x-reverse">
+              <SettingsMobileButton />
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    {/* Theme Selector Modal */}
-    {showThemeSelector && (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-        <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl">
-          <div className={`p-6 border-b ${
-            theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700'
-          }`}>
-            <div className="flex items-center justify-between">
-              <h3 className={`text-2xl font-bold ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-200'
-              }`}>
-                {language === 'ar' ? 'تخصيص الثيم' : 'Theme Customization'}
-              </h3>
-              <button
-                onClick={() => setShowThemeSelector(false)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                  theme === 'light'
-                    ? 'hover:bg-gray-100 text-gray-600'
-                    : 'hover:bg-gray-800 text-gray-400'
-                }`}
-              >
-                ✕
-              </button>
+          {/* Mobile Content */}
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+            {/* Timer Section - Takes most space */}
+            <div 
+              className="flex-1 flex items-center justify-center p-4 min-h-[60vh] flex-shrink-0 relative"
+              style={getBackgroundStyles(selectedBackground)}
+            >
+              <ServiceSelector />
             </div>
-          </div>
-          <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-            <ThemeSelector />
+
+            {/* User Section - Bottom */}
+            <div 
+              className="p-4 border-t flex-shrink-0"
+              style={{
+                backgroundColor: customTheme.colors.surface,
+                borderColor: customTheme.colors.border
+              }}
+            >
+              <CurrentUserSelector studyStreak={studyStreak} />
+              <div className="mt-4">
+                <UserRankings />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    )}
     </>
   );
 }
