@@ -117,7 +117,7 @@ function LandingPageContent() {
               </select>
               <ThemeToggle />
               <a 
-                href="/app"
+                href="/focus"
                 className="px-6 py-2 rounded-lg font-medium transition-colors whitespace-nowrap"
                 style={{
                   backgroundColor: customTheme.colors.primary,
@@ -163,7 +163,7 @@ function LandingPageContent() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <a 
-              href="/app"
+              href="/focus"
               className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
               style={{
                 backgroundColor: customTheme.colors.primary,
@@ -351,7 +351,7 @@ function LandingPageContent() {
             }
           </p>
           <a 
-            href="/app"
+            href="/focus"
             className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
             style={{
               backgroundColor: customTheme.colors.primary,

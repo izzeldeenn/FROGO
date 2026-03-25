@@ -4,7 +4,6 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Logo } from '@/components/Logo';
 import { UserRankings } from '@/components/UserRankings';
 import { CurrentUserSelector } from '@/components/CurrentUserSelector';
-import { SettingsButton } from '@/components/Settings';
 import { SettingsMobileButton } from '@/components/SettingsMobile';
 import { ServiceSelector } from '@/components/ServiceSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -17,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TimerIndicatorProvider } from '@/contexts/TimerIndicatorContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { RankingDisplay } from '@/components/RankingDisplay';
 
 // Helper function to get background properties
 const getBackgroundStyles = (backgroundId: string) => {
@@ -73,7 +73,6 @@ function HomeContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [studyStreak, setStudyStreak] = useState(0);
   const [wakeLock, setWakeLock] = useState<any>(null);
-  const [isLeftSectionCollapsed, setIsLeftSectionCollapsed] = useState(false);
 
   // Calculate study streak based on user activity (matching ActivityGraph logic)
   const calculateStudyStreak = () => {
@@ -257,17 +256,11 @@ function HomeContent() {
     setSelectedBackground(event.detail);
   };
 
-    // Listen for left section collapse events from fullscreen context
-  const handleSetLeftSectionCollapsed = (event: CustomEvent) => {
-    setIsLeftSectionCollapsed(event.detail);
-  };
-
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     window.addEventListener('backgroundChange', handleBackgroundChange as EventListener);
-    window.addEventListener('setLeftSectionCollapsed', handleSetLeftSectionCollapsed as EventListener);
 
     // Load saved background
     const savedBackground = localStorage.getItem('selectedBackground');
@@ -281,7 +274,6 @@ function HomeContent() {
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
       window.removeEventListener('backgroundChange', handleBackgroundChange as EventListener);
-      window.removeEventListener('setLeftSectionCollapsed', handleSetLeftSectionCollapsed as EventListener);
     };
   }, [setTimerActive]);
 
@@ -293,59 +285,39 @@ function HomeContent() {
         <FullscreenPrompt />
         {isLoading && <LoadingSpinner onComplete={() => setIsLoading(false)} />}
         
-        {/* Desktop Layout - Side by side */}
-        <div className="hidden md:flex w-full h-full">
-          {/* Left section - 1/4 width */}
-          <div 
-            className={`${isLeftSectionCollapsed ? 'w-16' : 'w-1/4'} p-6 flex flex-col h-full overflow-y-auto transition-all duration-300`}
-            style={{
-              backgroundColor: customTheme.colors.surface,
-              borderLeft: `2px solid ${customTheme.colors.border}`
-            }}
-          >
-          <div className="flex justify-between items-start mb-6 flex-shrink-0">
-            {!isLeftSectionCollapsed && <Logo />}
-            <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setIsLeftSectionCollapsed(!isLeftSectionCollapsed)}
-                  className="p-2 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: customTheme.colors.text
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = customTheme.colors.primary;
-                    e.currentTarget.style.color = '#ffffff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = customTheme.colors.text;
-                  }}
-                  title={language === 'ar' ? (isLeftSectionCollapsed ? 'فتح القائمة' : 'إغلاق القائمة') : (isLeftSectionCollapsed ? 'Open Menu' : 'Close Menu')}
-                >
-                  {isLeftSectionCollapsed ? '☰' : '✕'}
-                </button>
-                {!isLeftSectionCollapsed && (
-                  <>
-                    <SettingsButton />
-                  </>
-                )}
-              </div>
+        {/* Desktop Layout - Full screen with floating sidebar */}
+        <div className="hidden md:flex w-full h-full relative">
+          
+          {/* Top Bar with Logo and Social */}
+          <div className="absolute top-0 left-0 right-0 z-40 p-6 flex justify-between items-center">
+            <Logo />
+            <div className="flex items-center space-x-4">
+              <a
+                href="/social"
+                className="px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+                style={{
+                  backgroundColor: customTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = customTheme.colors.primary;
+                }}
+              >
+                {language === 'ar' ? 'التواصل' : 'Social'}
+              </a>
             </div>
-            {!isLeftSectionCollapsed && (
-              <>
-                <CurrentUserSelector studyStreak={studyStreak} />
-                <UserRankings />
-              </>
-            )}
           </div>
-        
-          {/* Right section - 3/4 width or full width when left is collapsed */}
+
+          {/* Right section - Full width */}
           <div 
-            className={`${isLeftSectionCollapsed ? 'w-full' : 'w-3/4'} flex items-center justify-center p-8 relative h-full overflow-hidden transition-all duration-300`}
+            className="w-full flex items-center justify-center p-8 relative h-full overflow-hidden"
             style={getBackgroundStyles(selectedBackground)}
           >
             <ServiceSelector />
+            <RankingDisplay studyStreak={studyStreak} />
           </div>
         </div>
 
@@ -361,6 +333,16 @@ function HomeContent() {
           >
             <Logo />
             <div className="flex items-center space-x-1 space-x-reverse">
+              <a
+                href="/social"
+                className="px-3 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap"
+                style={{
+                  backgroundColor: customTheme.colors.primary,
+                  color: '#ffffff'
+                }}
+              >
+                {language === 'ar' ? 'التواصل' : 'Social'}
+              </a>
               <SettingsMobileButton />
             </div>
           </div>
@@ -373,6 +355,7 @@ function HomeContent() {
               style={getBackgroundStyles(selectedBackground)}
             >
               <ServiceSelector />
+              <RankingDisplay studyStreak={studyStreak} />
             </div>
 
             {/* User Section - Bottom */}

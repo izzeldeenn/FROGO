@@ -62,9 +62,18 @@ const SETTINGS_SECTIONS = [
   { id: 'profile', name: 'الملف الشخصي', icon: '👤' },
   { id: 'appearance', name: 'المظهر', icon: '🎨' },
   { id: 'themes', name: 'الثيمات', icon: '🎭' },
+  { id: 'rankings', name: 'عرض الترتيب', icon: '🏆' },
   { id: 'timer', name: 'التايمر', icon: '⏱️' },
   { id: 'countdown', name: 'العد التنازلي', icon: '⏳' },
   { id: 'account', name: 'الحساب', icon: '🔐' },
+];
+
+// Ranking display modes
+const RANKING_DISPLAY_MODES = [
+  { id: 'bottom', name: 'منبثق من الأسفل', icon: '⬆️', description: 'ينزلق من أسفل الشاشة' },
+  { id: 'side', name: 'شريط جانبي', icon: '➡️', description: 'شريط ثابت على الجانب' },
+  { id: 'floating', name: 'عائم', icon: '🎈', description: 'نافذة عائمة قابلة للتحريك' },
+  { id: 'top', name: 'منبثق من الأعلى', icon: '⬇️', description: 'ينزلق من أعلى الشاشة' },
 ];
 
 export function SettingsButton() {
@@ -109,6 +118,14 @@ export function SettingsButton() {
   const [countdownFont, setCountdownFont] = useState('font-mono');
   const [countdownDesign, setCountdownDesign] = useState('minimal');
   const [countdownSize, setCountdownSize] = useState('text-4xl');
+
+  // Ranking display mode
+  const [rankingDisplayMode, setRankingDisplayMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('rankingDisplayMode') || 'bottom';
+    }
+    return 'bottom';
+  });
 
   const currentUser = getCurrentUser();
 
@@ -439,6 +456,9 @@ export function SettingsButton() {
                           {activeSection === 'profile' && 'إدارة ملفك الشخصي والصورة الرمزية'}
                           {activeSection === 'appearance' && 'تخصيص المظهر واللغة'}
                           {activeSection === 'themes' && 'اختيار وتخصيص الثيمات والخلفيات'}
+                          {activeSection === 'rankings' && 'اختر طريقة عرض الترتيب التي تناسبك'}
+                          {activeSection === 'timer' && 'تخصيص شكل وألوان المؤقت'}
+                          {activeSection === 'countdown' && 'إعداد العد التنازلي'}
                           {activeSection === 'account' && 'إعدادات الحساب والأمان'}
                         </div>
                       </div>
@@ -1371,6 +1391,76 @@ export function SettingsButton() {
                             </div>
                           </div>
                         )}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeSection === 'rankings' && (
+                    <div className="space-y-6">
+                      <div 
+                        className="relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl"
+                        style={{
+                          background: `linear-gradient(135deg, ${customTheme.colors.surface}60, ${customTheme.colors.background}20)`,
+                          border: `1px solid ${customTheme.colors.border}20`,
+                          boxShadow: `0 8px 32px ${customTheme.colors.border}15`
+                        }}
+                      >
+                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-20"
+                          style={{
+                            background: `radial-gradient(circle, ${customTheme.colors.primary}, transparent)`,
+                          }}
+                        />
+                        
+                        <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                          🏆 طريقة عرض الترتيب
+                        </h4>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {RANKING_DISPLAY_MODES.map((mode) => (
+                            <button
+                              key={mode.id}
+                              onClick={() => {
+                                setRankingDisplayMode(mode.id);
+                                if (typeof window !== 'undefined') {
+                                  localStorage.setItem('rankingDisplayMode', mode.id);
+                                }
+                                // Dispatch event to notify ranking display change
+                                window.dispatchEvent(new CustomEvent('rankingDisplayModeChange', { detail: mode.id }));
+                              }}
+                              className={`p-4 rounded-2xl border-2 transition-all duration-300 text-right ${
+                                rankingDisplayMode === mode.id 
+                                  ? 'ring-2 ring-offset-2' 
+                                  : 'hover:scale-[1.02]'
+                              }`}
+                              style={{
+                                background: rankingDisplayMode === mode.id 
+                                  ? `linear-gradient(135deg, ${customTheme.colors.primary}20, ${customTheme.colors.accent}10)`
+                                  : `${customTheme.colors.surface}40`,
+                                borderColor: rankingDisplayMode === mode.id 
+                                  ? customTheme.colors.primary 
+                                  : `${customTheme.colors.border}40`,
+                                '--tw-ring-color': rankingDisplayMode === mode.id ? customTheme.colors.primary : undefined
+                              } as React.CSSProperties}
+                            >
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-2xl">{mode.icon}</span>
+                                <span className="font-semibold" style={{ color: customTheme.colors.text }}>
+                                  {mode.name}
+                                </span>
+                              </div>
+                              <p className={`text-sm ${
+                                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                              }`}>
+                                {mode.description}
+                              </p>
+                              {rankingDisplayMode === mode.id && (
+                                <div className="mt-2 text-xs font-medium" style={{ color: customTheme.colors.primary }}>
+                                  ✓ محدد
+                                </div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}

@@ -4,6 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
+import { messageDB } from '@/lib/friendship';
+import { supabase } from '@/lib/supabase';
+import { useUser } from '@/contexts/UserContext';
+import { SettingsButton } from '@/components/Settings';
+import { NotesComponent } from '@/components/NotesComponent';
+import { StickyNotes } from '@/components/StickyNotes';
 import { Timer } from './Timer';
 import { PomodoroTimer } from './PomodoroTimer';
 import { CountdownTimer } from './CountdownTimer';
@@ -12,9 +18,6 @@ import { UserActivityDashboard } from './UserActivityDashboard';
 import FriendshipManager from './FriendshipManager';
 import MessagingSystem from './MessagingSystem';
 import { PDFStudyTimer } from './PDFStudyTimer';
-import { messageDB } from '@/lib/friendship';
-import { supabase } from '@/lib/supabase';
-import { useUser } from '@/contexts/UserContext';
 
 type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'friends' | 'messages' | 'pdf';
 
@@ -26,6 +29,8 @@ export function ServiceSelector() {
   const [activeTimer, setActiveTimer] = useState<TimerType>('stopwatch');
   const [selectedFriendForMessaging, setSelectedFriendForMessaging] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
+  const [notes, setNotes] = useState<string>('');
   
   // Refs for scroll containers
   const mobileScrollRef = useRef<HTMLDivElement>(null);
@@ -159,7 +164,36 @@ export function ServiceSelector() {
     };
   }, []);
 
-  // Fetch unread message count with realtime updates
+  // Load slides from localStorage for indicator
+  useEffect(() => {
+    const loadSlides = () => {
+      if (typeof window !== 'undefined') {
+        const savedSlides = localStorage.getItem('userSlides');
+        if (savedSlides) {
+          try {
+            const parsedSlides = JSON.parse(savedSlides);
+            setNotes(parsedSlides.length > 0 ? 'hasSlides' : '');
+          } catch (error) {
+            console.error('Failed to load slides:', error);
+          }
+        }
+      }
+    };
+
+    loadSlides();
+    
+    // Listen for custom events when new notes are published
+    const handleStickyNotePublished = (e: CustomEvent) => {
+      console.log('🔍 ServiceSelector detected new sticky note');
+      loadSlides(); // Reload to update indicator
+    };
+
+    window.addEventListener('stickyNotePublished', handleStickyNotePublished as EventListener);
+    
+    return () => {
+      window.removeEventListener('stickyNotePublished', handleStickyNotePublished as EventListener);
+    };
+  }, []);
   useEffect(() => {
     const fetchUnreadCount = async () => {
       const currentUser = getCurrentUser();
@@ -298,50 +332,86 @@ export function ServiceSelector() {
         )}
         
         {/* Scrollable Container */}
-        <div
-          ref={mobileScrollRef}
-          className="flex justify-center items-center gap-4 p-4 overflow-x-auto"
-        >
-          {timerButtons.map((button) => (
+        <div className="flex items-center">
+          {/* Service Buttons */}
+          <div
+            ref={mobileScrollRef}
+            className="flex justify-center items-center gap-4 p-4 overflow-x-auto flex-1"
+          >
+            {/* Notes Button */}
             <button
-              key={button.id}
-              onClick={() => setActiveTimer(button.type)}
-              className={`group relative w-9 h-9 rounded-xl flex items-center justify-center text-base transition-all duration-200 flex-shrink-0 border-2 ${
-                activeTimer === button.type
-                  ? theme === 'light'
-                    ? 'bg-gray-900 text-white border-gray-900 shadow-lg'
-                    : 'bg-white text-gray-900 border-white shadow-lg'
-                  : theme === 'light'
-                    ? 'bg-white text-gray-800 border-gray-400 hover:bg-gray-100 hover:border-gray-600 hover:shadow-md'
-                    : 'bg-gray-900 text-gray-100 border-gray-500 hover:bg-gray-800 hover:border-gray-300 hover:shadow-md'
-              }`}
-              title={button.label}
+              className="group relative w-9 h-9 rounded-xl flex items-center justify-center text-base transition-all duration-200 flex-shrink-0 border-2"
+              style={{
+                backgroundColor: theme === 'light' ? '#10b981' : '#059669',
+                color: '#ffffff',
+                borderColor: theme === 'light' ? '#059669' : '#047857'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme === 'light' ? '#059669' : '#047857';
+                e.currentTarget.style.borderColor = theme === 'light' ? '#047857' : '#059669';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = theme === 'light' ? '#10b981' : '#059669';
+                e.currentTarget.style.borderColor = theme === 'light' ? '#059669' : '#047857';
+              }}
+              onClick={() => setIsNotesOpen(!isNotesOpen)}
+              title={t.rank === 'ترتيب' ? 'الملاحظات' : 'Notes'}
             >
-              <span className={`transition-transform duration-200 group-hover:scale-110 ${
-                activeTimer === button.type
-                  ? theme === 'light' ? 'text-white' : 'text-gray-900'
-                  : theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-              }`}>
-                {button.icon}
+              <span className="transition-transform duration-200 group-hover:scale-110">
+                📝
               </span>
-              {/* Active Indicator - More visible */}
-              {activeTimer === button.type && (
-                <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${
-                  theme === 'light' ? 'bg-blue-500' : 'bg-blue-400'
-                } border-2 border-white shadow-sm`}></div>
-              )}
-              {/* Unread Count Badge - More visible */}
-              {button.type === 'messages' && unreadCount > 0 && (
-                <div className={`absolute -top-1 -right-1 min-w-[18px] h-5 text-xs rounded-full flex items-center justify-center px-1.5 font-bold border-2 shadow-sm ${
-                  theme === 'light' 
-                    ? 'bg-red-500 text-white border-white' 
-                    : 'bg-red-600 text-white border-gray-900'
-                }`}>
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </div>
+              {/* Notes Indicator */}
+              {notes.trim() && (
+                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-yellow-400 border-2 border-white shadow-sm"></div>
               )}
             </button>
-          ))}
+            
+            {timerButtons.map((button) => (
+              <button
+                key={button.id}
+                onClick={() => setActiveTimer(button.type)}
+                className={`group relative w-9 h-9 rounded-xl flex items-center justify-center text-base transition-all duration-200 flex-shrink-0 border-2 ${
+                  activeTimer === button.type
+                    ? theme === 'light'
+                      ? 'bg-gray-900 text-white border-gray-900 shadow-lg'
+                      : 'bg-white text-gray-900 border-white shadow-lg'
+                    : theme === 'light'
+                      ? 'bg-white text-gray-800 border-gray-400 hover:bg-gray-100 hover:border-gray-600 hover:shadow-md'
+                      : 'bg-gray-900 text-gray-100 border-gray-500 hover:bg-gray-800 hover:border-gray-300 hover:shadow-md'
+                }`}
+                title={button.label}
+              >
+                <span className={`transition-transform duration-200 group-hover:scale-110 ${
+                  activeTimer === button.type
+                    ? theme === 'light' ? 'text-white' : 'text-gray-900'
+                    : theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
+                  {button.icon}
+                </span>
+                {/* Active Indicator - More visible */}
+                {activeTimer === button.type && (
+                  <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${
+                    theme === 'light' ? 'bg-blue-500' : 'bg-blue-400'
+                  } border-2 border-white shadow-sm`}></div>
+                )}
+                {/* Unread Count Badge - More visible */}
+                {button.type === 'messages' && unreadCount > 0 && (
+                  <div className={`absolute -top-1 -right-1 min-w-[18px] h-5 text-xs rounded-full flex items-center justify-center px-1.5 font-bold border-2 shadow-sm ${
+                    theme === 'light' 
+                      ? 'bg-red-500 text-white border-white' 
+                      : 'bg-red-600 text-white border-gray-900'
+                  }`}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          
+          {/* Fixed Settings Button */}
+          <div className="px-4 py-2 flex-shrink-0">
+            <SettingsButton />
+          </div>
         </div>
         
         {/* Right Arrow */}
@@ -358,6 +428,12 @@ export function ServiceSelector() {
           </button>
         )}
       </div>
+
+      {/* Notes Component */}
+      <NotesComponent isOpen={isNotesOpen} onClose={() => setIsNotesOpen(false)} />
+      
+      {/* Sticky Notes */}
+      <StickyNotes />
     </div>
   );
 }

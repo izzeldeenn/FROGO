@@ -13,19 +13,13 @@ export function Logo() {
           alt="Mr Frogo" 
           className="w-14 h-14 object-contain"
         />
-        <div className="flex flex-col items-center">
-          <div className={`text-2xl font-bold tracking-tight ${
-            theme === 'light' ? 'text-black' : 'text-white'
-          }`}>
-            <span className={`inline-block font-black ${
-              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
-            }`}>
+        <div className="flex flex-col items-center" style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+          <div className="text-2xl font-bold tracking-tight">
+            <span className="inline-block font-black text-white">
               Frogo
             </span>
           </div>
-          <div className={`text-xs mt-1 font-medium tracking-wider ${
-            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-          }`}>
+          <div className="text-xs mt-1 font-medium tracking-wider text-white/90">
             Focus. Rise. Organize. Go.
           </div>
         </div>
