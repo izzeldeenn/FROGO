@@ -54,6 +54,18 @@ export function PublishedSlides() {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent, slideId: string) => {
+    const slide = slides.find(s => s.id === slideId);
+    if (slide && e.touches.length === 1) {
+      const touch = e.touches[0];
+      setDraggedSlide(slideId);
+      setDragOffset({
+        x: touch.clientX - slide.position.x,
+        y: touch.clientY - slide.position.y
+      });
+    }
+  };
+
   const handleMouseMove = (e: MouseEvent) => {
     if (draggedSlide) {
       setSlides(prevSlides => 
@@ -66,7 +78,25 @@ export function PublishedSlides() {
     }
   };
 
+  const handleTouchMove = (e: TouchEvent) => {
+    if (draggedSlide && e.touches.length === 1) {
+      e.preventDefault(); // Prevent scrolling while dragging
+      const touch = e.touches[0];
+      setSlides(prevSlides => 
+        prevSlides.map(slide => 
+          slide.id === draggedSlide 
+            ? { ...slide, position: { x: touch.clientX - dragOffset.x, y: touch.clientY - dragOffset.y } }
+            : slide
+        )
+      );
+    }
+  };
+
   const handleMouseUp = () => {
+    setDraggedSlide(null);
+  };
+
+  const handleTouchEnd = () => {
     setDraggedSlide(null);
   };
 
@@ -78,10 +108,14 @@ export function PublishedSlides() {
     if (draggedSlide) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
       };
     }
   }, [draggedSlide, dragOffset]);
@@ -103,6 +137,7 @@ export function PublishedSlides() {
             borderColor: theme === 'light' ? '#e5e7eb' : '#374151'
           }}
           onMouseDown={(e) => handleMouseDown(e, slide.id)}
+          onTouchStart={(e) => handleTouchStart(e, slide.id)}
         >
           {/* Header */}
           <div className="flex justify-between items-start mb-3">
@@ -146,7 +181,7 @@ export function PublishedSlides() {
             className="mt-3 pt-2 border-t text-xs"
             style={{ borderColor: theme === 'light' ? '#e5e7eb' : '#374151', color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
           >
-            {t.rank === 'ترتيب' ? 'اسحب للتحريك' : 'Drag to move'} • {t.rank === 'ترتيب' ? 'انقر على ✕ للحذف' : 'Click ✕ to delete'}
+            {t.rank === 'ترتيب' ? 'اسحب للتحريك (ماوس/لمس)' : 'Drag to move (mouse/touch)'} • {t.rank === 'ترتيب' ? 'انقر على ✕ للحذف' : 'Click ✕ to delete'}
           </div>
         </div>
       ))}
