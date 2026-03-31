@@ -20,7 +20,7 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     category: 'radio',
     duration: '1350', // 22.5 minutes
     url: 'https://dn710109.ca.archive.org/0/items/Mobasher-Ezaa/%D8%A7%D9%84%D8%B9%D9%84%D9%82%20%D8%A7%D9%84%D9%89%20%D8%AE%D8%AA%D8%A7%D9%85%20%D8%A7%D9%84%D9%82%D8%B1%D8%A7%D9%86%20%D9%85%D8%B9%20%D8%A7%D9%84%D8%AF%D8%B9%D8%A7%D8%A1%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_kena.mp3',
-    thumbnail: '/music/thumbnails/quran-radio.jpg',
+    thumbnail: '/music/thumbnails/quran-radio.png',
     mood: 'calm',
     isLive: true
   },
@@ -31,7 +31,7 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     category: 'radio',
     duration: '2400', // 40 minutes
     url: 'https://dn710109.ca.archive.org/0/items/Mobasher-Ezaa/2022-Original-New-15-3-22.MP3',
-    thumbnail: '/music/thumbnails/quran-radio.jpg',
+    thumbnail: '/music/thumbnails/quran-radio.png',
     mood: 'calm',
     isLive: true
   },
@@ -42,7 +42,7 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     category: 'radio',
     duration: '1800', // 30 minutes
     url: 'https://ia601705.us.archive.org/28/items/Mobasher-Ezaa/%D8%A7%D9%84%D9%85%D9%86%D8%B4%D8%A7%D9%88%D9%89%20%D8%A7%D9%84%D8%A7%D8%AD%D8%B2%D8%A7%D8%A8%20%D9%85%D9%86%2021%20%D8%A7%D9%84%D9%89%2027_kena.mp3',
-    thumbnail: '/music/thumbnails/quran-radio.jpg',
+    thumbnail: '/music/thumbnails/quran-radio.png',
     mood: 'calm',
     isLive: true
   },
@@ -55,7 +55,7 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     category: 'radio',
     duration: '600', // 10 minutes
     url: 'https://dn710109.ca.archive.org/0/items/Mobasher-Ezaa/002-%D8%A7%D9%84%D8%A8%D9%82%D8%B1%D8%A9%20%D9%85%D9%86%20278%20%D8%A7%D9%84%D9%89%20282%20%D8%A7%D9%84%D8%A7%D8%B0%D8%A7%D8%B9%D8%A9%20%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B3%D8%AA%D9%8A%D9%86%D9%8A%D8%A7%D8%AA.mp3',
-    thumbnail: '/music/thumbnails/quran-radio.jpg',
+    thumbnail: '/music/thumbnails/quran-radio.png',
     mood: 'calm',
     isLive: true
   },
@@ -66,7 +66,7 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     category: 'radio',
     duration: '2668', // 44.5 minutes
     url: 'https://dn710109.ca.archive.org/0/items/Mobasher-Ezaa/12-Yusuf-1-34-High-Quality.mp3',
-    thumbnail: '/music/thumbnails/quran-radio.jpg',
+    thumbnail: '/music/thumbnails/quran-radio.png',
     mood: 'calm',
     isLive: true
   },
