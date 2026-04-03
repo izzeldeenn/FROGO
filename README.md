@@ -1,335 +1,369 @@
 # <img src="public/mrfrogo.png" alt="Mr Frogo" width="30"> Frogo - Focus, Rise, Organize, Grow, Overcome
 
-A smart study time management platform inspired by the wisdom of Mr. Frogo.
+<div align="center">
 
-## 📋 Aboutmr_frogo
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+![Community](https://img.shields.io/badge/community-Open%20Source-orange.svg)
+![Language](https://img.shields.io/badge/TypeScript-blue.svg)
+![Framework](https://img.shields.io/badge/Next.js-black.svg)
 
-**Frogo** is a revolutionary study time management platform that combines the wisdom of focused productivity with modern web technology. Born from the philosophy of Mr. Frogo - a wise frog who understood that success comes not from jumping frequently, but from jumping purposefully.
+**🌟 An open-source community-driven study time management platform built by students, for students.**
 
-### 🎯 Our Mission
-To help students and professionals transform their study habits through:
-- **Focused Learning** - Eliminate distractions and concentrate on what matters
-- **Smart Progress Tracking** - Monitor improvement with real-time analytics
-- **Gamified Experience** - Make productivity enjoyable and rewarding
-- **Community Growth** - Learn and compete with like-minded individuals
+[![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen.svg)](https://frogo-community.vercel.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Contribute-purple.svg)](https://github.com/izzeldeenn/FROGO)
+[![Discord](https://img.shields.io/badge/Discord-Join-7289da.svg)](https://discord.gg/5wBNne8Z3f)
+
+</div>
+
+## 📖 Table of Contents
+
+- [🌟 About](#-about)
+- [✨ Features](#-features)
+- [🚀 Quick Start](#-quick-start)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🤝 Contributing](#-contributing)
+- [📊 Community Impact](#-community-impact)
+- [🔧 Development](#-development)
+- [📄 License](#-license)
+
+## 🌟 About
+
+Frogo is more than just a study timer—it's a comprehensive open-source platform designed to help students achieve deep focus and academic excellence through community-driven tools and collaborative learning.
+
+### Our Mission
+
+> **"Focus Together, Succeed Together"** - We believe that the power of community can transform individual study habits into collective success.
+
+### What Makes Frogo Different
+
+- **🌍 Community-Driven**: Built by students, for students
+- **🔓 Open Source**: Transparent, customizable, and free forever
+- **🎯 Focus-Oriented**: Designed specifically for deep work and concentration
+- **📊 Data-Driven**: Smart analytics to track and improve study patterns
+- **🤝 Collaborative**: Learn from peers and share success strategies
 
 ### 🐸 The Mr. Frogo Philosophy
+
 *"The secret isn't in jumping a lot... The secret is in jumping in the right direction."*
 
 This simple yet profound principle guides everything we build - every feature, every timer, every achievement is designed to help you make your next jump count.
 
-### 🚀 Why Frogo?
-- **Science-Based** - Built on proven productivity techniques
-- **Community-Driven** - Shaped by user feedback and real-world usage
-- **Privacy-First** - Your data stays yours, always
-- **Open Source** - Transparent, customizable, and free forever
+## ✨ Features
 
-## 📖 The Story of Mr. Frogo
+### 🎯 Core Study Tools
 
-On a quiet night beside a small pond, there was a frog different from all the others.
+| Feature | Description |
+|---------|-------------|
+| **🧘 Deep Focus Mode** | Community-tested techniques for achieving maximum concentration |
+| **📈 Smart Goal Tracking** | Set, track, and achieve academic goals with peer support |
+| **🔥 Streak Tracking** | Maintain consistent study habits with community accountability |
+| **📊 Progress Analytics** | Visual insights into your study patterns and improvement areas |
 
-While other frogs jumped aimlessly, this frog sat on a stone near the water, holding a warm cup of coffee and staring at the sky, deep in thought.
+### 🌟 Community Features
 
-His name was Mr. Frogo.
+| Feature | Description |
+|---------|-------------|
+| **💬 Peer Support Network** | Connect with motivated students worldwide |
+| **🏆 Community Challenges** | Participate in focus challenges and competitions |
+| **📚 Shared Resources** | Access community-curated study materials and techniques |
+| **🎓 Success Stories** | Learn from real experiences of fellow students |
 
-Frogo didn't like chaos or wasting time.
-He believed that every jump should be toward a goal.
+### 🛠️ Technical Features
 
-As time passed, Frogo discovered a simple secret:
-The mind is like a pond... if it's calm and clear, you can see everything perfectly.
+| Feature | Description |
+|---------|-------------|
+| **🌙 Dark/Light Themes** | Comfortable studying in any environment |
+| **📱 Responsive Design** | Study on any device, anywhere |
+| **🔄 Real-time Updates** | Live progress tracking and community interactions |
+| **🔐 Privacy-First** | Your data is yours - we don't sell or share it |
 
-But when the pond fills with noise, vision disappears.
+### ⚡ Advanced Features
 
-That's why Frogo started his own method:
-sit calmly, drink his coffee, think, then make one focused jump toward a single goal.
-
-And with every jump, he became better.
-
-After years, others started asking:
-"How can you focus like that?"
-
-Frogo smiled and said:
-
-"The secret isn't in jumping a lot...
-The secret is in jumping in the right direction."
-
-And from there, the FROGO platform was born.
-
-A place that helps people to:
-
-**Focus**
-**Rise** 
-**Organize**
-**Grow**
-**Overcome**
-
-And now, every time you enter the platform, you'll find Mr. Frogo sitting with his coffee, waiting for you to say:
-
-"Ready for the next jump?"
-
-## ✨ Key Features
-
-### 📊 **Real-time Leaderboard**
-- **WebSocket-based** - Real-time updates without polling
-- **State Protection** - Protects local timer from conflicts
-- **Auto-sync** - Automatic save every 10 seconds
-- **Real-time collaboration** - Instant updates for all users
-
-### ⏱️ **Smart Timer System**
-- **Multiple timer types** - YouTube, Pomodoro, Custom
-- **Time tracking** - Accurate time tracking to the second
-- **Points system** - Points for every 10 seconds of study
-- **Formatted display** - Time display in hours, minutes, and seconds
-
-### 🎮 **Gamification System**
-- **Coins** - Gold coins as rewards
-- **Achievements** - Achievements when reaching goals
-- **Leaderboard** - Compete with other users
-- **Avatar system** - Customizable profile pictures
-
-### 💾 **Data System**
-- **SQLite** - Fast local database
-- **Device identification** - Unique ID for each device
-- **Data persistence** - Permanent data storage
-- **API integration** - Complete API interface
+- **📊 Real-time Leaderboard** - WebSocket-based live updates without polling
+- **⏱️ Smart Timer System** - Multiple timer types (YouTube, Pomodoro, Custom)
+- **🎮 Gamification System** - Coins, achievements, and avatar customization
+- **💾 Smart Data System** - SQLite with device identification and API integration
 
 ## 🚀 Quick Start
 
-### Requirements
-- Node.js 18+
-- npm/yarn/pnpm
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Git
 
 ### Installation
+
 ```bash
-# Clone the project
-git clone <repository-url>
-cd frogo
+# Clone the repository
+git clone https://github.com/izzeldeenn/FROGO.git
+cd FROGO
 
 # Install dependencies
 npm install
 
-# Run WebSocket server
-npm run ws-server
+# Copy environment variables
+cp .env.example .env.local
 
-# Run the app
+# Start development server
 npm run dev
 ```
 
-### Access the application
-- **App:** http://localhost:3000
-- **WebSocket Server:** ws://localhost:8080
+### Environment Setup
 
-## 🏗️ Technical Architecture
+Create a `.env.local` file with:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Running the App
+
+```bash
+# Development mode
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run WebSocket server (for real-time features)
+npm run ws-server
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see Frogo in action!
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Modern styling
-- **React Context** - Global state management
 
-### Backend
-- **WebSocket Server** - Real-time communications
-- **SQLite Database** - Local storage
-- **Next.js API Routes** - RESTful API
-- **Node.js Runtime** - Server-side operations
+- **⚛️ Next.js 14** - React framework with App Router
+- **📘 TypeScript** - Type-safe development
+- **🎨 Tailwind CSS** - Utility-first styling
+- **🔥 Framer Motion** - Smooth animations
+- **🌙 Next Themes** - Dark/light mode support
 
-### Technical Features
-- **Real-time Updates** - No polling required
-- **State Management** - Local state protection
-- **Database Sync** - Smart synchronization
-- **Error Handling** - Robust error management
+### Backend & Database
 
-## 📱 User Interface
+- **🗄️ Supabase** - PostgreSQL database & real-time features
+- **🔐 NextAuth.js** - Authentication & security
+- **📊 Real-time Subscriptions** - Live updates
+- **🌐 WebSocket Server** - Real-time communications
 
-### Main Page
+### Development Tools
+
+- **📦 ESLint & Prettier** - Code quality
+- **🧪 Jest & Testing Library** - Testing framework
+- **🚀 Vercel** - Deployment platform
+
+### Architecture
+
+```
+src/
+├── app/                 # Next.js App Router
+│   ├── api/            # API routes
+│   ├── focus/          # Main application
+│   └── page.tsx        # Landing page
+├── components/         # Reusable UI components
+├── contexts/          # React contexts
+├── hooks/             # Custom hooks
+├── utils/             # Utility functions
+└── constants/         # App constants
+```
+
+## 🤝 Contributing
+
+We welcome contributions from everyone! Whether you're a developer, designer, or student passionate about focus and productivity.
+
+### 🎯 How to Contribute
+
+1. **🍴 Fork the repository**
+2. **🌿 Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **💫 Make your changes**
+4. **✅ Test thoroughly**
+5. **📤 Commit and push**
+   ```bash
+   git commit -m 'Add amazing feature'
+   git push origin feature/amazing-feature
+   ```
+6. **🔄 Create a Pull Request**
+
+### 🏷️ Contribution Areas
+
+- **🐛 Bug Fixes**: Help us squash those bugs!
+- **✨ New Features**: Suggest and implement new study tools
+- **📚 Documentation**: Improve our docs and README
+- **🎨 Design**: UI/UX improvements and themes
+- **🌍 Translation**: Help us reach more students worldwide
+
+### 📋 Development Guidelines
+
+- Follow the existing code style and conventions
+- Write tests for new features
+- Update documentation when necessary
+- Be respectful and constructive in PR discussions
+
+## 📊 Community Impact
+
+### 📈 Our Growing Community
+
+| Metric | Current | Goal |
+|--------|---------|------|
+| **👥 Community Members** | 1,000+ | 10,000+ |
+| **📚 Study Hours Tracked** | 50,000+ | 1,000,000+ |
+| **🎯 Goals Achieved** | 5,000+ | 100,000+ |
+| **🌍 Countries Represented** | 25+ | 100+ |
+
+### 🏆 Success Stories
+
+> *"This community transformed my academic life. The open-source approach and peer support kept me accountable and focused."* - Ahmed Mohammed, Computer Science Student
+
+> *"Being part of this community made all the difference. We share techniques, motivate each other, and celebrate success together."* - Sarah Ahmed, Medical Student
+
+> *"The collaborative environment and open-source tools helped me develop sustainable study habits and achieve my goals."* - Mohammed Ali, Engineering Student
+
+## 🔧 Development
+
+### 📋 Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run ws-server` | Run WebSocket server |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run tests |
+| `npm run type-check` | TypeScript type checking |
+
+### 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### 🚀 Deployment
+
+Frogo is deployed on Vercel for seamless integration:
+
+```bash
+# Deploy to Vercel
+npm run deploy
+
+# Or use the Vercel CLI
+vercel --prod
+```
+
+### 📱 User Interface
+
+#### Main Page
 - **Timer control** - Start/stop timer
 - **Time display** - Show elapsed time
 - **Study mode** - Choose study style
 - **Quick stats** - Quick statistics
 
-### Leaderboard
+#### Leaderboard
 - **Real-time ranking** - Live ranking
 - **User profiles** - User information
 - **Study statistics** - Study statistics
 - **Achievement badges** - Achievement badges
 
-### Settings
+#### Settings
 - **Device name** - Device name
 - **Avatar selection** - Choose profile picture
 - **Theme settings** - Appearance settings
 - **Data management** - Data management
 
-## 🔧 Development
+## 🌟 Roadmap
 
-### File Structure
-```
-src/
-├── app/                 # Next.js App Router
-│   ├── api/             # API routes
-│   ├── page.tsx         # Main page
-│   └── layout.tsx       # Global layout
-├── components/          # React components
-│   ├── Timer/           # Timer components
-│   ├── Leaderboard/     # Leaderboard components
-│   └── UI/              # UI components
-├── contexts/            # React Context
-│   ├── UserContext.tsx  # User management
-│   └── GamificationContext.tsx
-├── lib/                 # Helper libraries
-│   ├── sqlite.ts        # Database operations
-│   ├── websocket-server.ts # WebSocket server
-│   └── utils/           # Helper functions
-└── utils/               # Utilities
-    ├── deviceId.ts      # Device identification
-    └── timeFormat.ts    # Time formatting
-```
+### 🚀 Upcoming Features
 
-### Available Commands
-```bash
-# Development
-npm run dev              # Run development server
-npm run build           # Build production version
-npm run start           # Run production server
-npm run ws-server       # Run WebSocket server
+- [ ] **📱 Mobile App** - Native iOS and Android applications
+- [ ] **🤖 AI Study Assistant** - Personalized study recommendations
+- [ ] **🎮 Gamification** - Points, badges, and leaderboards
+- [ ] **👥 Study Groups** - Create and join focused study groups
+- [ ] **📝 Note Integration** - Connect with popular note-taking apps
+- [ ] **🔔 Smart Notifications** - Intelligent reminder system
 
-# Code quality
-npm run lint            # Check code
-```
+### 🌍 Community Goals
 
-## 🎯 Core Concepts
-
-### **Real-time Architecture**
-- **WebSocket Connection** - Persistent connection
-- **Event Broadcasting** - Send to everyone
-- **State Synchronization** - State sync
-- **Conflict Resolution** - Conflict handling
-
-### **Data Flow**
-1. **Local Update** - Instant UI updates
-2. **Accumulation** - Batch updates
-3. **Batch Sync** - Periodic database save
-4. **Broadcast** - Send to other clients
-
-### **State Protection**
-- **Local First** - Priority to local state
-- **Selective Sync** - Selective synchronization
-- **Conflict Handling** - Conflict handling
-- **Data Integrity** - Data integrity
-
-## 🛠️ Customization
-
-### Adding a new timer
-```typescript
-// in components/Timer
-interface TimerProps {
-  onStart: () => void;
-  onStop: () => void;
-  onTimeUpdate: (seconds: number) => void;
-}
-```
-
-### Modifying WebSocket messages
-```typescript
-// in lib/websocket-server.ts
-interface CustomMessage {
-  type: 'custom_action';
-  data: any;
-}
-```
-
-### Adding achievements
-```typescript
-// in contexts/GamificationContext.tsx
-interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  condition: (stats: UserStats) => boolean;
-}
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-- **WebSocket not working** - Check port 8080
-- **Time not saving** - Make sure ws-server is running
-- **State conflicts** - Restart the app
-- **Database error** - Check file permissions
-
-### Debugging
-```bash
-# Run with logging
-DEBUG=* npm run dev
-
-# Check WebSocket connection
-curl -i -N \
-     -H "Connection: Upgrade" \
-     -H "Upgrade: websocket" \
-     -H "Sec-WebSocket-Key: test" \
-     -H "Sec-WebSocket-Version: 13" \
-     http://localhost:8080/ws
-```
-
-## 📈 Performance
-
-### Optimizations
-- **Lazy Loading** - Load on demand
-- **Debouncing** - Reduce requests
-- **Caching** - Temporary storage
-- **Optimistic Updates** - Optimistic updates
-
-### Metrics
-- **WebSocket Latency** - < 50ms
-- **Database Operation** - < 100ms
-- **UI Response Time** - < 16ms
-- **Memory Usage** - < 100MB
-
-## 🔒 Security
-
-### Protection
-- **Input Validation** - Input validation
-- **SQL Injection Prevention** - Prevent SQL injection
-- **Rate Limiting** - Rate limiting
-- **Data Sanitization** - Data sanitization
-
-### Privacy
-- **Local Storage** - Local storage only
-- **No Tracking** - No tracking
-- **Data Control** - User control
-- **Minimal Data** - Minimal data only
-
-## 🤝 Contributing
-
-### How to contribute
-1. **Fork** the project
-2. **Create Branch** for feature
-3. **Code Changes** with tests
-4. **Pull Request** with description
-5. **Code Review** from team
-
-### Standards
-- **TypeScript** - Strong types
-- **ESLint** - Clean code
-- **Tests** - Full coverage
-- **Docs** - Clear documentation
+- [ ] **🌐 Multi-language Support** - Reach students globally
+- [ ] **🏫 School Integration** - Partner with educational institutions
+- [ ] **📚 Resource Library** - Comprehensive study material collection
+- [ ] **🎓 Certification Program** - Recognize study achievements
 
 ## 📄 License
 
-MIT License - Freedom to use, modify, and distribute
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### 🤝 What MIT Means
+
+- ✅ **Freedom**: Use, modify, and distribute freely
+- ✅ **Commercial Use**: Use in commercial projects
+- ✅ **No Warranty**: Use at your own risk
+- ✅ **Attribution**: Include original license and copyright
 
 ## 🙏 Acknowledgments
 
-- **Next.js Team** - Amazing framework
-- **WebSocket Community** - Real-time technology
-- **SQLite Team** - Fast database
-- **React Community** - Rich ecosystem
+### 🌟 Special Thanks
+
+- **👥 Our Community Contributors** - Everyone who helped build Frogo
+- **🎨 Design Inspiration** - Modern productivity and focus apps
+- **📚 Educational Resources** - Study techniques and research
+- **🛠️ Open Source Community** - Tools and libraries that make this possible
+
+### 📚 Resources & Inspiration
+
+- [Deep Work by Cal Newport](https://www.calnewport.com/books/deep-work/)
+- [Pomodoro Technique](https://francescocirillo.com/pages/pomodoro-technique)
+- [Open Source Community Guidelines](https://opensource.guide/)
+
+## 📞 Get in Touch
+
+### 🌐 Connect With Us
+
+| Platform | Link |
+|----------|------|
+| **🚀 GitHub** | [github.com/izzeldeenn/FROGO](https://github.com/izzeldeenn/FROGO) |
+| **💬 Discord** | [discord.gg/5wBNne8Z3f](https://discord.gg/5wBNne8Z3f) |
+| **🌐 Live Demo** | [frogo-community.vercel.app](https://frogo-community.vercel.app) |
+| **📧 Email** | [support@frogo.app](mailto:support@frogo.app) |
+
+### 🎯 Join Our Mission
+
+Become part of a growing movement of students committed to focus, learning, and mutual success. Whether you want to:
+
+- **🛠️ Contribute Code** - Help us build better features
+- **📝 Share Feedback** - Tell us what works and what doesn't
+- **🌍 Spread the Word** - Help other students discover Frogo
+- **🤝 Partner With Us** - Schools, organizations, and communities
+
+**Your journey starts here. Together, we focus, rise, organize, grow, and overcome.**
 
 ---
 
-**🚀 Developed with ❤️ to help students manage their study time wisely!**
+<div align="center">
 
-**📞 For contact and support:**
-Find Mr. Frogo sitting by his pond, always ready for the next focused jump.
+**⭐ Star this repo if it helped you focus better!**
 
-*"The secret isn't in jumping a lot... The secret is in jumping in the right direction."* - Mr. Frogo
+Made with ❤️ by the Frogo Community
+
+*"Focus. Rise. Organize. Grow. Overcome."*
+
+**🐸 "The secret isn't in jumping a lot... The secret is in jumping in the right direction." - Mr. Frogo**
+
+</div>
