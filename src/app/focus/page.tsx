@@ -1,13 +1,13 @@
 'use client';
 
 import { useTheme } from '@/contexts/ThemeContext';
-import { Logo } from '@/components/Logo';
-import { UserRankings } from '@/components/UserRankings';
-import { CurrentUserSelector } from '@/components/CurrentUserSelector';
-import { SettingsMobileButton } from '@/components/SettingsMobile';
-import { ServiceSelector } from '@/components/ServiceSelector';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { FullscreenPrompt } from '@/components/FullscreenPrompt';
+import { Logo } from '@/components/ui/Logo';
+import { UserRankings } from '@/components/users/UserRankings';
+import { CurrentUserSelector } from '@/components/users/CurrentUserSelector';
+import { SettingsMobileButton } from '@/components/settings/SettingsMobile';
+import { ServiceSelector } from '@/components/ui/ServiceSelector';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { FullscreenPrompt } from '@/components/ui/FullscreenPrompt';
 import { FullscreenProvider } from '@/contexts/FullscreenContext';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
@@ -15,14 +15,14 @@ import { useUser } from '@/contexts/UserContext';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TimerIndicatorProvider } from '@/contexts/TimerIndicatorContext';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { RankingDisplay } from '@/components/RankingDisplay';
-import { ChallengesButton } from '@/components/ChallengesButton';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { RankingDisplay } from '@/components/study/RankingDisplay';
+import { ChallengesButton } from '@/components/study/ChallengesButton';
 import { BACKGROUNDS } from '@/constants/backgrounds';
 import { useFirstTimeSetup } from '@/hooks/useFirstTimeSetup';
-import { OnboardingWizard } from '@/components/OnboardingWizard';
-import { MusicPlayer } from '@/components/MusicPlayer';
-import { MusicToggleButton } from '@/components/MusicToggleButton';
+import { OnboardingWizard } from '@/components/auth/OnboardingWizard';
+import { MusicPlayer } from '@/components/music/MusicPlayer';
+import { MusicToggleButton } from '@/components/music/MusicToggleButton';
 import { dailyActivityDB } from '@/lib/dailyActivity';
 
 // User account interface for profile modal

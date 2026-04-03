@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { LanguageLayout } from '@/components/LanguageLayout';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { Logo } from '@/components/Logo';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageLayout } from '@/components/ui/LanguageLayout';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { Logo } from '@/components/ui/Logo';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { landingTexts, features, testimonials, stats } from '@/constants/landingTexts';

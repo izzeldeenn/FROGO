@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
@@ -10,6 +11,7 @@ export function ChallengesButton() {
   const { theme } = useTheme();
   const { language } = useLanguage();
   const customTheme = useCustomThemeClasses();
+  const router = useRouter();
   const [isChallengesOpen, setIsChallengesOpen] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -98,6 +100,44 @@ export function ChallengesButton() {
     </button>
   );
 
+  const renderRealTimeChallengeButton = () => (
+    <button
+      onClick={() => router.push('/challenge')}
+      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, #ef4444, #dc2626)`,
+        boxShadow: `0 4px 16px #ef444430, 0 0 0 2px #ef444415`,
+        color: '#ffffff'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+        e.currentTarget.style.boxShadow = `0 6px 24px #ef444440, 0 0 0 2px #ef444420`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1) translateY(0)';
+        e.currentTarget.style.boxShadow = `0 4px 16px #ef444430, 0 0 0 2px #ef444415`;
+      }}
+      aria-label={language === 'ar' ? 'تحدي فوري' : 'Real-time Challenge'}
+      title={language === 'ar' ? 'تحدي فوري مع لاعبين حقيقيين' : 'Real-time challenge with live players'}
+    >
+      {/* Real-time Challenge Icon with Animation */}
+      <div className="relative flex items-center justify-center">
+        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+          ⚔️
+        </span>
+        {/* Pulse Effect for Live Indicator */}
+        <div className="absolute inset-0 rounded-2xl bg-red-400 opacity-0 group-hover:opacity-30 animate-pulse" />
+        {/* Shine Effect */}
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
+          style={{
+            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
+          }}
+        />
+      </div>
+    </button>
+  );
+
   const renderChallengesModal = () => (
     <>
       {renderChallengesButton()}
@@ -153,5 +193,10 @@ export function ChallengesButton() {
     </>
   );
 
-  return renderChallengesModal();
+  return (
+    <div className="flex flex-col gap-3">
+      {renderRealTimeChallengeButton()}
+      {renderChallengesModal()}
+    </div>
+  );
 }

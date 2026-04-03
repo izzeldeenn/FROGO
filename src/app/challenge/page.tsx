@@ -1,0 +1,777 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useUser } from '@/contexts/UserContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useRouter } from 'next/navigation';
+
+// Opponent interface
+interface Opponent {
+  id: string;
+  username: string;
+  avatar: string;
+  score: number;
+  studyTime: number;
+  isStudying: boolean;
+  studyStartTime?: number;
+  lastActive: number;
+  behavior: 'consistent' | 'competitive' | 'strategic';
+  rank: number;
+  level: number;
+}
+
+// Challenge state interface
+interface ChallengeState {
+  isActive: boolean;
+  opponent: Opponent | null;
+  startTime: number | null;
+  userStudyTime: number;
+  opponentStudyTime: number;
+  winner: 'user' | 'opponent' | null;
+  isUserStudying: boolean;
+  challengeDuration: number; // Total challenge duration in seconds
+  userProgress: number;
+  opponentProgress: number;
+}
+
+// Arabic names for realistic opponents
+const ARABIC_NAMES = [
+  'أحمد محمد', 'فاطمة الزهراء', 'عبدالله خالد', 'مريم أحمد', 
+  'يوسف عمر', 'عائشة علي', 'محمد عبدالرحمن', 'خديجة سعيد',
+  'عمر حسن', 'نورا سالم', 'علي محمود', 'زينب خالد',
+  'إبراهيم ياسر', 'سارة أحمد', 'عبدالرحمن محمد', 'ليلى حسن'
+];
+
+// Check if string is a URL
+const isUrl = (str: string) => {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Generate DiceBear avatar URL
+const generateAvatar = (seed: string) => `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+
+// Generate random seed for avatar
+const generateRandomSeed = () => Math.random().toString(36).substring(2, 15);
+
+export default function ChallengePage() {
+  const { theme } = useTheme();
+  const { getCurrentUser, updateUserStudyTime, setTimerActive, isTimerActive } = useUser();
+  const router = useRouter();
+  
+  const [challengeState, setChallengeState] = useState<ChallengeState>({
+    isActive: false,
+    opponent: null,
+    startTime: null,
+    userStudyTime: 0,
+    opponentStudyTime: 0,
+    winner: null,
+    isUserStudying: true, // Start studying immediately
+    challengeDuration: 0,
+    userProgress: 0,
+    opponentProgress: 0
+  });
+  
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchProgress, setSearchProgress] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const opponentIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Generate realistic random opponent
+  const generateOpponent = (): Opponent => {
+    const behaviors: Array<'consistent' | 'competitive' | 'strategic'> = ['consistent', 'competitive', 'strategic'];
+    const behavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+    
+    // Generate score based on behavior
+    let score: number;
+    switch (behavior) {
+      case 'competitive':
+        score = Math.floor(Math.random() * 500) + 800; // High score
+        break;
+      case 'consistent':
+        score = Math.floor(Math.random() * 300) + 400; // Medium score
+        break;
+      case 'strategic':
+        score = Math.floor(Math.random() * 400) + 600; // Medium-high score
+        break;
+    }
+    
+    const rank = Math.floor(score / 100) + 1;
+    const level = Math.floor(score / 200) + 1;
+    const avatarSeed = generateRandomSeed();
+    
+    return {
+      id: `opponent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      username: ARABIC_NAMES[Math.floor(Math.random() * ARABIC_NAMES.length)],
+      avatar: generateAvatar(avatarSeed),
+      score,
+      studyTime: 0,
+      isStudying: true,
+      studyStartTime: Date.now(),
+      lastActive: Date.now(),
+      behavior,
+      rank,
+      level
+    };
+  };
+
+  // Simulate opponent study behavior
+  const simulateOpponentBehavior = (opponent: Opponent) => {
+    if (!challengeState.isActive || !opponent) return;
+
+    const now = Date.now();
+    const sessionDuration = (now - (opponent.studyStartTime || now)) / 1000; // in seconds
+
+    switch (opponent.behavior) {
+      case 'consistent':
+        // Studies consistently with short breaks
+        if (Math.random() > 0.95) { // 5% chance to take a short break
+          opponent.isStudying = false;
+          setTimeout(() => {
+            opponent.isStudying = true;
+          }, Math.random() * 30000 + 10000); // 10-40 seconds break
+        }
+        break;
+        
+      case 'competitive':
+        // Studies aggressively, rarely takes breaks
+        if (sessionDuration > 300 && Math.random() > 0.98) { // Only after 5 minutes, 2% chance
+          opponent.isStudying = false;
+          setTimeout(() => {
+            opponent.isStudying = true;
+          }, Math.random() * 15000 + 5000); // 5-20 seconds break
+        }
+        break;
+        
+      case 'strategic':
+        // Takes strategic breaks every few minutes
+        if (sessionDuration > 180 && Math.random() > 0.90) { // After 3 minutes, 10% chance
+          opponent.isStudying = false;
+          setTimeout(() => {
+            opponent.isStudying = true;
+          }, Math.random() * 45000 + 15000); // 15-60 seconds break
+        }
+        break;
+    }
+
+    // Update opponent study time
+    if (opponent.isStudying) {
+      opponent.studyTime += 1;
+    }
+
+    setChallengeState(prev => ({
+      ...prev,
+      opponent: { ...opponent },
+      opponentStudyTime: opponent.studyTime
+    }));
+  };
+
+  // Start challenge
+  const startChallenge = async () => {
+    // Reset challenge state completely before starting new search
+    resetChallenge();
+    
+    setIsSearching(true);
+    setSearchProgress(0);
+
+    // Simulate searching for opponent
+    const searchInterval = setInterval(() => {
+      setSearchProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(searchInterval);
+          return 100;
+        }
+        return prev + Math.random() * 15 + 5;
+      });
+    }, 200);
+
+    setTimeout(() => {
+      clearInterval(searchInterval);
+      const opponent = generateOpponent();
+      const startTime = Date.now();
+      
+      setChallengeState({
+        isActive: true,
+        opponent,
+        startTime,
+        userStudyTime: 0,
+        opponentStudyTime: 0,
+        winner: null,
+        isUserStudying: true, // Start studying immediately
+        challengeDuration: 0,
+        userProgress: 0,
+        opponentProgress: 0
+      });
+      
+      setIsSearching(false);
+      setSearchProgress(0);
+      
+      // Start opponent simulation
+      opponentIntervalRef.current = setInterval(() => {
+        simulateOpponentBehavior(opponent);
+      }, 1000);
+      
+      // Start main timer - both timers count immediately
+      intervalRef.current = setInterval(() => {
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime) / 1000);
+        
+        setChallengeState(prev => {
+          // Update challenge duration
+          const newDuration = elapsed;
+          
+          // Update user study time (always counting)
+          const newUserTime = newDuration;
+          
+          // Update opponent study time based on their behavior
+          let newOpponentTime = prev.opponentStudyTime;
+          if (opponent.isStudying) {
+            newOpponentTime = newOpponentTime + 1;
+          }
+          
+          // Calculate progress (based on study time)
+          const maxTime = 600; // 10 minutes max for progress bar
+          const newUserProgress = Math.min((newUserTime / maxTime) * 100, 100);
+          const newOpponentProgress = Math.min((newOpponentTime / maxTime) * 100, 100);
+          
+          // Check if user stopped (user is not studying anymore)
+          if (!prev.isUserStudying && prev.userStudyTime > 0) {
+            endChallenge('opponent');
+            return prev;
+          }
+          
+          // Check if opponent stopped
+          if (!opponent.isStudying && newOpponentTime > 0) {
+            endChallenge('user');
+            return prev;
+          }
+          
+          return {
+            ...prev,
+            challengeDuration: newDuration,
+            userStudyTime: newUserTime,
+            opponentStudyTime: newOpponentTime,
+            userProgress: newUserProgress,
+            opponentProgress: newOpponentProgress
+          };
+        });
+        
+        // Update actual user study time
+        updateUserStudyTime(1);
+      }, 1000);
+      
+      setTimerActive(true);
+    }, 2000 + Math.random() * 4000); // 2-6 seconds search time for more realistic feel
+  };
+
+  // Handle user stopping study (user can only stop, not start)
+  const handleUserStopStudy = () => {
+    if (!challengeState.isActive || !challengeState.isUserStudying) return;
+    
+    setChallengeState(prev => ({
+      ...prev,
+      isUserStudying: false
+    }));
+    
+    setTimerActive(false);
+    
+    // User stopped, check if opponent is still studying
+    if (challengeState.opponent?.isStudying) {
+      endChallenge('opponent');
+    }
+  };
+
+  // Check for winner (handled in main timer now)
+  useEffect(() => {
+    if (!challengeState.isActive || !challengeState.opponent) return;
+
+    // This is now handled in the main timer interval
+  }, [challengeState.isActive, challengeState.opponent]);
+
+  const endChallenge = (winner: 'user' | 'opponent') => {
+    setChallengeState(prev => ({
+      ...prev,
+      winner,
+      isActive: false
+    }));
+
+    // Clear intervals
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (opponentIntervalRef.current) {
+      clearInterval(opponentIntervalRef.current);
+      opponentIntervalRef.current = null;
+    }
+
+    setTimerActive(false);
+  };
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const resetChallenge = () => {
+    setChallengeState({
+      isActive: false,
+      opponent: null,
+      startTime: null,
+      userStudyTime: 0,
+      opponentStudyTime: 0,
+      winner: null,
+      isUserStudying: true, // Reset to default
+      challengeDuration: 0,
+      userProgress: 0,
+      opponentProgress: 0
+    });
+  };
+
+  const goBack = () => {
+    router.push('/focus');
+  };
+
+  // Cleanup intervals on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (opponentIntervalRef.current) clearInterval(opponentIntervalRef.current);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-black text-gray-100 flex flex-col items-center justify-center p-4">
+      {/* Header */}
+      <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
+        <button
+          onClick={goBack}
+          className="px-4 py-2 text-gray-400 hover:text-gray-100 hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          العودة
+        </button>
+        <div className="w-16" /> {/* Spacer for centering */}
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl w-full">
+        {!challengeState.isActive && !challengeState.winner && !isSearching && (
+          /* Search Screen */
+          <div className="text-center">
+            <div className="mb-12">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-semibold text-gray-100 mb-4">
+                ابدأ تحدي الدراسة
+              </h2>
+              <p className="text-gray-400 text-lg mb-2">
+                ابحث عن متحدي وابدأ منافسة الدراسة
+              </p>
+              <p className="text-gray-500 text-sm">
+                يبدأ التحدي تلقائياً عند العثور على خصم - أول من يتوقف يخسر
+              </p>
+            </div>
+            
+            <button
+              onClick={startChallenge}
+              className="px-8 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-lg font-medium transition-colors"
+            >
+              البحث عن متحدي
+            </button>
+            
+            <div className="mt-8 bg-gray-900 rounded-lg p-4 max-w-sm mx-auto">
+              <h3 className="font-medium text-gray-100 mb-2">قواعد التحدي</h3>
+              <div className="space-y-1 text-sm text-gray-400">
+                <p>الفائز هو من يدرس لفترة أطول</p>
+                <p>عندما يتوقف أحد المتنافسين، يخسر التحدي</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isSearching && (
+          /* Searching Screen */
+          <div className="text-center">
+            <div className="mb-8">
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-100 mb-2">
+                جاري البحث عن متحدي...
+              </h2>
+            </div>
+            
+            <div className="w-full max-w-sm mx-auto mb-6">
+              <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-gray-900 h-full transition-all duration-300"
+                  style={{ width: `${searchProgress}%` }}
+                />
+              </div>
+              <p className="text-gray-400 mt-2 text-sm">{Math.floor(searchProgress)}%</p>
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-4 max-w-sm mx-auto">
+              <p className="text-gray-400 text-sm">يتم البحث عن منافس مناسب لك...</p>
+            </div>
+          </div>
+        )}
+
+        {challengeState.isActive && challengeState.opponent && (
+          /* Active Challenge Screen */
+          <div>
+            {/* Timer Display */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-4 bg-gray-900 border border-gray-700 rounded-lg px-6 py-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-100">
+                    التحدي جارٍ
+                  </h2>
+                  <p className="text-gray-400 font-mono text-sm">
+                    {formatTime(Math.floor((Date.now() - (challengeState.startTime || Date.now())) / 1000))}
+                  </p>
+                </div>
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              </div>
+            </div>
+
+            {/* Battle Arena */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* User Card */}
+              <div className={`bg-gray-900 border-2 rounded-lg p-6 transition-all ${
+                challengeState.isUserStudying ? 'border-green-500' : 'border-gray-700 opacity-75'
+              }`}>
+                {/* Status Badge */}
+                <div className={`inline-block px-2 py-1 rounded text-xs font-medium mb-4 ${
+                  challengeState.isUserStudying ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {challengeState.isUserStudying ? 'نشط' : 'متوقف'}
+                </div>
+                
+                <div className="text-center">
+                  {/* User Avatar */}
+                  <div className="relative inline-block mb-4">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 p-1">
+                      <div className="w-full h-full rounded-full bg-gray-50 flex items-center justify-center">
+                        {(() => {
+                          const currentUser = getCurrentUser();
+                          return currentUser?.avatar ? (
+                            <img 
+                              src={isUrl(currentUser.avatar) ? currentUser.avatar : generateAvatar(currentUser.avatar)}
+                              alt="User Avatar" 
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <img 
+                              src={generateAvatar(currentUser?.accountId || 'user')}
+                              alt="User Avatar" 
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          );
+                        })()}
+                      </div>
+                    </div>
+                    {challengeState.isUserStudying && (
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                    )}
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-gray-100 mb-2">{getCurrentUser()?.username || 'أنت'}</h3>
+                  
+                  {/* User Stats */}
+                  <div className="mb-4 space-y-2">
+                    <div className="flex justify-center items-center gap-2 text-sm">
+                      <span className="text-gray-400">المستوى:</span>
+                      <span className="font-medium text-gray-100">{Math.floor((getCurrentUser()?.score || 0) / 100) + 1}</span>
+                    </div>
+                    <div className="flex justify-center items-center gap-2 text-sm">
+                      <span className="text-gray-400">النقاط:</span>
+                      <span className="font-medium text-gray-100">{getCurrentUser()?.score || 0}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Study Time Display */}
+                  <div className="bg-gray-800 rounded-lg p-4 mb-4">
+                    <div className="text-2xl font-semibold text-gray-100 mb-1">
+                      {formatTime(challengeState.userStudyTime)}
+                    </div>
+                    <div className="text-xs text-gray-400">وقت الدراسة</div>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-green-500 h-full transition-all duration-300"
+                      style={{ width: `${challengeState.userProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* VS Divider */}
+              <div className="md:hidden flex items-center justify-center py-2">
+                <div className="px-3 py-1 bg-gray-800 rounded text-sm font-medium text-gray-300">VS</div>
+              </div>
+
+              {/* Opponent Card */}
+              <div className={`bg-gray-900 border-2 rounded-lg p-6 transition-all ${
+                challengeState.opponent.isStudying ? 'border-green-500' : 'border-gray-700 opacity-75'
+              }`}>
+                {/* Status Badge */}
+                <div className={`inline-block px-2 py-1 rounded text-xs font-medium mb-4 ${
+                  challengeState.opponent.isStudying ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {challengeState.opponent.isStudying ? 'نشط' : 'متوقف'}
+                </div>
+                
+                <div className="text-center">
+                  {/* Opponent Avatar */}
+                  <div className="relative inline-block mb-4">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 p-1">
+                      <div className="w-full h-full rounded-full bg-gray-50 flex items-center justify-center">
+                        <img 
+                          src={challengeState.opponent.avatar}
+                          alt="Opponent Avatar" 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    {challengeState.opponent.isStudying && (
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                    )}
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-gray-100 mb-2">{challengeState.opponent.username}</h3>
+                  
+                  {/* Opponent Stats */}
+                  <div className="mb-4 space-y-2">
+                    <div className="flex justify-center items-center gap-2 text-sm">
+                      <span className="text-gray-400">المستوى:</span>
+                      <span className="font-medium text-gray-100">{challengeState.opponent.rank}</span>
+                    </div>
+                    <div className="flex justify-center items-center gap-2 text-sm">
+                      <span className="text-gray-400">النقاط:</span>
+                      <span className="font-medium text-gray-100">{challengeState.opponent.score}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Study Time Display */}
+                  <div className="bg-gray-800 rounded-lg p-4 mb-4">
+                    <div className="text-2xl font-semibold text-gray-100 mb-1">
+                      {formatTime(challengeState.opponentStudyTime)}
+                    </div>
+                    <div className="text-xs text-gray-400">وقت الدراسة</div>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-green-500 h-full transition-all duration-300"
+                      style={{ width: `${challengeState.opponentProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* VS Badge - Desktop */}
+            <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+              <div className="bg-gray-800 text-gray-300 rounded-full w-12 h-12 flex items-center justify-center font-medium text-sm">
+                VS
+              </div>
+            </div>
+
+            {/* Control Button */}
+            <div className="text-center">
+              <button
+                onClick={handleUserStopStudy}
+                disabled={!challengeState.isUserStudying}
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              >
+                إيقاف الدراسة
+              </button>
+            </div>
+
+            {/* Challenge Info */}
+            <div className="mt-6 bg-gray-900 rounded-lg p-4">
+              <div className="flex justify-between items-center text-sm">
+                <div>
+                  <p className="text-gray-400">استراتيجية الخصم</p>
+                  <p className="font-medium text-gray-100">
+                    {challengeState.opponent.behavior === 'competitive' ? 'تنافسية' :
+                     challengeState.opponent.behavior === 'consistent' ? 'منتظمة' : 'استراتيجية'}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-400">حالة التحدي</p>
+                  <p className="font-medium text-green-400">جارٍ</p>
+                </div>
+                <div className="text-left">
+                  <p className="text-gray-400">القاعدة</p>
+                  <p className="font-medium text-gray-100">آخر من يتوقف يفوز</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {challengeState.winner && (
+          /* Result Screen */
+          <div className="text-center">
+            <div className="mb-8">
+              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">
+                  {challengeState.winner === 'user' ? '🏆' : '😔'}
+                </span>
+              </div>
+              <h2 className={`text-2xl font-semibold mb-2 ${
+                challengeState.winner === 'user' ? 'text-gray-100' : 'text-gray-400'
+              }`}>
+                {challengeState.winner === 'user' ? 'لقد فزت!' : 'لقد خسرت'}
+              </h2>
+              <p className="text-gray-400">
+                {challengeState.winner === 'user' 
+                  ? 'أحسن عمل! لقد درست لفترة أطول من خصمك'
+                  : 'حاول مرة أخرى في التحدي القادم'
+                }
+              </p>
+            </div>
+
+            {/* Results Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* User Result Card */}
+              <div className={`bg-gray-900 border-2 rounded-lg p-6 ${
+                challengeState.winner === 'user' ? 'border-green-500' : 'border-gray-700'
+              }`}>
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-gray-100 mb-4">أدائك</h3>
+                  <div className="space-y-3">
+                    <div className="bg-gray-800 rounded-lg p-4">
+                      <div className="text-xl font-semibold text-gray-100 mb-1">
+                        {formatTime(challengeState.userStudyTime)}
+                      </div>
+                      <div className="text-xs text-gray-400">وقت الدراسة</div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">النقاط:</span>
+                      <span className="font-medium text-gray-100">{getCurrentUser()?.score || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">المستوى:</span>
+                      <span className="font-medium text-gray-100">{Math.floor((getCurrentUser()?.score || 0) / 100) + 1}</span>
+                    </div>
+                  </div>
+                  {challengeState.winner === 'user' && (
+                    <div className="mt-4 px-3 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
+                      فائز!
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Opponent Result Card */}
+              <div className={`bg-gray-900 border-2 rounded-lg p-6 ${
+                challengeState.winner === 'opponent' ? 'border-green-500' : 'border-gray-700'
+              }`}>
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-gray-100 mb-4">الخصم</h3>
+                  <div className="space-y-3">
+                    <div className="bg-gray-800 rounded-lg p-4">
+                      <div className="text-xl font-semibold text-gray-100 mb-1">
+                        {formatTime(challengeState.opponentStudyTime)}
+                      </div>
+                      <div className="text-xs text-gray-400">وقت الدراسة</div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">الاسم:</span>
+                      <span className="font-medium text-gray-100">{challengeState.opponent?.username}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">النقاط:</span>
+                      <span className="font-medium text-gray-100">{challengeState.opponent?.score}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">المستوى:</span>
+                      <span className="font-medium text-gray-100">{challengeState.opponent?.rank}</span>
+                    </div>
+                  </div>
+                  {challengeState.winner === 'opponent' && (
+                    <div className="mt-4 px-3 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
+                      فائز!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Statistics Summary */}
+            <div className="bg-gray-900 rounded-lg p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-100 mb-4">إحصائيات التحدي</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-lg font-semibold text-gray-100">
+                    {formatTime(challengeState.userStudyTime)}
+                  </div>
+                  <div className="text-xs text-gray-400">وقتك</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-semibold text-gray-100">
+                    {formatTime(challengeState.opponentStudyTime)}
+                  </div>
+                  <div className="text-xs text-gray-400">وقت الخصم</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-semibold text-gray-100">
+                    {formatTime(Math.abs(challengeState.userStudyTime - challengeState.opponentStudyTime))}
+                  </div>
+                  <div className="text-xs text-gray-400">فرق الوقت</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-semibold text-gray-100">
+                    {formatTime(challengeState.challengeDuration)}
+                  </div>
+                  <div className="text-xs text-gray-400">مدة التحدي</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={startChallenge}
+                className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors"
+              >
+                تحدي جديد
+              </button>
+              <button
+                onClick={resetChallenge}
+                className="px-6 py-3 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-100 rounded-lg font-medium transition-colors"
+              >
+                العودة للرئيسية
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

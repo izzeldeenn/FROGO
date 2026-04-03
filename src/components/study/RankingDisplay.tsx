@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
-import { UserRankings } from './UserRankings';
-import { CurrentUserSelector } from './CurrentUserSelector';
+import { UserRankings } from '../users/UserRankings';
+import { CurrentUserSelector } from '../users/CurrentUserSelector';
 
 interface RankingDisplayProps {
   studyStreak: number;

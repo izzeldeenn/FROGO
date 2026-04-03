@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useGamification } from '@/contexts/GamificationContext';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { dailyActivityDB } from '@/lib/dailyActivity';
 
 const AVATARS = [

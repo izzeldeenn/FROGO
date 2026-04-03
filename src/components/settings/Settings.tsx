@@ -6,14 +6,14 @@ import { useGamification } from '@/contexts/GamificationContext';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomTheme, getThemeClasses } from '@/contexts/CustomThemeContext';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { AuthModal } from '@/components/AuthModal';
-import { AccountSwitcher } from '@/components/AccountSwitcher';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { AccountSwitcher } from '@/components/users/AccountSwitcher';
 import { dailyActivityDB } from '@/lib/dailyActivity';
 import { ActivityContribution } from '@/lib/dailyActivity';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { BACKGROUNDS } from '@/constants/backgrounds';
-import { PresetSelector } from '@/components/PresetSelector';
+import { PresetSelector } from '@/components/settings/PresetSelector';
 
 // Generate 250 avatars dynamically
 const AVATARS = Array.from({ length: 250 }, (_, i) => 

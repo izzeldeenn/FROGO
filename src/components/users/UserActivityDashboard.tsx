@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
-import { ActivityGraph } from './ActivityGraph';
+import { ActivityGraph } from '../study/ActivityGraph';
 import { dailyActivityDB, ActivityContribution, DailyActivityFrontend } from '@/lib/dailyActivity';
 
 interface UserActivityDashboardProps {

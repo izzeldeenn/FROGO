@@ -6,7 +6,7 @@ import { UserProvider } from "@/contexts/UserContext";
 import { GamificationProvider } from "@/contexts/GamificationContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Analytics } from "@vercel/analytics/next";
-import { FirstTimeSetup } from "@/components/FirstTimeSetup";
+import { FirstTimeSetup } from "@/components/auth/FirstTimeSetup";
 import { MusicProvider } from "@/contexts/MusicContext";
 
 const geistSans = Geist({

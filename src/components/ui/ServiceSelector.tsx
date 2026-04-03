@@ -7,19 +7,18 @@ import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { messageDB } from '@/lib/friendship';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
-import { SettingsButton } from '@/components/Settings';
-import { MusicPlayer } from '@/components/MusicPlayer';
-import { NotesComponent } from '@/components/NotesComponent';
-import { StickyNotes } from '@/components/StickyNotes';
-import { Timer } from './Timer';
-import { PomodoroTimer } from './PomodoroTimer';
-import { CountdownTimer } from './CountdownTimer';
-import { YouTubeTimer } from './YouTubeTimer';
-import { UserActivityDashboard } from './UserActivityDashboard';
-import { PDFStudyTimer } from './PDFStudyTimer';
-import { TaskBoard } from './TaskBoard';
+import { SettingsButton } from '@/components/settings/Settings';
+import { MusicPlayer } from '@/components/music/MusicPlayer';
+import { NotesComponent } from '@/components/chat/NotesComponent';
+import { StickyNotes } from '@/components/chat/StickyNotes';
+import { Timer } from '../timers/Timer';
+import { PomodoroTimer } from '../timers/PomodoroTimer';
+import { CountdownTimer } from '../timers/CountdownTimer';
+import { YouTubeTimer } from '../timers/YouTubeTimer';
+import { UserActivityDashboard } from '../users/UserActivityDashboard';
+import { PDFStudyTimer } from '../timers/PDFStudyTimer';
 
-type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'pdf' | 'tasks';
+type TimerType = 'stopwatch' | 'pomodoro' | 'countdown' | 'youtube' | 'dashboard' | 'pdf';
 
 export function ServiceSelector() {
   const { theme } = useTheme();
@@ -54,8 +53,6 @@ export function ServiceSelector() {
         return <UserActivityDashboard />;
       case 'pdf':
         return <PDFStudyTimer />;
-      case 'tasks':
-        return <TaskBoard />;
       default:
         return <Timer />;
     }
@@ -68,8 +65,7 @@ export function ServiceSelector() {
     { id: 'countdown', type: 'countdown' as TimerType, label: t.countdown, icon: '⏳' },
     { id: 'youtube', type: 'youtube' as TimerType, label: t.youtube, icon: '🎬' },
     { id: 'dashboard', type: 'dashboard' as TimerType, label: t.rank === 'ترتيب' ? 'لوحة التحكم' : 'Dashboard', icon: '📈' },
-    { id: 'pdf', type: 'pdf' as TimerType, label: t.rank === 'ترتيب' ? 'دراسة PDF' : 'PDF Study', icon: '📚' },
-    { id: 'tasks', type: 'tasks' as TimerType, label: t.tasks === 'المهام' ? 'tasks' : 'Tasks', icon: '✅' }
+    { id: 'pdf', type: 'pdf' as TimerType, label: t.rank === 'ترتيب' ? 'دراسة PDF' : 'PDF Study', icon: '📚' }
   ];
 
   // Check scroll position for mobile
