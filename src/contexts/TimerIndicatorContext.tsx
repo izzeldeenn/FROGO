@@ -13,7 +13,6 @@ export function TimerIndicatorProvider({ children }: { children: ReactNode }) {
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   const setTimerActiveState = (active: boolean) => {
-    console.log('🎯 TimerIndicator: Setting timer active to:', active);
     setIsTimerActive(active);
     
     // Also store in localStorage for backup

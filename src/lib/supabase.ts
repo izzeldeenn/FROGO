@@ -18,7 +18,6 @@ if (supabaseAnonKey.length < 20) {
   throw new Error('❌ Invalid Supabase key format. Please check your environment variables.');
 }
 
-console.log('✅ Supabase environment variables validated successfully');
 
 // Create Supabase client
 export const supabase = createClient(
@@ -75,7 +74,6 @@ export class UserAccountDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching all users:', error);
       return [];
     }
   }
@@ -92,7 +90,6 @@ export class UserAccountDB {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching user by accountId:', error);
       return null;
     }
   }
@@ -100,8 +97,6 @@ export class UserAccountDB {
   // Update existing user by account_id
   async updateUserByAccountId(accountId: string, userData: Partial<UserAccount>): Promise<UserAccount | null> {
     try {
-      console.log('🔄 Updating existing user:', accountId);
-      
       // Remove id field to let PostgreSQL keep the existing UUID
       const { id, ...userDataWithoutId } = userData;
       
@@ -113,15 +108,11 @@ export class UserAccountDB {
         .single();
 
       if (error) {
-        console.error('❌ Supabase update error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
-      console.log('✅ User updated successfully:', data);
       return data;
     } catch (error) {
-      console.error('Error updating user:', error);
       return null;
     }
   }
@@ -129,8 +120,6 @@ export class UserAccountDB {
   // Create or update user (upsert)
   async upsertUser(userData: Partial<UserAccount>): Promise<UserAccount | null> {
     try {
-      console.log('🔄 Upserting user with data:', userData);
-      
       // Remove id field to let PostgreSQL auto-generate UUID
       const { id, ...userDataWithoutId } = userData;
       
@@ -141,15 +130,11 @@ export class UserAccountDB {
         .single();
 
       if (error) {
-        console.error('❌ Supabase upsert error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
-      console.log('✅ User upserted successfully:', data);
       return data;
     } catch (error) {
-      console.error('Error upserting user:', error);
       return null;
     }
   }
@@ -170,7 +155,6 @@ export class UserAccountDB {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating user score:', error);
       return null;
     }
   }
@@ -201,7 +185,6 @@ export class UserAccountDB {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating user profile:', error);
       return null;
     }
   }
@@ -209,15 +192,12 @@ export class UserAccountDB {
   // Subscribe to real-time changes
   subscribeToUsers(callback: (records: UserAccount[]) => void) {
     try {
-      console.log('🔄 Setting up Supabase real-time subscription...');
-      
       // Subscribe to the users table for real-time updates
       const subscription = supabase
         .channel('users_changes')
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'users' },
           async (payload) => {
-            console.log('🔄 Real-time update received:', payload);
             // Refetch all users when any change occurs
             const users = await this.getAllUsers();
             callback(users);
@@ -227,11 +207,10 @@ export class UserAccountDB {
 
       // Initial load
       this.getAllUsers().then(callback);
-      console.log('✅ Supabase real-time subscription established');
       
       return subscription;
     } catch (error) {
-      console.error('❌ Error subscribing to users:', error);
+      // Error subscribing to users
     }
   }
 
@@ -240,7 +219,7 @@ export class UserAccountDB {
     try {
       supabase.channel('users_changes').unsubscribe();
     } catch (error) {
-      console.error('Error unsubscribing from users:', error);
+      // Error unsubscribing from users
     }
   }
 
@@ -250,7 +229,6 @@ export class UserAccountDB {
       const { data, error } = await supabase.from('users').select('id').limit(1);
       return !error;
     } catch (error) {
-      console.error('Supabase initialization failed:', error);
       return false;
     }
   }
@@ -262,18 +240,14 @@ export const userDB = UserAccountDB.getInstance();
 // Check if Supabase is available
 export const isSupabaseAvailable = async (): Promise<boolean> => {
   try {
-    console.log('🔍 Testing Supabase connection...');
     const { data, error } = await supabase.from('users').select('id').limit(1);
     
     if (error) {
-      console.error('❌ Supabase connection test failed:', error);
       return false;
     }
     
-    console.log('✅ Supabase connection successful');
     return true;
   } catch (error) {
-    console.error('❌ Supabase connection error:', error);
     return false;
   }
 };

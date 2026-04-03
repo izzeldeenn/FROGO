@@ -127,7 +127,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         // Try fallback track (different from current)
         const fallbackTrack = MUSIC_TRACKS.find(t => t.id !== track.id && t.url !== track.url);
         if (fallbackTrack) {
-          console.log('Trying fallback track:', fallbackTrack.name);
           setTimeout(() => playTrack(fallbackTrack), 1000); // Delay to prevent infinite loops
         } else {
           console.error('No fallback tracks available');
@@ -138,7 +137,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       
       // Add load success handler
       audioRef.current.addEventListener('canplay', () => {
-        console.log('Audio loaded successfully:', track.name);
       }, { once: true });
       
       // Attempt to play
@@ -158,11 +156,9 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             console.error('Error playing track:', error);
             // Handle autoplay policy restrictions
             if (error.name === 'NotAllowedError') {
-              console.log('Autoplay prevented by browser. User interaction required.');
               setIsPlaying(false);
               setCurrentTrack(null);
             } else if (error.name === 'NotSupportedError') {
-              console.log('Media format not supported:', track.url);
               // Try next track
               const nextTrack = MUSIC_TRACKS.find(t => t.id !== track.id);
               if (nextTrack) {

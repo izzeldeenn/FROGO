@@ -62,7 +62,6 @@ export function MusicPlayer({ isVisible: externalVisible, setIsVisible: external
   };
 
   const handleClose = () => {
-    console.log('Closing music player');
     currentSetVisible(false);
   };
 

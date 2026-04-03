@@ -17,7 +17,6 @@ export function FirstTimeSetup() {
           // Mark that default preset has been applied
           localStorage.setItem('defaultPresetApplied', 'true');
           
-          console.log('Applied productive preset for first-time user');
         }
       } catch (error) {
         console.error('Error in first time setup:', error);

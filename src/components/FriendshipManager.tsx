@@ -102,9 +102,7 @@ export default function FriendshipManager({ onSwitchToMessaging }: FriendshipMan
         }
       }
 
-      console.log('🔄 Loading friendship data...');
       setFriends(friendsWithDetails);
-      console.log('🔄 Friends data updated:', friendsWithDetails.length, 'friends loaded');
       setPendingRequests(pendingData.map(req => ({
         id: req.id,
         senderId: req.sender_id,
@@ -122,9 +120,7 @@ export default function FriendshipManager({ onSwitchToMessaging }: FriendshipMan
         updatedAt: req.updated_at
       })));
       setAllUsers(usersData.filter(u => u.account_id !== currentUser.accountId));
-      console.log('🔄 All friendship data loaded successfully');
     } catch (error) {
-      console.error('Error loading friendship data:', error);
     } finally {
       setLoading(false);
     }
@@ -137,15 +133,10 @@ export default function FriendshipManager({ onSwitchToMessaging }: FriendshipMan
   };
 
   const openMessaging = (friend: UserAccount) => {
-    console.log('🔍 Debug - openMessaging called with:', friend.username, friend.id, friend.account_id);
     const friendId = friend.id || friend.account_id;
-    console.log('🔍 Debug - Using friendId:', friendId);
     
     if (onSwitchToMessaging) {
-      console.log('🔍 Debug - Calling onSwitchToMessaging with:', friendId);
       onSwitchToMessaging(friendId);
-    } else {
-      console.log('🔍 Debug - No onSwitchToMessaging function provided');
     }
   };
 
@@ -185,11 +176,9 @@ export default function FriendshipManager({ onSwitchToMessaging }: FriendshipMan
     
     const success = await friendshipDB.removeFriend(currentUserId, friendUuid);
     if (success) {
-      console.log('🔄 Friend removed successfully, refreshing data...');
       await loadData();
-      console.log('🔄 Data refresh completed');
     } else {
-      console.error('❌ Failed to remove friend');
+      // Failed to remove friend
     }
   };
 
@@ -298,7 +287,6 @@ export default function FriendshipManager({ onSwitchToMessaging }: FriendshipMan
                     <div className="flex items-center space-x-2 space-x-reverse mt-auto">
                       <button
                         onClick={() => {
-                          console.log('🔍 Debug - Messaging button clicked for:', friend.user.username);
                           openMessaging(friend.user);
                         }}
                         className={`p-2 rounded-full transition-colors ${

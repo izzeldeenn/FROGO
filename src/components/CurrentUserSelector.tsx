@@ -56,29 +56,21 @@ export function CurrentUserSelector({ studyStreak }: { studyStreak?: number }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of day
     
-    // Debug: Log the study dates to see what we have
-    console.log('CurrentUserSelector Study dates found:', Array.from(studyDates).sort());
-    console.log('CurrentUserSelector Today is:', today.toISOString().split('T')[0]);
-    
+       
     // Check backwards from today
     for (let i = 0; i < 365; i++) { // Check up to a year back
       const checkDate = new Date(today);
       checkDate.setDate(today.getDate() - i);
       const dateStr = checkDate.toISOString().split('T')[0];
       
-      // Debug: Log what we're checking
-      console.log(`CurrentUserSelector Checking day ${i}: ${dateStr}, has study:`, studyDates.has(dateStr));
-      
+            
       if (studyDates.has(dateStr)) {
         streak++;
-        console.log(`CurrentUserSelector Found study for ${dateStr}, streak is now:`, streak);
       } else {
-        console.log(`CurrentUserSelector No study for ${dateStr}, breaking streak at:`, streak);
         break; // Break on first day without study
       }
     }
 
-    console.log('CurrentUserSelector Final streak:', streak);
     return streak;
   };
 

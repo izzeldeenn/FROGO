@@ -42,15 +42,6 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     // Get all users including virtual ones and merge with daily rankings
     const allUsers = getAllDeviceUsers();
     const currentUser = getCurrentUser();
-    console.log('👥 All users:', allUsers.map(u => ({ id: u.accountId, name: u.username })));
-    console.log('👤 Current user:', currentUser ? { id: currentUser.accountId, name: currentUser.username } : 'No current user');
-    console.log('🏆 Daily rankings available:', dailyRankings.map(dr => ({ 
-        id: dr.id, 
-        accountId: dr.accountId, 
-        rank: dr.dailyRank, 
-        minutes: dr.studyMinutes,
-        username: 'Unknown'
-      })));
     
     const usersWithDailyRank = allUsers.map(user => {
       const dailyActivity = dailyRankings.find(dr => dr.accountId === user.accountId);
@@ -60,39 +51,24 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
         dailyStudyTime: dailyActivity?.studyMinutes || 0
       };
       
-      // Log for all users to debug the mapping issue
-      console.log('🎯 User mapping:', {
-        accountId: user.accountId,
-        username: user.username,
-        foundActivity: !!dailyActivity,
-        dailyRank: result.dailyRank,
-        dailyStudyTime: result.dailyStudyTime,
-        dailyActivityData: dailyActivity
-      });
-      
       return result;
     });
     
     // Sort by daily rank
     const sortedUsers = usersWithDailyRank.sort((a, b) => a.dailyRank - b.dailyRank);
-    console.log('📊 Final sorted users (top 10):', sortedUsers.slice(0, 10).map(u => ({ 
-      rank: u.dailyRank, 
-      name: u.username, 
-      minutes: u.dailyStudyTime 
-    })));
     setDisplayUsers(sortedUsers);
   }, [users, dailyRankings]);
 
-  const loadDailyRankings = async () => {
+  const loadDailyRankings = async (showLoading = true) => {
     try {
-      setLoading(true);
-      console.log('🔄 Loading daily rankings...');
+      if (showLoading) {
+        setLoading(true);
+      }
       
       // Force update rankings before loading
       await dailyActivityDB.updateTodayRankings();
       
       const rankings = await dailyActivityDB.getTodayRankings();
-      console.log('📊 Raw rankings from DB:', rankings);
       
       const formattedRankings = rankings.map(activity => ({
         id: activity.id,
@@ -110,24 +86,23 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
         createdAt: activity.created_at,
         updatedAt: activity.updated_at
       }));
-      console.log('📊 Formatted rankings:', formattedRankings);
       
       // Debug: Check if we have any rankings with valid ranks
       const validRanks = formattedRankings.filter(r => r.dailyRank < 999);
-      console.log('📊 Valid rankings (rank < 999):', validRanks);
       
       setDailyRankings(formattedRankings);
     } catch (error) {
-      console.error('❌ Error loading daily rankings:', error);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    // Update rankings every 30 seconds for live changes
+    // Update rankings every 30 seconds for live changes (without loading indicator)
     const interval = setInterval(() => {
-      loadDailyRankings();
+      loadDailyRankings(false);
       setCurrentTime(new Date());
     }, 30000);
 
@@ -153,10 +128,9 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
 
   const isCurrentUserActive = (user: UserAccount) => {
     // Check if this is the current account and timer is active
-    // In a real app, you'd track which user is currently studying
-    // For now, we'll assume the user with currentAccountId is the active one
     const isActive = isTimerActive();
-    const isCurrent = users.length > 0 && users[0]?.accountId === user.accountId;
+    const currentUser = getCurrentUser();
+    const isCurrent = currentUser?.accountId === user.accountId;
     
     return isActive && isCurrent;
   };
@@ -195,7 +169,7 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
             return (
               <div
                 key={user.accountId}
-                className={`p-3 rounded-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer ${
+                className={`p-3 rounded-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer w-full max-w-md ${
                   isCurrent ? 'ring-4 ring-blue-400 ring-offset-2' : ''
                 }`}
                 onClick={() => onUserClick && onUserClick(user)}
@@ -215,9 +189,9 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
                     <span 
-                      className="text-sm font-bold"
+                      className="text-sm font-bold flex-shrink-0"
                       style={{
                         color: (user.dailyRank || 0) === 1 
                           ? customTheme.colors.secondary
@@ -229,7 +203,7 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                       #{user.dailyRank || 999}
                     </span>
                     
-                    <div className="text-xl">
+                    <div className="text-xl flex-shrink-0">
                       {user.avatar?.startsWith('http') ? (
                         <img 
                           src={user.avatar} 
@@ -245,19 +219,29 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <span className={`text-sm font-semibold ${
+                      <span className={`text-sm font-semibold block ${
                         theme === 'light' ? 'text-black' : 'text-white'
-                      } truncate`}>{user.username}</span>
+                      } truncate`} title={user.username}>{user.username}</span>
                     </div>
                   </div>
                   
-                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    theme === 'light'
-                      ? 'bg-gradient-to-r from-yellow-50 to-green-50 text-green-700 border border-yellow-200'
-                      : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-300 border border-yellow-700/50'
-                  }`}>
-                    <span className="w-1 h-1 bg-green-500 rounded-full mr-1 animate-pulse"></span>
-                    {Math.floor(getTodayStudyTime(user) / 60)}m
+                  <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      theme === 'light'
+                        ? 'bg-gradient-to-r from-yellow-50 to-green-50 text-green-700 border border-yellow-200'
+                        : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-300 border border-yellow-700/50'
+                    }`}>
+                      <span className="w-1 h-1 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                      {Math.floor(getTodayStudyTime(user) / 60)}m
+                    </div>
+
+                    {userIsActive && (
+                      <div className="flex items-center">
+                        <span className={`w-2 h-2 rounded-full ${
+                          theme === 'light' ? 'bg-green-500' : 'bg-green-400'
+                        } animate-pulse shadow-lg shadow-green-500/50`}></span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

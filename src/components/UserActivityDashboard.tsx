@@ -146,8 +146,6 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
     today.setHours(0, 0, 0, 0); // Set to start of day
     
     // Debug: Log the study dates to see what we have
-    console.log('Dashboard Study dates found:', Array.from(studyDates).sort());
-    console.log('Dashboard Today is:', today.toISOString().split('T')[0]);
     
     // Check backwards from today
     for (let i = 0; i < 365; i++) { // Check up to a year back
@@ -156,18 +154,14 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
       const dateStr = checkDate.toISOString().split('T')[0];
       
       // Debug: Log what we're checking
-      console.log(`Dashboard Checking day ${i}: ${dateStr}, has study:`, studyDates.has(dateStr));
       
       if (studyDates.has(dateStr)) {
         streak++;
-        console.log(`Dashboard Found study for ${dateStr}, streak is now:`, streak);
       } else {
-        console.log(`Dashboard No study for ${dateStr}, breaking streak at:`, streak);
         break; // Break on first day without study
       }
     }
 
-    console.log('Dashboard Final streak:', streak);
     return streak;
   };
 

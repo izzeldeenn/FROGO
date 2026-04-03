@@ -134,7 +134,6 @@ export function Timer() {
       const studyInterval = setInterval(async () => {
         const currentUser = getCurrentUser();
         if (currentUser?.accountId) {
-          console.log('⏰ Updating study time for user:', currentUser.accountId);
           await dailyActivityDB.updateStudyTimeRealtime(currentUser.accountId, 1); // Add 1 second
           updateUserStudyTime(1); // Add 1 second for points
         }
@@ -178,13 +177,11 @@ export function Timer() {
       return;
     }
     
-    console.log('🚀 Starting timer for user:', currentUser.accountId, currentUser.username);
     
     // Start a new study session
     const success = await dailyActivityDB.startStudySession(currentUser.accountId);
     if (success) {
       setIsRunning(true);
-      console.log('✅ Timer started successfully');
     } else {
       console.error('❌ Failed to start study session');
     }

@@ -57,7 +57,6 @@ interface MessagingSystemProps {
 }
 
 export default function MessagingSystem({ selectedFriendId }: MessagingSystemProps = {}) {
-  console.log('🔍 MessagingSystem - Component initialized with selectedFriendId:', selectedFriendId);
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -95,9 +94,7 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
 
   // Track selectedFriendId changes
   useEffect(() => {
-    console.log('🔍 MessagingSystem - selectedFriendId changed to:', selectedFriendId);
     if (selectedFriendId !== selectedFriendIdState) {
-      console.log('🔍 MessagingSystem - Updating selectedFriendIdState to:', selectedFriendId);
       setSelectedFriendIdState(selectedFriendId || null);
     }
   }, [selectedFriendId]);
@@ -107,7 +104,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    console.log('🔍 Setting up realtime subscription for user:', userId);
 
     // Subscribe to all messages (we'll filter in the handler)
     const subscription = supabase
@@ -120,7 +116,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
           table: 'messages'
         },
         (payload) => {
-          console.log('🔍 Real-time message update:', payload);
           
           if (payload.eventType === 'INSERT') {
             const newMessage = payload.new as any;
@@ -130,11 +125,9 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
               newMessage.sender_id === userId || newMessage.receiver_id === userId;
             
             if (!involvesCurrentUser) {
-              console.log('🔍 Message does not involve current user, skipping');
               return;
             }
             
-            console.log('🔍 New message involves current user, processing...');
             
             // Convert to MessageFrontend format
             const formattedMessage: MessageFrontend = {
@@ -155,26 +148,18 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
                 (formattedMessage.senderId === userId && formattedMessage.receiverId === friendId) ||
                 (formattedMessage.senderId === friendId && formattedMessage.receiverId === userId);
               
-              console.log('🔍 Message relevance check:', {
-                senderId: formattedMessage.senderId,
-                receiverId: formattedMessage.receiverId,
-                currentUserId: userId,
-                friendId,
-                isRelevant
-              });
+         
               
               if (isRelevant) {
                 // Check if message already exists to prevent duplicates
                 setMessages(prev => {
                   const messageExists = prev.some(msg => msg.id === formattedMessage.id);
                   if (messageExists) {
-                    console.log('🔍 Message already exists, skipping to prevent duplicate');
                     return prev;
                   }
                   return [...prev, formattedMessage];
                 });
                 scrollToBottom();
-                console.log('🔍 Message added to current conversation');
               }
             }
             
@@ -210,7 +195,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
               })
             );
             
-            console.log('🔍 Message added to current conversation');
           } else if (payload.eventType === 'UPDATE') {
             const updatedMessage = payload.new as any;
             
@@ -233,13 +217,11 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         }
       )
       .subscribe((status) => {
-        console.log('🔍 Realtime subscription status:', status);
       });
 
     subscriptionRef.current = subscription;
 
     return () => {
-      console.log('🔍 Unsubscribing from realtime');
       subscription.unsubscribe();
     };
   }, [selectedConversation]);
@@ -254,32 +236,17 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         return;
       }
       
-      console.log('🔍 Debug - Looking for conversation with friend ID:', selectedFriendIdState);
-      console.log('🔍 Debug - Available conversations:', conversations.map(c => ({ 
-        id: c.id, 
-        userId: c.user?.id, 
-        username: c.user?.username,
-        accountId: c.user?.account_id
-      })));
+   
       
       // Find conversation with the selected friend
       const conversation = conversations.find(conv => {
-        console.log('🔍 Debug - Checking conversation:', {
-          convId: conv.id,
-          convUserId: conv.user?.id,
-          convAccountId: conv.user?.account_id,
-          targetId: selectedFriendIdState,
-          match: conv.user?.id === selectedFriendIdState || conv.user?.account_id === selectedFriendIdState
-        });
         return conv.user?.id === selectedFriendIdState || conv.user?.account_id === selectedFriendIdState;
       });
       
-      console.log('🔍 Debug - Found conversation:', conversation?.user?.username);
       
       if (conversation) {
         setSelectedConversation(conversation);
       } else {
-        console.log('🔍 Debug - No conversation found, creating new one...');
         // Create a new conversation
         createConversationWithFriend(selectedFriendIdState);
       }
@@ -292,7 +259,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         return;
       }
       
-      console.log('🔍 Debug - No conversations at all, creating new one...');
       createConversationWithFriend(selectedFriendIdState);
     }
   }, [selectedFriendIdState, conversations, isCreatingConversation]);
@@ -306,8 +272,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
       const friendId = selectedConversation.user.id || selectedConversation.user.account_id;
       const currentUserId = getCurrentUserId();
       
-      console.log('🔍 Debug - Loading messages for friend:', friendId);
-      console.log('🔍 Debug - Current user ID:', currentUserId);
       
       // Prevent loading messages if friend is the same as current user
       if (friendId === currentUserId) {
@@ -354,7 +318,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
 
     // Don't send automatic welcome message
     // Just create the conversation entry without sending a message
-    console.log('🔍 Debug - Creating conversation without automatic message');
     
     // First check if conversation already exists
     const { data: existingConv } = await supabase
@@ -364,22 +327,12 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
       .single();
     
     if (existingConv) {
-      console.log('🔍 Debug - Conversation already exists, loading it instead');
       // Reload conversations and select the existing one
       await loadConversations();
       return true;
     }
     
     // Create conversation entry in the base table (not the view)
-    console.log('🔍 Debug - Attempting to create conversation with:', {
-      user1_id: currentUserId,
-      user2_id: friendId,
-      last_message: null,
-      last_message_at: new Date().toISOString(),
-      last_message_sender_id: null
-    });
-    
-    // Use the base table instead of the view
     const { data, error } = await supabase
       .from('conversations_base') // Try the base table first
       .insert({
@@ -392,26 +345,17 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
       .select();
 
     if (error) {
-      console.error('❌ Error creating conversation:', error);
-      console.error('❌ Error details:', JSON.stringify(error, null, 2));
-      console.error('❌ Error code:', error.code);
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error details:', error.details);
-      
       // If table creation fails, just reload conversations
-      console.log('🔍 Debug - Table creation failed, reloading conversations...');
       await loadConversations();
       return true;
     }
     
-    console.log('✅ Conversation created successfully:', data);
     
     // Don't send automatic welcome message
     // Just reload conversations to get the new one
     await loadConversations();
     return true;
   } catch (error) {
-    console.error('Error creating conversation:', error);
     return false;
   } finally {
     setIsCreatingConversation(false);
@@ -428,7 +372,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
     setLoading(true);
     try {
       const currentUserId = getCurrentUserId();
-      console.log('🔍 Debug - Loading conversations for user:', currentUserId);
       if (!currentUserId) return;
 
       const [conversationsData, usersData] = await Promise.all([
@@ -436,44 +379,30 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         userDB.getAllUsers()
       ]);
 
-      console.log('🔍 Debug - Raw conversations data:', conversationsData);
-      console.log('🔍 Debug - Sample conversation structure:', conversationsData[0]);
-      console.log('🔍 Debug - Users data length:', usersData.length);
 
       const conversationsWithUsers: Conversation[] = [];
       
       for (const conv of conversationsData) {
-        console.log('🔍 Debug - Processing conversation:', {
-          id: conv.id,
-          user1_id: conv.user1_id,
-          user2_id: conv.user2_id,
-          currentUserId: currentUserId
-        });
         
         // Skip self-conversations where both users are the same
         if (conv.user1_id === conv.user2_id) {
-          console.log('🔍 Debug - Skipping self-conversation where user1_id === user2_id');
           continue;
         }
         
         // Determine the other user ID based on which field matches current user
         const otherUserId: string = conv.user1_id === currentUserId ? conv.user2_id : conv.user1_id;
         
-        console.log('🔍 Debug - Determined otherUserId:', otherUserId);
         
         // Skip if other user is the same as current user (additional safety check)
         if (!otherUserId || otherUserId === currentUserId) {
-          console.log('🔍 Debug - Skipping conversation - other user is same as current user or invalid');
           continue;
         }
         
-        console.log('🔍 Debug - Looking for user with ID:', otherUserId);
+        
         const otherUser = usersData.find(u => u.id === otherUserId || u.account_id === otherUserId);
-        console.log('🔍 Debug - Found user:', otherUser?.username, 'with id:', otherUser?.id, 'account_id:', otherUser?.account_id);
         
         // Skip if user not found
         if (!otherUser) {
-          console.log('🔍 Debug - Skipping conversation - user not found');
           continue;
         }
         
@@ -498,7 +427,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
 
       setConversations(conversationsWithUsers);
     } catch (error) {
-      console.error('Error loading conversations:', error);
     } finally {
       setLoading(false);
     }
@@ -507,20 +435,16 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
   const loadMessages = async (otherUserId: string) => {
     try {
       const currentUserId = getCurrentUserId();
-      console.log('🔍 Debug - loadMessages called with:', { currentUserId, otherUserId });
       
       if (!currentUserId) {
-        console.error('❌ No current user ID found');
         return;
       }
       
       if (!otherUserId) {
-        console.error('❌ No other user ID provided');
         return;
       }
 
       const messagesData = await messageDB.getConversation(currentUserId, otherUserId);
-      console.log('🔍 Debug - Messages loaded:', messagesData.length);
       
       const formattedMessages: MessageFrontend[] = messagesData.map(msg => ({
         id: msg.id,
@@ -535,7 +459,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
 
       setMessages(formattedMessages.reverse()); // Show oldest first
     } catch (error) {
-      console.error('Error loading messages:', error);
     }
   };
 
@@ -545,18 +468,9 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
     const currentUserId = getCurrentUserId();
     const friendId = selectedConversation.user.id || selectedConversation.user.account_id;
     
-    console.log('🔍 Debug - User IDs:', { 
-      currentUserId, 
-      friendId, 
-      currentUserIdType: typeof currentUserId,
-      friendIdType: typeof friendId,
-      selectedConversationUser: selectedConversation.user
-    });
-    
     if (!currentUserId || !friendId) return;
     
     try {
-      console.log('🔍 Marking messages as read for conversation:', { currentUserId, friendId });
       
       // First, let's check what messages exist that need to be marked as read
       const { data: unreadMessages, error: checkError } = await supabase
@@ -573,17 +487,13 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         throw checkError;
       }
       
-      console.log('🔍 Found unread messages to mark as read:', unreadMessages?.length || 0);
-      console.log('🔍 Unread messages sample:', unreadMessages?.slice(0, 3));
       
       if (!unreadMessages || unreadMessages.length === 0) {
-        console.log('🔍 No unread messages to mark as read');
         return;
       }
       
       // Try to mark messages as read using individual message IDs
       const messageIds = unreadMessages.map(msg => msg.id);
-      console.log('🔍 Attempting to mark messages as read:', messageIds);
       
       const { data, error } = await supabase
         .from('messages')
@@ -598,7 +508,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         console.error('❌ Error details:', JSON.stringify(error, null, 2));
         
         // Fallback: try individual updates
-        console.log('🔍 Trying fallback approach with individual updates...');
         let successCount = 0;
         
         for (const message of unreadMessages) {
@@ -620,14 +529,12 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
           }
         }
         
-        console.log(`🔍 Fallback approach: ${successCount}/${unreadMessages.length} messages updated`);
         
         if (successCount === 0) {
           throw error; // Re-throw original error if fallback failed completely
         }
       }
       
-      console.log('✅ Messages marked as read successfully:', data);
       
       // Also update local messages state
       setMessages(prev => 
@@ -668,8 +575,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
       if (!currentUserId) return;
 
       const receiverId = selectedConversation.user.id || selectedConversation.user.account_id;
-      console.log('🔍 Debug - Sending message to:', receiverId);
-      console.log('🔍 Debug - From user:', currentUserId);
 
       const message = await messageDB.sendMessage(
         currentUserId,
@@ -692,7 +597,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
         setMessages(prev => {
           const messageExists = prev.some(msg => msg.id === newMsg.id);
           if (messageExists) {
-            console.log('🔍 Message already exists locally, skipping');
             return prev;
           }
           return [...prev, newMsg];
@@ -717,7 +621,6 @@ export default function MessagingSystem({ selectedFriendId }: MessagingSystemPro
           )
         );
         
-        console.log('🔍 Message sent and added to local state:', newMsg);
       }
     } catch (error) {
       console.error('Error sending message:', error);

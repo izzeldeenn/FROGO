@@ -3,8 +3,6 @@ import { supabase } from './supabase';
 // Check if tables exist and create them if they don't
 export async function initializeFriendshipTables(): Promise<boolean> {
   try {
-    console.log('🔍 Checking if friendship tables exist...');
-    
     // Check if friendships table exists
     const { data: friendshipsCheck, error: friendshipsError } = await supabase
       .from('friendships')
@@ -12,7 +10,6 @@ export async function initializeFriendshipTables(): Promise<boolean> {
       .limit(1);
     
     if (friendshipsError && friendshipsError.code === 'PGRST116') {
-      console.log('❌ Friendships table does not exist');
       return false;
     }
     
@@ -23,7 +20,6 @@ export async function initializeFriendshipTables(): Promise<boolean> {
       .limit(1);
     
     if (requestsError && requestsError.code === 'PGRST116') {
-      console.log('❌ Friendship requests table does not exist');
       return false;
     }
     
@@ -34,14 +30,11 @@ export async function initializeFriendshipTables(): Promise<boolean> {
       .limit(1);
     
     if (messagesError && messagesError.code === 'PGRST116') {
-      console.log('❌ Messages table does not exist');
       return false;
     }
     
-    console.log('✅ All friendship tables exist');
     return true;
   } catch (error) {
-    console.error('❌ Error checking friendship tables:', error);
     return false;
   }
 }

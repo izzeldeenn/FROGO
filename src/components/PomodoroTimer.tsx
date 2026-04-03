@@ -340,13 +340,11 @@ export function PomodoroTimer() {
       return;
     }
     
-    console.log('🚀 Starting Pomodoro timer for user:', currentUser.accountId, currentUser.username);
     
     // Start a new study session
     const success = await dailyActivityDB.startStudySession(currentUser.accountId);
     if (success) {
       setIsRunning(true);
-      console.log('✅ Pomodoro timer started successfully');
     } else {
       console.error('❌ Failed to start study session');
     }

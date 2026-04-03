@@ -41,7 +41,6 @@ export function StickyNotes() {
     
     // Listen for custom events when new notes are published
     const handleStickyNotePublished = (e: CustomEvent) => {
-      console.log('🎉 New sticky note published:', e.detail);
       loadNotes(); // Reload notes to show the new one immediately
     };
 

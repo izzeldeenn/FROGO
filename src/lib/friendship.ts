@@ -91,7 +91,6 @@ export class FriendshipDB {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error sending friend request:', error);
       return false;
     }
   }
@@ -109,7 +108,6 @@ export class FriendshipDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching pending requests:', error);
       return [];
     }
   }
@@ -127,7 +125,6 @@ export class FriendshipDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching sent requests:', error);
       return [];
     }
   }
@@ -166,7 +163,6 @@ export class FriendshipDB {
 
       return true;
     } catch (error) {
-      console.error('Error accepting friend request:', error);
       return false;
     }
   }
@@ -182,7 +178,6 @@ export class FriendshipDB {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error rejecting friend request:', error);
       return false;
     }
   }
@@ -200,7 +195,6 @@ export class FriendshipDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching user friends:', error);
       return [];
     }
   }
@@ -218,7 +212,6 @@ export class FriendshipDB {
       if (error && error.code !== 'PGRST116') throw error;
       return !!data;
     } catch (error) {
-      console.error('Error checking friendship status:', error);
       return false;
     }
   }
@@ -228,16 +221,12 @@ export class FriendshipDB {
     try {
       // Validate input parameters
       if (!user1Id || !user2Id) {
-        console.error('❌ Invalid user IDs provided:', { user1Id, user2Id });
         return false;
       }
       
       if (user1Id === user2Id) {
-        console.error('❌ Cannot remove self as friend:', { user1Id, user2Id });
         return false;
       }
-
-      console.log('🔍 Debug - removeFriend called with:', { user1Id, user2Id });
       
       // Try direct delete approach (most reliable)
       try {
@@ -258,22 +247,17 @@ export class FriendshipDB {
             .select();
           
           if (deleteError2) {
-            console.error('❌ Both delete attempts failed:', { deleteError1, deleteError2 });
             return false;
           } else {
-            console.log('✅ Friend removed successfully');
             return true;
           }
         } else {
-          console.log('✅ Friend removed successfully');
           return true;
         }
       } catch (deleteError) {
-        console.error('❌ Delete operation failed:', deleteError);
         return false;
       }
     } catch (error) {
-      console.error('❌ Error removing friend:', error);
       return false;
     }
   }
@@ -289,7 +273,6 @@ export class FriendshipDB {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error blocking user:', error);
       return false;
     }
   }
@@ -309,7 +292,6 @@ export class MessageDB {
   // Send message
   async sendMessage(senderId: string, receiverId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<Message | null> {
     try {
-      console.log('🔍 Debug - DB sendMessage called with:', { senderId, receiverId, content, messageType });
       const { data, error } = await supabase
         .from('messages')
         .insert({
@@ -321,11 +303,9 @@ export class MessageDB {
         .select()
         .single();
 
-      console.log('🔍 Debug - DB sendMessage result:', { data, error });
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error sending message:', error);
       return null;
     }
   }
@@ -333,10 +313,7 @@ export class MessageDB {
   // Get conversation between two users
   async getConversation(user1Id: string, user2Id: string, limit: number = 50): Promise<Message[]> {
     try {
-      console.log('🔍 Debug - getConversation called with:', { user1Id, user2Id, limit });
-      
       if (!user1Id || !user2Id) {
-        console.error('❌ Invalid user IDs provided:', { user1Id, user2Id });
         return [];
       }
       
@@ -372,34 +349,9 @@ export class MessageDB {
 
       const error = error1 || error2;
       const data = uniqueData.slice(0, limit);
-
-      console.log('🔍 Debug - getConversation result:', { data, error });
       
-      // Try different ways to log the error
       if (error) {
-        console.error('❌ Error object:', error);
-        console.error('❌ Error message:', error?.message);
-        console.error('❌ Error string:', String(error));
-        console.error('❌ Error JSON:', JSON.parse(JSON.stringify(error)));
-        console.error('❌ Error constructor:', error.constructor.name);
-        
-        // Log each property individually
-        for (const key in error) {
-          console.error(`❌ Error.${key}:`, (error as any)[key]);
-        }
-        
-        console.error('❌ Supabase error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          errorString: JSON.stringify(error, null, 2),
-          errorKeys: Object.keys(error),
-          errorType: typeof error
-        });
-        
         // Try a simpler fallback query
-        console.log('🔍 Debug - Trying fallback query...');
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('messages')
           .select('*')
@@ -409,8 +361,6 @@ export class MessageDB {
           .order('created_at', { ascending: false })
           .limit(limit);
           
-        console.log('🔍 Debug - Fallback query result:', { fallbackData, fallbackError });
-        
         if (fallbackError) {
           throw fallbackError;
         }
@@ -419,7 +369,6 @@ export class MessageDB {
       }
       return data || [];
     } catch (error) {
-      console.error('❌ Error fetching conversation:', error);
       return [];
     }
   }
@@ -436,7 +385,6 @@ export class MessageDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching user conversations:', error);
       return [];
     }
   }
@@ -452,7 +400,6 @@ export class MessageDB {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error marking messages as read:', error);
       return false;
     }
   }
@@ -468,7 +415,6 @@ export class MessageDB {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('Error deleting message:', error);
       return false;
     }
   }
@@ -476,10 +422,7 @@ export class MessageDB {
   // Get unread messages count for a specific conversation between two users
   async getUnreadCountForConversation(userId: string, otherUserId: string): Promise<number> {
     try {
-      console.log('🔍 getUnreadCountForConversation called for:', { userId, otherUserId });
-      
       if (!userId || !otherUserId) {
-        console.error('❌ Invalid user IDs provided to getUnreadCountForConversation');
         return 0;
       }
       
@@ -491,19 +434,13 @@ export class MessageDB {
         .is('read_at', null)
         .eq('is_deleted', false);
 
-      console.log('🔍 getUnreadCountForConversation - data:', data);
-      console.log('🔍 getUnreadCountForConversation - error:', error);
-
       if (error) {
-        console.error('❌ Supabase error in getUnreadCountForConversation:', error);
         throw error;
       }
       
       const count = data?.length || 0;
-      console.log('🔍 getUnreadCountForConversation - returning count:', count);
       return count;
     } catch (error) {
-      console.error('❌ Error fetching unread count for conversation:', error);
       return 0;
     }
   }
@@ -511,19 +448,9 @@ export class MessageDB {
   // Get unread messages count for a user
   async getUnreadCount(userId: string): Promise<number> {
     try {
-      console.log('🔍 getUnreadCount called for userId:', userId);
-      
       // Validate UUID format
       if (!userId) {
-        console.error('❌ No userId provided to getUnreadCount');
         return 0;
-      }
-      
-      // Check if userId looks like a UUID (basic validation)
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(userId)) {
-        console.warn('⚠️ UserId does not appear to be a valid UUID format:', userId);
-        console.warn('⚠️ This may cause database errors if the receiver_id column expects UUID format');
       }
       
       const { data, error } = await supabase
@@ -533,20 +460,13 @@ export class MessageDB {
         .is('read_at', null)
         .eq('is_deleted', false);
 
-      console.log('🔍 getUnreadCount - data:', data);
-      console.log('🔍 getUnreadCount - error:', error);
-
       if (error) {
-        console.error('❌ Supabase error in getUnreadCount:', error);
         throw error;
       }
       
       const count = data?.length || 0;
-      console.log('🔍 getUnreadCount - returning count:', count);
       return count;
     } catch (error) {
-      console.error('❌ Error fetching unread count:', error);
-      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       return 0;
     }
   }

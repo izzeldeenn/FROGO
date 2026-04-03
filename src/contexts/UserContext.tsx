@@ -73,8 +73,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initializeApp = async () => {
-      console.log('🚀 Initializing UserContext...');
-      
       // Clean up any virtual users data from localStorage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('fahman-hub-virtual-users-state');
@@ -91,23 +89,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
         const savedLoginState = localStorage.getItem('isLoggedIn') === 'true';
         
         if (savedAccountId && savedLoginState) {
-          console.log('🔍 Found existing session for account:', savedAccountId);
-          
-          // Verify the account still exists in database
+          // Verify that account still exists in database
           try {
             const user = await userDB.getUserByAccountId(savedAccountId);
             if (user) {
               setCurrentAccountId(savedAccountId);
               setIsLoggedIn(true);
               hasValidSession = true;
-              console.log('✅ Existing session restored for:', user.username);
             } else {
-              console.log('❌ Saved account not found in database, clearing session');
               localStorage.removeItem('currentAccountId');
               localStorage.removeItem('isLoggedIn');
             }
           } catch (error) {
-            console.log('❌ Error verifying saved session, clearing session');
             localStorage.removeItem('currentAccountId');
             localStorage.removeItem('isLoggedIn');
           }
@@ -117,24 +110,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
       // If no valid session, get/create device account
       if (!hasValidSession) {
         const accountId = getAccountId();
-        console.log('🔍 No active session, creating guest account with ID:', accountId);
         setCurrentAccountId(accountId);
         setIsLoggedIn(false);
         createCurrentAccount();
       }
       
       // Load initial leaderboard
-      console.log('📊 Loading initial leaderboard...');
       await loadInitialLeaderboard();
       
       // Set up real-time updates
       try {
         const pocketBaseReady = await isSupabaseAvailable();
-        console.log('🔗 Supabase available:', pocketBaseReady);
         if (pocketBaseReady) {
-          console.log('🔄 Setting up real-time subscription...');
           userDB.subscribeToUsers((updatedUsers: UserAccount[]) => {
-            console.log('🔄 Real-time update received, users count:', updatedUsers.length);
             const userAccounts: UserAccountFrontend[] = updatedUsers.map((dbUser: UserAccount) => ({
               id: dbUser.id,
               accountId: dbUser.account_id,
@@ -146,7 +134,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
               createdAt: dbUser.created_at,
               lastActive: dbUser.last_active
             }));
-            console.log('📊 Mapped users to frontend format:', userAccounts.length);
             
             // IMPORTANT: Only update other users, preserve current user's local state
             setUsers(prevUsers => {
@@ -182,15 +169,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
               });
             });
           });
-        } else {
-          console.log('🔄 Real-time subscription failed, using fallback mode');
         }
       } catch (error) {
-        console.log('🔄 Real-time subscription failed, using fallback mode');
         // Continue without real-time updates
       }
       
-      console.log('✅ UserContext initialization complete');
     };
     
     initializeApp();
@@ -203,25 +186,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
 
   const loadInitialLeaderboard = async () => {
-    console.log('📊 Starting loadInitialLeaderboard...');
     try {
       // Get current account ID for comparison
       const currentAccountId = getAccountId();
-      console.log('🔍 Current account ID for comparison:', currentAccountId);
       
       // Check if Supabase is available
       const pocketBaseReady = await isSupabaseAvailable();
-      console.log('🔗 Supabase available:', pocketBaseReady);
       
       if (pocketBaseReady) {
-        console.log('🗄️ Using Supabase database');
-        console.log('📊 Fetching users from Supabase...');
         // Try Supabase first
         const users = await userDB.getAllUsers();
-        console.log('📊 Retrieved users from Supabase:', users.length);
         
         if (users && users.length > 0) {
-          console.log('📊 Mapping users to frontend format...');
           const userAccounts: UserAccountFrontend[] = users.map((dbUser: UserAccount) => ({
               id: dbUser.id,
               accountId: dbUser.account_id,
@@ -233,42 +209,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
               createdAt: dbUser.created_at,
               lastActive: dbUser.last_active
             }));
-          console.log('📊 Mapped users:', userAccounts.length);
           
           // Check if current user exists in the database
           const currentUserExists = userAccounts.some(user => user.accountId === currentAccountId);
-          console.log('🔍 Current user exists in database:', currentUserExists);
           
           if (!currentUserExists) {
-            console.log('🔧 Current user not found, creating new account...');
             createCurrentAccount();
           } else {
-            console.log('✅ Current user found, loading existing users');
             setUsers(userAccounts);
-            console.log('✅ Loaded leaderboard from Supabase');
           }
         } else {
-          console.log('📊 No users in Supabase, creating new account...');
           createCurrentAccount();
         }
       } else {
-        console.log('💾 Using in-memory storage (Supabase not available)');
         // Fallback to in-memory storage
         createCurrentAccount();
       }
     } catch (error) {
-      console.log('💾 Using in-memory storage (Supabase error):', error);
       // Fallback to in-memory storage until Supabase is set up
       createCurrentAccount();
     }
-    
-    console.log('📊 loadInitialLeaderboard complete');
   };
 
   const createCurrentAccount = async () => {
-    console.log('🔧 Creating guest account...');
     const accountInfo = getAccountInfo();
-    console.log('📋 Account info:', accountInfo);
     
     // Restore username, email, and avatar from localStorage if available
     let savedUsername = accountInfo.username;
@@ -282,17 +246,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       
       if (localUsername) {
         savedUsername = localUsername;
-        console.log('🔄 Restored username from localStorage:', localUsername);
       }
       
       if (localEmail) {
         savedEmail = localEmail;
-        console.log('🔄 Restored email from localStorage:', localEmail);
       }
       
       if (localAvatar) {
         savedAvatar = localAvatar;
-        console.log('🔄 Restored avatar from localStorage:', localAvatar);
       }
     }
     
@@ -308,18 +269,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
       lastActive: accountInfo.lastLogin
     };
     
-    console.log('💾 Saving guest account to database...');
     await saveAccountToDatabase(currentAccount);
-    console.log('📊 Setting users array with guest account');
     setUsers([currentAccount]);
-    console.log('✅ Guest account created and set');
   };
 
   const saveAccountToDatabase = async (userAccount: UserAccountFrontend) => {
     try {
-      console.log('💾 Saving account to database:', userAccount.accountId);
-      console.log('📋 Account data to save:', userAccount);
-      
       // First check if account exists
       const existingUser = await userDB.getUserByAccountId(userAccount.accountId);
       
@@ -335,7 +290,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
           created_at: userAccount.createdAt,
           last_active: userAccount.lastActive
         });
-        console.log('✅ Account updated successfully:', result);
         
         // Update local user object with database UUID
         if (result && result.id) {
@@ -354,7 +308,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
           created_at: userAccount.createdAt,
           last_active: userAccount.lastActive
         });
-        console.log('✅ Account created successfully:', result);
         
         // Update local user object with database UUID
         if (result && result.id) {
@@ -363,8 +316,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return result;
       }
     } catch (error: any) {
-      console.error('❌ Error saving account to database:', error);
-      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       return null;
     }
   };
@@ -383,31 +334,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (available) {
         const result = await userDB.updateUserProfile(currentAccountId, name);
         if (!result) {
-          console.error('❌ Failed to update username in database');
           return;
         }
-        console.log('✅ Username updated in database successfully');
       }
     } catch (error) {
-      console.error('❌ Error updating username in database:', error);
-      return;
-    }
-    
-    // Only update local state after successful database update
-    setUsers(prevUsers => {
-      const newUsers = prevUsers.map(user => {
-        if (user.accountId === currentAccountId) {
-          return { ...user, username: name, lastActive: new Date().toISOString() };
-        }
-        return user;
-      });
-      return newUsers;
-    });
-    
-    // Save to localStorage as backup after successful update
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`username_${currentAccountId}`, name);
-      localStorage.setItem(`username_${currentAccountId}_timestamp`, Date.now().toString());
+      // Error updating username in database
     }
   };
 
@@ -420,13 +351,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (available) {
         const result = await userDB.updateUserProfile(currentAccountId, '', avatar);
         if (!result) {
-          console.error('❌ Failed to update avatar in database');
           return;
         }
-        console.log('✅ Avatar updated in database successfully');
       }
     } catch (error) {
-      console.error('❌ Error updating avatar in database:', error);
+      // Error updating avatar in database
       return;
     }
     
@@ -457,13 +386,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (available) {
         const result = await userDB.updateUserByAccountId(currentAccountId, { email });
         if (!result) {
-          console.error('❌ Failed to update email in database');
           return;
         }
-        console.log('✅ Email updated in database successfully');
       }
     } catch (error) {
-      console.error('❌ Error updating email in database:', error);
+      // Error updating email in database
       return;
     }
     
@@ -569,7 +496,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         updatedAt: activity.updated_at
       };
     } catch (error) {
-      console.error('Error getting user daily activity:', error);
       return null;
     }
   };
@@ -577,8 +503,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // Authentication methods
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      console.log('🔐 Attempting login with email:', email);
-      
       if (!email || !password) {
         return { success: false, error: 'Email and password are required' };
       }
@@ -617,18 +541,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(`email_${users.account_id}`, users.email);
       }
 
-      console.log('✅ Login successful for:', users.username);
       return { success: true };
     } catch (error) {
-      console.error('❌ Login error:', error);
       return { success: false, error: 'Login failed' };
     }
   };
 
   const logout = () => {
-    console.log('🚪 Logging out...');
-    
-    // Clear session but keep the account data intact
+    // Clear session but keep account data intact
     setCurrentAccountId('');
     setIsLoggedIn(false);
     
@@ -638,15 +558,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('isLoggedIn');
     }
     
-    // Don't create a new account - just clear the session
+    // Don't create a new account - just clear session
     // The account remains in database for future login
-    console.log('✅ Logged out successfully, account data preserved');
   };
 
   const switchAccount = async (accountId: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      console.log('🔄 Switching to account:', accountId);
-      
       const user = await userDB.getUserByAccountId(accountId);
       if (!user) {
         return { success: false, error: 'Account not found' };
@@ -661,18 +578,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('isLoggedIn', 'true');
       }
 
-      console.log('✅ Account switch successful');
       return { success: true };
     } catch (error) {
-      console.error('❌ Account switch error:', error);
       return { success: false, error: 'Failed to switch account' };
     }
   };
 
   const register = async (email: string, password: string, username: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      console.log('📝 Upgrading guest account to registered user:', email);
-      
       // Validation
       if (!email || !password || !username) {
         return { success: false, error: 'All fields are required' };
@@ -705,9 +618,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return { success: false, error: 'No current user found' };
       }
 
-      console.log('🔄 Upgrading existing account:', currentUser.accountId);
-
-      // Hash the password before storing
+      // Hash password before storing
       const hashedPassword = await hashPassword(password);
 
       // Update current user's account with email, hashed password, and new username
@@ -756,13 +667,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
           localStorage.setItem(`username_${currentUser.accountId}`, username);
         }
 
-        console.log('✅ Account upgrade successful');
         return { success: true };
       } else {
         return { success: false, error: 'Account upgrade failed' };
       }
     } catch (error) {
-      console.error('❌ Account upgrade error:', error);
       return { success: false, error: 'Account upgrade failed' };
     }
   };

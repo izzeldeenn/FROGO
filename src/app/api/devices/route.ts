@@ -30,11 +30,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    console.log('PUT request received');
     
     const { id, lastActive, ...updates } = await request.json();
-    
-    console.log('PUT request - ID:', id, 'Updates:', updates, 'lastActive:', lastActive);
     
     // Update device in in-memory storage
     const deviceIndex = devices.findIndex((d: any) => d.id === id);

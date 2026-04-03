@@ -107,7 +107,6 @@ export function ChallengesButton() {
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer"
             onClick={() => {
-              console.log('Backdrop clicked');
               setIsChallengesOpen(false);
             }}
           />

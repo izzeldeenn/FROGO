@@ -34,7 +34,6 @@ export function FullscreenProvider({ children }: { children: ReactNode }) {
       
       setShowFullscreenPrompt(false);
     } catch (error) {
-      console.log('Fullscreen request failed:', error);
       // Keep showing prompt if failed
     }
   };

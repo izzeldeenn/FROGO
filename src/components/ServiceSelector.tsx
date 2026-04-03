@@ -171,7 +171,6 @@ export function ServiceSelector() {
     
     // Listen for custom events when new notes are published
     const handleStickyNotePublished = (e: CustomEvent) => {
-      console.log('🔍 ServiceSelector detected new sticky note');
       loadSlides(); // Reload to update indicator
     };
 

@@ -358,7 +358,6 @@ export function Challenges() {
                 // Only allow clicking if not completed (for viewing details)
                 if (!challenge.completed) {
                   // Could show details or requirements here
-                  console.log('Challenge requirements:', challenge.description);
                 }
               }}
               style={{

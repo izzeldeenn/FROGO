@@ -220,11 +220,9 @@ function HomeContent() {
       if ('wakeLock' in navigator && 'request' in (navigator as any).wakeLock) {
         const wakeLockSentinel = await (navigator as any).wakeLock.request('screen');
         setWakeLock(wakeLockSentinel);
-        console.log('🔒 Wake Lock activated - screen will stay awake');
         
         // Listen for wake lock release
         wakeLockSentinel.addEventListener('release', () => {
-          console.log('🔓 Wake Lock released');
           setWakeLock(null);
         });
       } else {

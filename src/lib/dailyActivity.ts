@@ -86,12 +86,10 @@ export class DailyActivityDB {
         .maybeSingle(); // Use maybeSingle() instead of single() to handle no results
 
       if (error) {
-        console.error('Supabase error in getDailyActivity:', error);
         return null;
       }
       return data;
     } catch (error) {
-      console.error('Error fetching daily activity:', error);
       return null;
     }
   }
@@ -109,7 +107,6 @@ export class DailyActivityDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching user daily activities:', error);
       return [];
     }
   }
@@ -128,7 +125,6 @@ export class DailyActivityDB {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching today rankings:', error);
       return [];
     }
   }
@@ -136,27 +132,21 @@ export class DailyActivityDB {
   // Create or update daily activity
   async upsertDailyActivity(activityData: Partial<DailyActivity>): Promise<DailyActivity | null> {
     try {
-      console.log('🔄 Upserting daily activity with data:', activityData);
-      
       const { data, error } = await supabase
         .from('daily_activities')
         .upsert({
           ...activityData,
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'account_id,date', // Specify the conflict columns
+          onConflict: 'account_id,date', // Specify conflict columns
           ignoreDuplicates: false // Allow upsert to update existing records
         })
         .select()
         .single();
 
       if (error) {
-        console.error('❌ Supabase upsert error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
-        
         // If it's a duplicate key error, try to update instead
         if (error.code === '23505') {
-          console.log('🔄 Duplicate detected, trying to update existing record...');
           return this.updateExistingActivity(activityData);
         }
         
@@ -166,11 +156,8 @@ export class DailyActivityDB {
       // Update rankings after successful upsert
       await this.updateTodayRankings();
       
-      console.log('✅ Daily activity upserted successfully:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error upserting daily activity:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return null;
     }
   }
@@ -178,9 +165,7 @@ export class DailyActivityDB {
   // Helper method to update existing activity
   private async updateExistingActivity(activityData: Partial<DailyActivity>): Promise<DailyActivity | null> {
     try {
-      console.log('🔄 Updating existing activity for:', activityData.account_id, activityData.date);
-      
-      // First get the existing record
+      // First get existing record
       const { data: existing, error: fetchError } = await supabase
         .from('daily_activities')
         .select('*')
@@ -189,7 +174,6 @@ export class DailyActivityDB {
         .single();
 
       if (fetchError) {
-        console.error('❌ Error fetching existing activity:', fetchError);
         throw fetchError;
       }
 
@@ -209,17 +193,14 @@ export class DailyActivityDB {
         .single();
 
       if (error) {
-        console.error('❌ Error updating existing activity:', error);
         throw error;
       }
       
       // Update rankings after updating activity
       await this.updateTodayRankings();
       
-      console.log('✅ Existing activity updated successfully:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error in updateExistingActivity:', error);
       return null;
     }
   }
@@ -231,16 +212,12 @@ export class DailyActivityDB {
     try {
       // Validate inputs
       if (!accountId) {
-        console.error('❌ No account ID provided for realtime update');
         return null;
       }
       
       if (additionalSeconds <= 0) {
-        console.error('❌ Invalid additional seconds:', additionalSeconds);
         return null;
       }
-      
-      console.log('🔄 Updating study time in real-time:', { accountId, additionalSeconds });
       
       // First, try to get existing activity
       const existing = await this.getDailyActivity(accountId, today);
@@ -265,14 +242,12 @@ export class DailyActivityDB {
           .single();
 
         if (error) {
-          console.error('❌ Supabase update error in realtime update:', error);
           return null;
         }
         
         // Update rankings after updating activity
         await this.updateTodayRankings();
         
-        console.log('✅ Study time updated in real-time:', data);
         return data;
       } else {
         // Create new activity record
@@ -296,19 +271,15 @@ export class DailyActivityDB {
           .single();
 
         if (error) {
-          console.error('❌ Supabase insert error in realtime update:', error);
           return null;
         }
         
         // Update rankings after creating activity
         await this.updateTodayRankings();
         
-        console.log('✅ New activity created in real-time:', data);
         return data;
       }
     } catch (error) {
-      console.error('❌ Error updating study time in real-time:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return null;
     }
   }
@@ -318,11 +289,8 @@ export class DailyActivityDB {
     const today = new Date().toISOString().split('T')[0];
     
     try {
-      console.log('🚀 Starting study session for:', accountId);
-      
       // Check if user exists
       if (!accountId) {
-        console.error('❌ No account ID provided');
         return false;
       }
 
@@ -343,12 +311,8 @@ export class DailyActivityDB {
             .single();
 
           if (error) {
-            console.error('❌ Supabase update error:', error);
             return false;
           }
-          console.log('✅ Start time updated for existing activity:', data);
-        } else {
-          console.log('✅ Study session already started today');
         }
       } else {
         // Create new activity with start time
@@ -370,36 +334,15 @@ export class DailyActivityDB {
           .single();
 
         if (error) {
-          console.error('❌ Supabase insert error:', error);
-          console.error('Error code:', error.code);
-          console.error('Error message:', error.message);
-          console.error('Error details:', error.details);
-          console.error('Error hint:', error.hint);
-          console.error('Insert data being sent:', {
-            account_id: accountId,
-            date: today,
-            study_minutes: 0,
-            study_seconds: 0,
-            points_earned: 0,
-            sessions_count: 0,
-            focus_score: 50,
-            daily_rank: 999,
-            start_time: new Date().toISOString(),
-            last_updated: new Date().toISOString()
-          });
           return false;
         }
-        console.log('✅ New activity created:', data);
         
         // Update rankings after creating activity
         await this.updateTodayRankings();
       }
       
-      console.log('✅ Study session started successfully');
       return true;
     } catch (error) {
-      console.error('❌ Error starting study session:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return false;
     }
   }
@@ -409,11 +352,8 @@ export class DailyActivityDB {
     const today = new Date().toISOString().split('T')[0];
     
     try {
-      console.log('🏁 Ending study session for:', accountId);
-      
       // Check if user exists
       if (!accountId) {
-        console.error('❌ No account ID provided');
         return false;
       }
 
@@ -426,7 +366,6 @@ export class DailyActivityDB {
         .single();
 
       if (fetchError) {
-        console.error('❌ Error fetching activity:', fetchError);
         return false;
       }
 
@@ -443,7 +382,6 @@ export class DailyActivityDB {
         .single();
 
       if (error) {
-        console.error('❌ Supabase update error:', error);
         return false;
       }
 
@@ -467,18 +405,13 @@ export class DailyActivityDB {
         }
       }
       
-      console.log('✅ Study session ended successfully:', data);
       return true;
     } catch (error) {
-      console.error('❌ Error ending study session:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return false;
     }
   }
   async addStudySession(sessionData: Partial<ActivitySession>): Promise<ActivitySession | null> {
     try {
-      console.log('🔄 Adding study session with data:', sessionData);
-      
       const { data, error } = await supabase
         .from('activity_sessions')
         .insert(sessionData)
@@ -486,16 +419,11 @@ export class DailyActivityDB {
         .single();
 
       if (error) {
-        console.error('❌ Supabase insert error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
-      console.log('✅ Study session added successfully:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error adding study session:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return null;
     }
   }
@@ -503,8 +431,6 @@ export class DailyActivityDB {
   // Update study session end time
   async updateStudySession(sessionId: string, endTime: string, durationMinutes: number): Promise<ActivitySession | null> {
     try {
-      console.log('🔄 Updating study session:', { sessionId, endTime, durationMinutes });
-      
       const { data, error } = await supabase
         .from('activity_sessions')
         .update({
@@ -516,16 +442,11 @@ export class DailyActivityDB {
         .single();
 
       if (error) {
-        console.error('❌ Supabase update error:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
-      console.log('✅ Study session updated successfully:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error updating study session:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
       return null;
     }
   }
@@ -556,7 +477,6 @@ export class DailyActivityDB {
         };
       });
     } catch (error) {
-      console.error('Error fetching user activity contributions:', error);
       return [];
     }
   }
@@ -566,8 +486,6 @@ export class DailyActivityDB {
     const today = new Date().toISOString().split('T')[0];
     
     try {
-      console.log('🔄 Updating today rankings for:', today);
-      
       // Get all activities for today
       const { data: activities, error } = await supabase
         .from('daily_activities')
@@ -576,12 +494,8 @@ export class DailyActivityDB {
         .order('study_minutes', { ascending: false });
 
       if (error) {
-        console.error('❌ Error fetching activities for ranking:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
-
-      console.log('📊 Found activities for ranking:', activities?.length || 0);
 
       // Update ranks
       if (activities && activities.length > 0) {
@@ -594,20 +508,12 @@ export class DailyActivityDB {
             .eq('id', activity.id);
 
           if (updateError) {
-            console.error(`❌ Error updating rank for user ${activity.account_id}:`, updateError);
-            console.error('Update error details:', JSON.stringify(updateError, null, 2));
-          } else {
-            console.log(`✅ Updated rank ${i + 1} for ${activity.account_id}`);
+            // Error updating rank for user
           }
         }
-
-        console.log('✅ Successfully updated rankings for', activities.length, 'users');
-      } else {
-        console.log('📊 No activities found for today');
       }
     } catch (error) {
-      console.error('❌ Error updating today rankings:', error);
-      console.error('Full error object:', JSON.stringify(error, null, 2));
+      // Error updating today rankings
     }
   }
 
@@ -632,7 +538,7 @@ export class DailyActivityDB {
       
       return subscription;
     } catch (error) {
-      console.error('Error subscribing to daily activities:', error);
+      // Error subscribing to daily activities
     }
   }
 
@@ -641,7 +547,7 @@ export class DailyActivityDB {
     try {
       supabase.channel('daily_activities_changes').unsubscribe();
     } catch (error) {
-      console.error('Error unsubscribing from daily activities:', error);
+      // Error unsubscribing from daily activities
     }
   }
 }
@@ -666,7 +572,6 @@ export const createTestActivity = async (accountId: string) => {
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found"
-      console.error('❌ Error checking existing activity:', checkError);
       return null;
     }
 
@@ -689,11 +594,9 @@ export const createTestActivity = async (accountId: string) => {
         .single();
 
       if (error) {
-        console.error('❌ Error updating test activity:', error);
         return null;
       }
       
-      console.log('✅ Test activity updated successfully:', data);
       return data;
     } else {
       // Create new test activity
@@ -706,11 +609,9 @@ export const createTestActivity = async (accountId: string) => {
         focus_score: Math.floor(Math.random() * 40) + 60 // 60-100 focus score
       });
       
-      console.log('✅ New test activity created:', activity);
       return activity;
     }
   } catch (error) {
-    console.error('❌ Error creating test activity:', error);
     return null;
   }
 };

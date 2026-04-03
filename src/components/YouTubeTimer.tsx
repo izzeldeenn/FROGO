@@ -171,14 +171,12 @@ export function YouTubeTimer() {
         return;
       }
       
-      console.log('🚀 Starting YouTube timer for user:', currentUser.accountId, currentUser.username);
       
       // Start a new study session
       const success = await dailyActivityDB.startStudySession(currentUser.accountId);
       if (success) {
         setIsRunning(true);
         setShowVideo(true);
-        console.log('✅ YouTube timer started successfully');
       } else {
         console.error('❌ Failed to start study session');
       }
