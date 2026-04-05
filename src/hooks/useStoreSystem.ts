@@ -92,7 +92,7 @@ export const useStoreSystem = () => {
 
       // Give streak bonus
       if (newStreak > 1) {
-        addCoins(REWARDS.streakDay);
+        setTimeout(() => addCoins(REWARDS.streakDay), 100);
       }
 
       const updatedData = {
@@ -121,7 +121,7 @@ export const useStoreSystem = () => {
     const totalReward = baseReward + bonusReward;
     
     // Add bonus coins from store system (in addition to the main point system)
-    addCoins(totalReward);
+    setTimeout(() => addCoins(totalReward), 50);
 
     const updatedData = {
       ...userStoreData,
@@ -141,7 +141,7 @@ export const useStoreSystem = () => {
     const rewardPoints = REWARDS.pomodoroSession;
     
     // Add bonus coins from store system (in addition to the main point system)
-    addCoins(rewardPoints);
+    setTimeout(() => addCoins(rewardPoints), 50);
 
     const updatedData = {
       ...userStoreData,
@@ -161,7 +161,7 @@ export const useStoreSystem = () => {
     const rewardPoints = REWARDS.levelUp;
     
     // Add bonus coins from store system (in addition to the main point system)
-    addCoins(rewardPoints);
+    setTimeout(() => addCoins(rewardPoints), 50);
 
     const updatedData = {
       ...userStoreData,
@@ -184,7 +184,7 @@ export const useStoreSystem = () => {
     const rewardPoints = REWARDS.achievement;
     
     // Add bonus coins from store system (in addition to the main point system)
-    addCoins(rewardPoints);
+    setTimeout(() => addCoins(rewardPoints), 50);
 
     const updatedData = {
       ...userStoreData,

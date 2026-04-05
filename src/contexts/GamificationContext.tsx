@@ -63,9 +63,12 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  // Sync coins with real user score from database
+  // Track if we're in the middle of a purchase operation
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Sync coins with real user score from database (only when not updating)
   useEffect(() => {
-    if (currentUser?.score !== undefined) {
+    if (currentUser?.score !== undefined && !isUpdating) {
       setState(prev => ({
         ...prev,
         coins: currentUser.score,
@@ -73,7 +76,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         experience: currentUser.score
       }));
     }
-  }, [currentUser?.score]);
+  }, [currentUser?.score, isUpdating]);
 
   useEffect(() => {
     localStorage.setItem('fahman_hub_gamification', JSON.stringify(state));
@@ -107,6 +110,9 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   };
 
   const addCoins = (amount: number) => {
+    // Set updating flag to prevent sync override
+    setIsUpdating(true);
+    
     // Update real user score in database
     if (currentUser) {
       updateUserScore(amount);
@@ -119,9 +125,15 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       experience: prev.experience + amount,
       level: Math.floor((prev.experience + amount) / 100) + 1
     }));
+    
+    // Clear updating flag after a short delay to allow database update
+    setTimeout(() => setIsUpdating(false), 1000);
   };
 
   const removeCoins = (amount: number) => {
+    // Set updating flag to prevent sync override
+    setIsUpdating(true);
+    
     // Update real user score in database
     if (currentUser) {
       updateUserScore(-amount);
@@ -134,6 +146,9 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       experience: Math.max(0, prev.experience - amount),
       level: Math.floor(Math.max(0, prev.experience - amount) / 100) + 1
     }));
+    
+    // Clear updating flag after a short delay to allow database update
+    setTimeout(() => setIsUpdating(false), 1000);
   };
 
   const generateDailyTasks = () => {
