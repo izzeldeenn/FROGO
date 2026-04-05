@@ -57,13 +57,13 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#f59e0b',
         font: 'font-mono',
         design: 'minimal',
-        size: 'text-5xl'
+        size: 'text-6xl'
       },
       pomodoro: {
         color: '#ef4444',
         font: 'font-mono',
         design: 'minimal',
-        size: 'text-4xl',
+        size: 'text-6xl',
         completedIcon: '🍅'
       },
       language: 'ar'
@@ -90,19 +90,19 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#a78bfa',
         font: 'font-sans',
         design: 'rounded',
-        size: 'text-5xl'
+        size: 'text-6xl'
       },
       countdown: {
         color: '#c084fc',
         font: 'font-sans',
         design: 'rounded',
-        size: 'text-4xl'
+        size: 'text-6xl'
       },
       pomodoro: {
         color: '#e9d5ff',
         font: 'font-sans',
         design: 'rounded',
-        size: 'text-3xl',
+        size: 'text-6xl',
         completedIcon: '✨'
       },
       language: 'ar'
@@ -129,7 +129,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#f97316',
         font: 'font-bold',
         design: 'neon',
-        size: 'text-7xl'
+        size: 'text-6xl'
       },
       countdown: {
         color: '#fb923c',
@@ -141,7 +141,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#fed7aa',
         font: 'font-bold',
         design: 'neon',
-        size: 'text-5xl',
+        size: 'text-6xl',
         completedIcon: '🔥'
       },
       language: 'ar'
@@ -159,19 +159,19 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#374151',
         font: 'font-mono',
         design: 'minimal',
-        size: 'text-4xl'
+        size: 'text-6xl'
       },
       countdown: {
         color: '#6b7280',
         font: 'font-mono',
         design: 'minimal',
-        size: 'text-3xl'
+        size: 'text-6xl'
       },
       pomodoro: {
         color: '#9ca3af',
         font: 'font-mono',
         design: 'minimal',
-        size: 'text-2xl',
+        size: 'text-6xl',
         completedIcon: '⏰'
       },
       language: 'ar'
@@ -198,19 +198,19 @@ export const DEFAULT_PRESETS: UserPreset[] = [
         color: '#16a34a',
         font: 'font-serif',
         design: 'organic',
-        size: 'text-5xl'
+        size: 'text-6xl'
       },
       countdown: {
         color: '#22c55e',
         font: 'font-serif',
         design: 'organic',
-        size: 'text-4xl'
+        size: 'text-6xl'
       },
       pomodoro: {
         color: '#4ade80',
         font: 'font-serif',
         design: 'organic',
-        size: 'text-3xl',
+        size: 'text-6xl',
         completedIcon: '🌱'
       },
       language: 'ar'

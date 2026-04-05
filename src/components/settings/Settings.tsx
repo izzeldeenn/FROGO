@@ -14,6 +14,7 @@ import { ActivityContribution } from '@/lib/dailyActivity';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { BACKGROUNDS } from '@/constants/backgrounds';
 import { PresetSelector } from '@/components/settings/PresetSelector';
+import { LocalBackgroundSelector } from '@/components/backgrounds/LocalBackgroundSelector';
 
 // Generate 250 avatars dynamically
 const AVATARS = Array.from({ length: 250 }, (_, i) => 
@@ -75,6 +76,7 @@ export function SettingsButton() {
   });
   const [customThemeName, setCustomThemeName] = useState('');
   const [selectedBackground, setSelectedBackground] = useState('default');
+  const [customBackgroundValue, setCustomBackgroundValue] = useState('');
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('');
   const [customAvatarUrl, setCustomAvatarUrl] = useState('');
@@ -172,19 +174,37 @@ export function SettingsButton() {
     updateThemeColors(customColors);
   };
 
-  const handleBackgroundSelect = (backgroundId: string) => {
+  const handleBackgroundSelect = (backgroundId: string, backgroundValue?: string) => {
     setSelectedBackground(backgroundId);
+    
+    // Handle custom backgrounds
+    if (backgroundValue) {
+      setCustomBackgroundValue(backgroundValue);
+      localStorage.setItem('customBackgroundValue', backgroundValue);
+    }
+    
     // Store in localStorage for global access
     localStorage.setItem('selectedBackground', backgroundId);
+    
     // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('backgroundChange', { detail: backgroundId }));
+    window.dispatchEvent(new CustomEvent('backgroundChange', { 
+      detail: { 
+        backgroundId, 
+        customValue: backgroundValue || (backgroundId.startsWith('custom-') ? customBackgroundValue : undefined)
+      } 
+    }));
   };
 
   // Load background from localStorage on mount
   useEffect(() => {
     const savedBackground = localStorage.getItem('selectedBackground');
+    const savedCustomValue = localStorage.getItem('customBackgroundValue');
+    
     if (savedBackground) {
       setSelectedBackground(savedBackground);
+    }
+    if (savedCustomValue) {
+      setCustomBackgroundValue(savedCustomValue);
     }
   }, []);
 
@@ -1143,161 +1163,62 @@ export function SettingsButton() {
                             </label>
                           </div>
                           
-                          {/* Background Categories */}
-                          <div className="space-y-4">
-                            {/* Basic Backgrounds */}
-                            <div>
-                              <h5 className={`text-sm font-medium mb-3 ${
-                                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                              }`}>
-                                أساسية
-                              </h5>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {BACKGROUNDS.filter(bg => ['default', 'gradient1', 'gradient2', 'gradient3', 'gradient4', 'gradient5', 'pattern1', 'pattern2'].includes(bg.id)).map((background) => (
-                                  <button
-                                    key={background.id}
-                                    onClick={() => handleBackgroundSelect(background.id)}
-                                    className={`p-3 rounded-2xl transition-all duration-300 relative overflow-hidden group ${
-                                      selectedBackground === background.id
-                                        ? 'ring-2 ring-offset-2'
-                                        : ''
-                                    }`}
-                                    style={{
-                                      background: selectedBackground === background.id
-                                        ? `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`
-                                        : `linear-gradient(135deg, ${customTheme.colors.surface}, ${customTheme.colors.background})`,
-                                      boxShadow: selectedBackground === background.id
-                                        ? `0 12px 48px ${customTheme.colors.primary}50, 0 4px 16px ${customTheme.colors.primary}30`
-                                        : `0 4px 16px ${customTheme.colors.border}30`
+                          <LocalBackgroundSelector
+                            selectedBackground={selectedBackground}
+                            onBackgroundSelect={handleBackgroundSelect}
+                          />
+                          
+                          {/* Default Backgrounds */}
+                          <div className="mt-8">
+                            <h4 className={`text-lg font-semibold mb-4 ${
+                              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                            }`}>
+                              الخلفيات الافتراضية
+                            </h4>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                              {BACKGROUNDS.filter(bg => ['default', 'gradient1', 'gradient2', 'gradient3', 'gradient4', 'gradient5', 'pattern1', 'pattern2', 'focus1', 'focus2', 'focus3', 'focus4', 'focus5', 'focus6', 'focus7'].includes(bg.id)).map((background) => (
+                                <button
+                                  key={background.id}
+                                  onClick={() => handleBackgroundSelect(background.id)}
+                                  className={`p-3 rounded-2xl transition-all duration-300 relative overflow-hidden group ${
+                                    selectedBackground === background.id
+                                      ? 'ring-2 ring-offset-2'
+                                      : ''
+                                  }`}
+                                  style={{
+                                    background: selectedBackground === background.id
+                                      ? `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`
+                                      : `linear-gradient(135deg, ${customTheme.colors.surface}, ${customTheme.colors.background})`,
+                                    boxShadow: selectedBackground === background.id
+                                      ? `0 12px 48px ${customTheme.colors.primary}50, 0 4px 16px ${customTheme.colors.primary}30`
+                                      : `0 4px 16px ${customTheme.colors.border}30`
+                                  }}
+                                >
+                                  <div 
+                                    className="w-full h-12 rounded mb-2"
+                                    style={{ 
+                                      background: background.value,
+                                      border: background.value === 'transparent' ? '2px dashed #d1d5db' : 'none',
+                                      backgroundImage: background.value.startsWith('url(') ? background.value : 'none',
+                                      backgroundSize: background.value.startsWith('url(') ? 'cover' : 'auto',
+                                      backgroundPosition: background.value.startsWith('url(') ? 'center' : 'auto'
                                     }}
-                                  >
-                                    <div 
-                                      className="w-full h-12 rounded mb-2"
-                                      style={{ 
-                                        background: background.value,
-                                        border: background.value === 'transparent' ? '2px dashed #d1d5db' : 'none'
-                                      }}
-                                    />
-                                    <div className={`text-xs font-medium ${
-                                      selectedBackground === background.id ? 'text-white' : customTheme.colors.text
-                                    }`}>
-                                      {background.name}
-                                    </div>
-                                    
-                                    {/* Hover effect */}
-                                    <div 
-                                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                      style={{
-                                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)'
-                                      }}
-                                    />
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Focus Images */}
-                            <div>
-                              <h5 className={`text-sm font-medium mb-3 ${
-                                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                              }`}>
-                                صور للتركيز
-                              </h5>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {BACKGROUNDS.filter(bg => ['focus1', 'focus2', 'focus3', 'focus4', 'focus5', 'focus6', 'focus7', 'focus8'].includes(bg.id)).map((background) => (
-                                  <button
-                                    key={background.id}
-                                    onClick={() => handleBackgroundSelect(background.id)}
-                                    className={`p-3 rounded-2xl transition-all duration-300 relative overflow-hidden group ${
-                                      selectedBackground === background.id
-                                        ? 'ring-2 ring-offset-2'
-                                        : ''
-                                    }`}
+                                  />
+                                  <div className={`text-xs font-medium ${
+                                    selectedBackground === background.id ? 'text-white' : customTheme.colors.text
+                                  }`}>
+                                    {background.name}
+                                  </div>
+                                  
+                                  {/* Hover effect */}
+                                  <div 
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     style={{
-                                      background: selectedBackground === background.id
-                                        ? `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`
-                                        : `linear-gradient(135deg, ${customTheme.colors.surface}, ${customTheme.colors.background})`,
-                                      boxShadow: selectedBackground === background.id
-                                        ? `0 12px 48px ${customTheme.colors.primary}50, 0 4px 16px ${customTheme.colors.primary}30`
-                                        : `0 4px 16px ${customTheme.colors.border}30`
+                                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)'
                                     }}
-                                  >
-                                    <div 
-                                      className="w-full h-12 rounded mb-2 bg-cover bg-center"
-                                      style={{ 
-                                        backgroundImage: background.value,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
-                                      }}
-                                    />
-                                    <div className={`text-xs font-medium ${
-                                      selectedBackground === background.id ? 'text-white' : customTheme.colors.text
-                                    }`}>
-                                      {background.name}
-                                    </div>
-                                    
-                                    {/* Hover effect */}
-                                    <div 
-                                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                      style={{
-                                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)'
-                                      }}
-                                    />
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Animated Backgrounds */}
-                            <div>
-                              <h5 className={`text-sm font-medium mb-3 ${
-                                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                              }`}>
-                                خلفيات متحركة
-                              </h5>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {BACKGROUNDS.filter(bg => ['animated1', 'animated2', 'animated3', 'animated4', 'animated5', 'animated6', 'animated7', 'animated8', 'animated9', 'animated10'].includes(bg.id)).map((background) => (
-                                  <button
-                                    key={background.id}
-                                    onClick={() => handleBackgroundSelect(background.id)}
-                                    className={`p-3 rounded-2xl transition-all duration-300 relative overflow-hidden group ${
-                                      selectedBackground === background.id
-                                        ? 'ring-2 ring-offset-2'
-                                        : ''
-                                    }`}
-                                    style={{
-                                      background: selectedBackground === background.id
-                                        ? `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`
-                                        : `linear-gradient(135deg, ${customTheme.colors.surface}, ${customTheme.colors.background})`,
-                                      boxShadow: selectedBackground === background.id
-                                        ? `0 12px 48px ${customTheme.colors.primary}50, 0 4px 16px ${customTheme.colors.primary}30`
-                                        : `0 4px 16px ${customTheme.colors.border}30`
-                                    }}
-                                  >
-                                    <div 
-                                      className="w-full h-12 rounded"
-                                      style={{ 
-                                        background: background.value,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
-                                      }}
-                                    />
-                                    <div className={`text-xs font-medium ${
-                                      selectedBackground === background.id ? 'text-white' : customTheme.colors.text
-                                    }`}>
-                                      {background.name}
-                                    </div>
-                                    
-                                    {/* Hover effect */}
-                                    <div 
-                                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                      style={{
-                                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)'
-                                      }}
-                                    />
-                                  </button>
-                                ))}
-                              </div>
+                                  />
+                                </button>
+                              ))}
                             </div>
                           </div>
                         </div>

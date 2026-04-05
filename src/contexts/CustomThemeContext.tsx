@@ -122,6 +122,39 @@ export function CustomThemeProvider({ children }: { children: ReactNode }) {
     const updatedThemes = [...availableThemes, newTheme];
     setAvailableThemes(updatedThemes);
     setTheme(newTheme);
+    
+    // Also set timer settings to use large fonts when creating custom theme
+    const largeTimerSettings = {
+      color: colors.primary || '#84cc16',
+      font: 'font-mono',
+      design: 'minimal',
+      size: 'text-6xl'
+    };
+    
+    localStorage.setItem('timer_settings', JSON.stringify(largeTimerSettings));
+    window.dispatchEvent(new CustomEvent('timerSettingsChanged', { detail: largeTimerSettings }));
+    
+    // Also set countdown and pomodoro to use large fonts
+    const largeCountdownSettings = {
+      color: colors.secondary || '#fbbf24',
+      font: 'font-mono',
+      design: 'minimal',
+      size: 'text-6xl'
+    };
+    
+    localStorage.setItem('countdown_timer_settings', JSON.stringify(largeCountdownSettings));
+    window.dispatchEvent(new CustomEvent('countdownTimerSettingsChanged', { detail: largeCountdownSettings }));
+    
+    const largePomodoroSettings = {
+      color: colors.accent || '#166534',
+      font: 'font-mono',
+      design: 'minimal',
+      size: 'text-6xl',
+      completedIcon: '🍅'
+    };
+    
+    localStorage.setItem('pomodoro_timer_settings', JSON.stringify(largePomodoroSettings));
+    window.dispatchEvent(new CustomEvent('pomodoroTimerSettingsChanged', { detail: largePomodoroSettings }));
   };
 
   const updateThemeColors = (colors: Partial<ThemeColors>) => {
@@ -131,6 +164,23 @@ export function CustomThemeProvider({ children }: { children: ReactNode }) {
         colors: { ...currentTheme.colors, ...colors }
       };
       setTheme(updatedTheme);
+      
+      // Also update timer settings with new colors while keeping large fonts
+      const currentTimerSettings = localStorage.getItem('timer_settings');
+      if (currentTimerSettings) {
+        try {
+          const timerSettings = JSON.parse(currentTimerSettings);
+          const updatedTimerSettings = {
+            ...timerSettings,
+            color: colors.primary || timerSettings.color,
+            size: 'text-6xl' // Ensure large font
+          };
+          localStorage.setItem('timer_settings', JSON.stringify(updatedTimerSettings));
+          window.dispatchEvent(new CustomEvent('timerSettingsChanged', { detail: updatedTimerSettings }));
+        } catch (error) {
+          console.error('Error updating timer settings:', error);
+        }
+      }
     }
   };
 

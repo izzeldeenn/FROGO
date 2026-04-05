@@ -24,6 +24,7 @@ import { OnboardingWizard } from '@/components/auth/OnboardingWizard';
 import { MusicPlayer } from '@/components/music/MusicPlayer';
 import { MusicToggleButton } from '@/components/music/MusicToggleButton';
 import { dailyActivityDB } from '@/lib/dailyActivity';
+import { useBackgroundValue } from '@/hooks/useBackgroundValue';
 
 // User account interface for profile modal
 interface UserAccount {
@@ -71,6 +72,20 @@ const MOTIVATIONAL_QUOTES = {
 
 // Helper function to get background properties
 const getBackgroundStyles = (backgroundId: string) => {
+  // Check for custom backgrounds
+  const customValue = typeof window !== 'undefined' ? localStorage.getItem('customBackgroundValue') : null;
+  
+  // Handle custom backgrounds
+  if (backgroundId?.startsWith('custom-') && customValue) {
+    return {
+      backgroundImage: customValue.startsWith('url(') ? customValue : `url(${customValue})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    };
+  }
+  
+  // Handle default backgrounds
   const background = BACKGROUNDS.find(bg => bg.id === backgroundId)?.value || 'transparent';
   const isImageUrl = background?.startsWith('url(');
   
@@ -84,7 +99,7 @@ const getBackgroundStyles = (backgroundId: string) => {
   }
   
   return {
-    backgroundImage: backgroundId
+    backgroundImage: background
   };
 };
 
@@ -345,9 +360,15 @@ function HomeContent() {
     };
 
     // Listen for background changes
-  const handleBackgroundChange = (event: CustomEvent) => {
-    setSelectedBackground(event.detail);
-  };
+    const handleBackgroundChange = (event: CustomEvent) => {
+      // Handle both old format (string) and new format (object)
+      const detail = event.detail;
+      if (typeof detail === 'string') {
+        setSelectedBackground(detail);
+      } else if (detail && typeof detail === 'object') {
+        setSelectedBackground(detail.backgroundId);
+      }
+    };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);

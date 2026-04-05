@@ -355,14 +355,7 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                           {Math.floor(getTodayStudyTime(user) / 60)}m
                         </div>
 
-                        {userIsActive && (
-                          <div className="flex items-center">
-                            <span className={`w-2 h-2 rounded-full ${
-                              theme === 'light' ? 'bg-green-500' : 'bg-green-400'
-                            } animate-pulse shadow-lg shadow-green-500/50`}></span>
-                          </div>
-                        )}
-                      </div>
+                       </div>
                     </div>
                   </div>
                 );
