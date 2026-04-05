@@ -61,7 +61,6 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { addCoins } = useGamification();
   const [users, setUsers] = useState<UserAccountFrontend[]>([]);
   const [currentAccountId, setCurrentAccountId] = useState<string>('');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -452,8 +451,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return newUsers;
     });
 
-    // Add coins to gamification system
-    addCoins(pointsEarned);
+    // Note: Points are automatically added by the dailyActivity system
+    // No need to manually add coins here
   };
 
   const updateUserScore = async (additionalScore: number) => {

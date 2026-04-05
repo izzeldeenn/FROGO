@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useUser } from './UserContext';
 
 interface Task {
   id: string;
@@ -37,6 +38,9 @@ interface GamificationContextType {
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
 
 export function GamificationProvider({ children }: { children: ReactNode }) {
+  const { getCurrentUser, updateUserScore } = useUser();
+  const currentUser = getCurrentUser();
+  
   const [state, setState] = useState<GamificationState>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('fahman_hub_gamification');
@@ -58,6 +62,18 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       lastStudyDate: null
     };
   });
+
+  // Sync coins with real user score from database
+  useEffect(() => {
+    if (currentUser?.score !== undefined) {
+      setState(prev => ({
+        ...prev,
+        coins: currentUser.score,
+        level: Math.floor(currentUser.score / 100) + 1,
+        experience: currentUser.score
+      }));
+    }
+  }, [currentUser?.score]);
 
   useEffect(() => {
     localStorage.setItem('fahman_hub_gamification', JSON.stringify(state));
@@ -91,16 +107,32 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   };
 
   const addCoins = (amount: number) => {
+    // Update real user score in database
+    if (currentUser) {
+      updateUserScore(amount);
+    }
+    
+    // Update local state for immediate UI feedback
     setState(prev => ({
       ...prev,
-      coins: prev.coins + amount
+      coins: prev.coins + amount,
+      experience: prev.experience + amount,
+      level: Math.floor((prev.experience + amount) / 100) + 1
     }));
   };
 
   const removeCoins = (amount: number) => {
+    // Update real user score in database
+    if (currentUser) {
+      updateUserScore(-amount);
+    }
+    
+    // Update local state for immediate UI feedback
     setState(prev => ({
       ...prev,
-      coins: Math.max(0, prev.coins - amount)
+      coins: Math.max(0, prev.coins - amount),
+      experience: Math.max(0, prev.experience - amount),
+      level: Math.floor(Math.max(0, prev.experience - amount) / 100) + 1
     }));
   };
 

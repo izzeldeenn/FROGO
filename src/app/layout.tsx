@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "../styles/effects.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { GamificationProvider } from "@/contexts/GamificationContext";
@@ -42,16 +43,16 @@ export default function RootLayout({
       >
         <LanguageProvider>
           <ThemeProvider>
-            <GamificationProvider>
-              <UserProvider>
+            <UserProvider>
+              <GamificationProvider>
                 <StudySessionProvider>
                   <MusicProvider>
                     <FirstTimeSetup />
                     {children}
                   </MusicProvider>
                 </StudySessionProvider>
-              </UserProvider>
-            </GamificationProvider>
+              </GamificationProvider>
+            </UserProvider>
           </ThemeProvider>
         </LanguageProvider>
         <Analytics />

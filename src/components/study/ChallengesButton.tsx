@@ -5,16 +5,24 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
+import { useGamification } from '@/contexts/GamificationContext';
+
 import { Challenges } from './Challenges';
 
 export function ChallengesButton() {
   const { theme } = useTheme();
   const { language } = useLanguage();
   const customTheme = useCustomThemeClasses();
+  const { coins } = useGamification();
   const router = useRouter();
   const [isChallengesOpen, setIsChallengesOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const loadChallengesProgress = () => {
@@ -49,6 +57,48 @@ export function ChallengesButton() {
       window.removeEventListener('challengesUpdated', handleStorageChange);
     };
   }, []);
+
+  const renderStoreButton = () => (
+    <button
+      onClick={() => router.push('/store')}
+      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, #8b5cf6, #7c3aed)`,
+        boxShadow: `0 4px 16px #8b5cf630, 0 0 0 2px #8b5cf615`,
+        color: '#ffffff'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+        e.currentTarget.style.boxShadow = `0 6px 24px #8b5cf640, 0 0 0 2px #8b5cf620`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1) translateY(0)';
+        e.currentTarget.style.boxShadow = `0 4px 16px #8b5cf630, 0 0 0 2px #8b5cf615`;
+      }}
+      aria-label={language === 'ar' ? 'المتجر' : 'Store'}
+      title={mounted ? `${language === 'ar' ? 'المتجر' : 'Store'} - ${coins} ${language === 'ar' ? 'نقطة' : 'coins'}` : language === 'ar' ? 'المتجر' : 'Store'}
+    >
+      {/* Store Icon with Animation */}
+      <div className="relative flex items-center justify-center">
+        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+          🛍️
+        </span>
+        {/* Coins Badge */}
+        {mounted && (
+          <div className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-purple-600 border-2 border-white shadow-lg flex items-center justify-center px-1">
+            <span className="text-xs font-bold text-white">{coins}</span>
+          </div>
+        )}
+        {/* Shine Effect */}
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
+          style={{
+            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
+          }}
+        />
+      </div>
+    </button>
+  );
 
   const renderChallengesButton = () => (
     <button
@@ -195,6 +245,8 @@ export function ChallengesButton() {
 
   return (
     <div className="flex flex-col gap-3">
+      {renderStoreButton()}
+      {renderChallengesButton()}
       {renderRealTimeChallengeButton()}
       {renderChallengesModal()}
     </div>
