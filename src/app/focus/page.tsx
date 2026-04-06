@@ -435,45 +435,17 @@ function HomeContent() {
         {/* Desktop Layout - Full screen with floating sidebar */}
         <div className="hidden md:flex w-full h-full relative">
           
-          {/* Top Bar with Logo and Social */}
-          <div className="absolute top-0 left-0 right-0 z-40 p-6 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Logo />
-              <MusicToggleButton />
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <div 
-                className="text-2xl transition-all duration-300 max-w-lg text-center"
-                style={{ 
-                  fontFamily: "'ADLaM Display', sans-serif",
-                  color: theme === 'light' ? '#1f2937' : '#f3f4f6',
-                  textShadow: theme === 'light' ? '0 2px 4px rgba(0,0,0,0.1)' : '0 2px 4px rgba(255,255,255,0.1)',
-                  fontWeight: 400
-                }}
-              >
-                "{MOTIVATIONAL_QUOTES[language as keyof typeof MOTIVATIONAL_QUOTES][currentQuoteIndex]}"
-              </div>
-              {currentQuoteIndex < MOTIVATIONAL_QUOTES[language as keyof typeof MOTIVATIONAL_QUOTES].length - 1 && (
-                <div 
-                  className="text-lg transition-all duration-300 max-w-lg text-center opacity-75"
-                  style={{ 
-                    fontFamily: "'ADLaM Display', sans-serif",
-                    color: theme === 'light' ? '#4b5563' : '#d1d5db',
-                    textShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.05)' : '0 1px 2px rgba(255,255,255,0.05)',
-                    fontWeight: 400
-                  }}
-                >
-                  "{MOTIVATIONAL_QUOTES[language as keyof typeof MOTIVATIONAL_QUOTES][(currentQuoteIndex + 1) % MOTIVATIONAL_QUOTES[language as keyof typeof MOTIVATIONAL_QUOTES].length]}"
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Right section - Full width */}
           <div 
             className="w-full flex items-center justify-center p-8 relative h-full overflow-hidden"
             style={getBackgroundStyles(selectedBackground)}
           >
+            <div className="absolute top-8 right-8">
+              <Logo />
+            </div>
+            <div className="absolute top-8 left-8">
+              <MusicToggleButton />
+            </div>
             <ServiceSelector />
             <div className="flex flex-col gap-3">
               <ChallengesButton />
@@ -505,6 +477,7 @@ function HomeContent() {
             >
               <ServiceSelector />
             </div>
+            
             {/* Fixed Buttons Container */}
             <div className="absolute top-4 right-4 flex flex-col gap-3">
               <ChallengesButton />
