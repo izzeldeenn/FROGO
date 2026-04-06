@@ -41,6 +41,15 @@ export function CurrentUserSelector({ studyStreak }: { studyStreak?: number }) {
   const currentUser = getCurrentUser();
   const isActive = isTimerActive();
 
+  // Format time to HH:MM:SS
+  const formatStudyTime = (minutes: number) => {
+    const totalSeconds = minutes * 60;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutesLeft = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutesLeft.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   // Calculate study streak (same function as ActivityGraph)
   const calculateCurrentStreak = (contributions: any[]): number => {
     if (contributions.length === 0) return 0;
@@ -193,7 +202,7 @@ export function CurrentUserSelector({ studyStreak }: { studyStreak?: number }) {
                       : 'bg-gradient-to-r from-yellow-900/30 to-green-900/30 text-green-300 border border-yellow-700/50'
                   }`}>
                     <span className="w-1 h-1 bg-green-500 rounded-full mr-1 animate-pulse"></span>
-                    {todayStudyTime}m ⏱️
+                    {formatStudyTime(todayStudyTime)} ⏱️
                   </div>
                   
                   {currentStreak > 0 && (
