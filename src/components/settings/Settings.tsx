@@ -32,27 +32,6 @@ interface ThemeColors {
 }
 
 
-// Settings sections configuration
-const SETTINGS_SECTIONS = [
-  { id: 'presets', name: 'الإعدادات المسبقة', icon: '🎨' },
-  { id: 'profile', name: 'الملف الشخصي', icon: '👤' },
-  { id: 'appearance', name: 'المظهر', icon: '🎨' },
-  { id: 'themes', name: 'الثيمات', icon: '🎭' },
-  { id: 'rankings', name: 'عرض الترتيب', icon: '🏆' },
-  { id: 'timer', name: 'التايمر', icon: '⏱️' },
-  { id: 'countdown', name: 'العد التنازلي', icon: '⏳' },
-  { id: 'pomodoro', name: 'بومودورو', icon: '🍅' },
-  { id: 'account', name: 'الحساب', icon: '🔐' },
-];
-
-// Ranking display modes
-const RANKING_DISPLAY_MODES = [
-  { id: 'bottom', name: 'منبثق من الأسفل', icon: '⬆️', description: 'ينزلق من أسفل الشاشة' },
-  { id: 'side', name: 'شريط جانبي', icon: '➡️', description: 'شريط ثابت على الجانب' },
-  { id: 'floating', name: 'عائم', icon: '🎈', description: 'نافذة عائمة قابلة للتحريك' },
-  { id: 'top', name: 'منبثق من الأعلى', icon: '⬇️', description: 'ينزلق من أعلى الشاشة' },
-];
-
 export function SettingsButton() {
   const { theme } = useTheme();
   const { coins, level, experience } = useGamification();
@@ -60,6 +39,27 @@ export function SettingsButton() {
   const { language, setLanguage, t } = useLanguage();
   const { currentTheme, setTheme, availableThemes, createCustomTheme, updateThemeColors } = useCustomTheme();
   const customTheme = useCustomThemeClasses();
+
+  // Settings sections configuration
+  const getSettingsSections = () => [
+    { id: 'presets', name: t.presets || 'الإعدادات المسبقة', icon: '🎨' },
+    { id: 'profile', name: t.profile || 'الملف الشخصي', icon: '👤' },
+    { id: 'appearance', name: t.appearance || 'المظهر', icon: '🎨' },
+    { id: 'themes', name: t.themes || 'الثيمات', icon: '🎭' },
+    { id: 'rankings', name: t.rankings || 'عرض الترتيب', icon: '🏆' },
+    { id: 'timer', name: t.timer || 'التايمر', icon: '⏱️' },
+    { id: 'countdown', name: t.countdown || 'العد التنازلي', icon: '⏳' },
+    { id: 'pomodoro', name: t.pomodoro || 'بومودورو', icon: '🍅' },
+    { id: 'account', name: t.account || 'الحساب', icon: '🔐' },
+  ];
+
+  // Ranking display modes
+  const getRankingDisplayModes = () => [
+    { id: 'bottom', name: t.bottom_popup || 'منبثق من الأسفل', icon: '⬆️', description: t.bottom_popup_desc || 'ينزلق من أسفل الشاشة' },
+    { id: 'side', name: t.side_bar || 'شريط جانبي', icon: '➡️', description: t.side_bar_desc || 'شريط ثابت على الجانب' },
+    { id: 'floating', name: t.floating || 'عائم', icon: '🎈', description: t.floating_desc || 'نافذة عائمة قابلة للتحريك' },
+    { id: 'top', name: t.top_popup || 'منبثق من الأعلى', icon: '⬇️', description: t.top_popup_desc || 'ينزلق من أعلى الشاشة' },
+  ];
   const [showSettings, setShowSettings] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
@@ -397,7 +397,7 @@ export function SettingsButton() {
 
                   <nav className="mt-4 flex-1 overflow-auto">
                     <ul className="flex flex-col gap-2">
-                      {SETTINGS_SECTIONS.map((section) => {
+                      {getSettingsSections().map((section) => {
                         const active = activeSection === section.id;
                         return (
                           <li key={section.id}>
@@ -477,7 +477,7 @@ export function SettingsButton() {
                         <h3 className={`text-lg font-black tracking-tight ${
                           theme === 'light' ? 'text-gray-900' : 'text-gray-50'
                         }`}>
-                          {SETTINGS_SECTIONS.find(s => s.id === activeSection)?.name}
+                          {getSettingsSections().find(s => s.id === activeSection)?.name}
                         </h3>
                         <div className={`text-xs opacity-70 mt-1 ${
                           theme === 'light' ? 'text-gray-600' : 'text-gray-400'
@@ -1395,7 +1395,7 @@ export function SettingsButton() {
                         </h4>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {RANKING_DISPLAY_MODES.map((mode) => (
+                          {getRankingDisplayModes().map((mode) => (
                             <button
                               key={mode.id}
                               onClick={() => {

@@ -22,6 +22,8 @@ const translations = {
     coins: 'Coins',
     // Settings
     settings: 'Settings',
+    presets: 'Presets',
+    profile: 'Profile',
     username: 'UserName',
     appearance: 'Appearance',
   themes: 'Themes',
@@ -80,7 +82,16 @@ const translations = {
     progress: 'Progress',
     completedAt: 'Completed at',
     todayBtn: 'Today',
-    tasks: 'Tasks'
+    tasks: 'Tasks',
+    // Ranking display modes
+    bottom_popup: 'Bottom Popup',
+    bottom_popup_desc: 'Slides up from bottom of screen',
+    side_bar: 'Side Bar',
+    side_bar_desc: 'Fixed sidebar on the side',
+    floating: 'Floating',
+    floating_desc: 'Movable floating window',
+    top_popup: 'Top Popup',
+    top_popup_desc: 'Slides down from top of screen'
   },
   ar: {
     // Timer
@@ -99,6 +110,8 @@ const translations = {
     coins: 'عملات',
     // Settings
     settings: 'إعدادات',
+    presets: 'الإعدادات المسبقة',
+    profile: 'الملف الشخصي',
     username: 'اسم المستخدم',
     appearance: 'المظهر',
   themes: 'الثيمات',
@@ -157,7 +170,16 @@ const translations = {
     progress: 'التقدم',
     completedAt: 'تم الإكمال في',
     todayBtn: 'اليوم',
-    tasks: 'المهام'
+    tasks: 'المهام',
+    // Ranking display modes
+    bottom_popup: 'منبثق من الأسفل',
+    bottom_popup_desc: 'ينزلق من أسفل الشاشة',
+    side_bar: 'شريط جانبي',
+    side_bar_desc: 'شريط ثابت على الجانب',
+    floating: 'عائم',
+    floating_desc: 'نافذة عائمة قابلة للتحريك',
+    top_popup: 'منبثق من الأعلى',
+    top_popup_desc: 'ينزلق من أعلى الشاشة'
   }
 };
 
