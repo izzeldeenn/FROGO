@@ -51,7 +51,8 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     if (isSessionActive) {
       setLoading(false);
     } else {
-      loadDailyRankings();
+      // Force update rankings immediately when session ends
+      loadDailyRankings(true, true);
     }
   }, [isSessionActive]);
 
@@ -81,16 +82,16 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     setDisplayUsers(sortedUsers);
   }, [users, dailyRankings, isSessionActive]);
 
-  const loadDailyRankings = async (showLoading = true) => {
+  const loadDailyRankings = async (showLoading = true, forceUpdate = false) => {
     try {
       if (showLoading) {
         setLoading(true);
       }
       
-      // Only update rankings if it's been more than 2 minutes since last update
+      // Force update if requested, otherwise use the 2-minute cache
       const lastRankUpdate = localStorage.getItem('lastRankUpdate');
       const now = Date.now();
-      const shouldUpdateRankings = !lastRankUpdate || (now - parseInt(lastRankUpdate)) > 120000; // 2 minutes
+      const shouldUpdateRankings = forceUpdate || !lastRankUpdate || (now - parseInt(lastRankUpdate)) > 120000; // 2 minutes
       
       if (shouldUpdateRankings) {
         await dailyActivityDB.updateTodayRankings();
