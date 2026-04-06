@@ -151,6 +151,37 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     thumbnail: '/music/thumbnails/piano-meditation.jpg',
     mood: 'relax'
   },
+  // New Additional Tracks
+  {
+    id: 'gentle-rain',
+    name: 'Gentle Rain',
+    artist: 'Dragon Studio',
+    category: 'nature',
+    duration: '180', // 3 minutes
+    url: '/music/dragon-studio-gentle-rain-07-437321.mp3',
+    thumbnail: '/music/thumbnails/nature-rain.jpg',
+    mood: 'calm'
+  },
+  {
+    id: 'relaxing-rain',
+    name: 'Relaxing Rain',
+    artist: 'Dragon Studio',
+    category: 'nature',
+    duration: '600', // 10 minutes
+    url: '/music/dragon-studio-relaxing-rain-444802.mp3',
+    thumbnail: '/music/thumbnails/nature-rain.jpg',
+    mood: 'relax'
+  },
+  {
+    id: 'calming-rain',
+    name: 'Calming Rain',
+    artist: 'Liecio',
+    category: 'nature',
+    duration: '240', // 4 minutes
+    url: '/music/liecio-calming-rain-257596.mp3',
+    thumbnail: '/music/thumbnails/nature-rain.jpg',
+    mood: 'calm'
+  }
 ];
 
 // Music categories with icons
