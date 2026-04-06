@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
+import { useUser } from '@/contexts/UserContext';
+import { dailyActivityDB, DailyActivityFrontend } from '@/lib/dailyActivity';
 import { UserRankings } from '../users/UserRankings';
 import { CurrentUserSelector } from '../users/CurrentUserSelector';
 
@@ -15,9 +17,15 @@ interface RankingDisplayProps {
 export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps) {
   const { theme } = useTheme();
   const { language } = useLanguage();
+  const { getCurrentUser } = useUser();
   const customTheme = useCustomThemeClasses();
   const [displayMode, setDisplayMode] = useState('bottom');
   const [isRankingsOpen, setIsRankingsOpen] = useState(false);
+  const [dailyRankings, setDailyRankings] = useState<DailyActivityFrontend[]>([]);
+  const [currentRank, setCurrentRank] = useState(1);
+
+  // Get current user
+  const currentUser = getCurrentUser();
 
   // Floating window state
   const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -31,6 +39,9 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
       setDisplayMode(savedMode);
     }
 
+    // Load daily rankings to get current user's rank
+    loadDailyRankings();
+
     // Listen for display mode changes
     const handleDisplayModeChange = (event: CustomEvent) => {
       setDisplayMode(event.detail);
@@ -42,6 +53,50 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
       window.removeEventListener('rankingDisplayModeChange', handleDisplayModeChange as EventListener);
     };
   }, []);
+
+  const loadDailyRankings = async () => {
+    try {
+      const rankings = await dailyActivityDB.getTodayRankings();
+      
+      const formattedRankings = rankings.map(activity => ({
+        id: activity.id,
+        accountId: activity.account_id,
+        date: activity.date,
+        studyMinutes: activity.study_minutes,
+        studySeconds: activity.study_seconds || 0,
+        lastUpdated: activity.last_updated || activity.updated_at,
+        startTime: activity.start_time,
+        endTime: activity.end_time,
+        pointsEarned: activity.points_earned || 0,
+        dailyRank: activity.daily_rank || 999,
+        sessionsCount: activity.sessions_count || 0,
+        focusScore: activity.focus_score || 0,
+        createdAt: activity.created_at,
+        updatedAt: activity.updated_at
+      }));
+      
+      setDailyRankings(formattedRankings);
+      
+      // Find current user's rank
+      if (currentUser) {
+        const userActivity = formattedRankings.find(r => r.accountId === currentUser.accountId);
+        const rank = userActivity?.dailyRank || 1;
+        setCurrentRank(rank);
+      }
+    } catch (error) {
+      console.error('Failed to load daily rankings:', error);
+      setCurrentRank(1);
+    }
+  };
+
+  // Update rankings every 2 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadDailyRankings();
+    }, 120000); // 2 minutes
+    
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   // Floating window drag handlers
   useEffect(() => {
@@ -103,16 +158,16 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
           : `0 4px 16px ${customTheme.colors.primary}30, 0 0 0 2px ${customTheme.colors.primary}15}`;
       }}
       aria-label={language === 'ar' ? 'الترتيب' : 'Rankings'}
-      title={`${language === 'ar' ? 'الترتيب' : 'Rankings'} - ${studyStreak} ${language === 'ar' ? 'يوم' : 'day'} streak`}
+      title={`${language === 'ar' ? 'الترتيب' : 'Rankings'} - ${language === 'ar' ? 'الترتيب اليومي' : 'Daily Rank'} ${currentRank}`}
     >
       {/* Trophy Icon with Animation */}
       <div className="relative flex items-center justify-center">
         <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
           🏆
         </span>
-        {/* Study Streak Badge */}
-        <div className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-red-500 border-2 border-white shadow-lg flex items-center justify-center px-1">
-          <span className="text-xs font-bold text-white">{studyStreak}</span>
+        {/* Daily Rank Badge */}
+        <div className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-green-500 border-2 border-white shadow-lg flex items-center justify-center px-1">
+          <span className="text-xs font-bold text-white">{currentRank}</span>
         </div>
         {/* Shine Effect */}
         <div 

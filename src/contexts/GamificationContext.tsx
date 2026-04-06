@@ -62,8 +62,8 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         }
       }
       
-      // Initialize with current user score if available, otherwise default to 100
-      const initialScore = currentUser?.score !== undefined ? currentUser.score : 100;
+      // Initialize with current user score if available, otherwise default to 0
+      const initialScore = currentUser?.score !== undefined ? currentUser.score : 0;
       return {
         coins: initialScore,
         level: Math.floor(initialScore / 100) + 1,
@@ -74,11 +74,11 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       };
     }
     
-    const initialScore = currentUser?.score !== undefined ? currentUser.score : 100;
+    // Fallback for server-side rendering
     return {
-      coins: initialScore,
-      level: Math.floor(initialScore / 100) + 1,
-      experience: initialScore,
+      coins: 0,
+      level: 1,
+      experience: 0,
       tasks: [],
       streak: 0,
       lastStudyDate: null
@@ -91,8 +91,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   // Sync coins with real user score from database (only when not updating and when user first loads)
   useEffect(() => {
     if (currentUser?.score !== undefined && !isUpdating) {
-      // Only sync if the current state coins are different from user score
-      // and if this is the initial load (no previous sync)
+      // Only sync if current state coins are different from user score
       const hasSyncedBefore = localStorage.getItem('fahman_hub_gamification_synced');
       if (!hasSyncedBefore || state.coins !== currentUser.score) {
         setState(prev => ({
@@ -104,7 +103,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('fahman_hub_gamification_synced', 'true');
       }
     }
-  }, [currentUser?.score, isUpdating, state.coins]);
+  }, [currentUser?.score, isUpdating]);
 
   useEffect(() => {
     localStorage.setItem('fahman_hub_gamification', JSON.stringify(state));
