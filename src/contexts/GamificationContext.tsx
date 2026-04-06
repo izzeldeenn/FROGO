@@ -44,19 +44,41 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GamificationState>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('fahman_hub_gamification');
-      return saved ? JSON.parse(saved) : {
-        coins: 100,
-        level: 1,
-        experience: 0,
+      if (saved) {
+        try {
+          const parsedState = JSON.parse(saved);
+          // If we have a current user with a score, prioritize the database score
+          if (currentUser?.score !== undefined) {
+            return {
+              ...parsedState,
+              coins: currentUser.score,
+              level: Math.floor(currentUser.score / 100) + 1,
+              experience: currentUser.score
+            };
+          }
+          return parsedState;
+        } catch (error) {
+          console.error('Failed to parse gamification state:', error);
+        }
+      }
+      
+      // Initialize with current user score if available, otherwise default to 100
+      const initialScore = currentUser?.score !== undefined ? currentUser.score : 100;
+      return {
+        coins: initialScore,
+        level: Math.floor(initialScore / 100) + 1,
+        experience: initialScore,
         tasks: [],
         streak: 0,
         lastStudyDate: null
       };
     }
+    
+    const initialScore = currentUser?.score !== undefined ? currentUser.score : 100;
     return {
-      coins: 100,
-      level: 1,
-      experience: 0,
+      coins: initialScore,
+      level: Math.floor(initialScore / 100) + 1,
+      experience: initialScore,
       tasks: [],
       streak: 0,
       lastStudyDate: null
@@ -66,17 +88,23 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   // Track if we're in the middle of a purchase operation
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Sync coins with real user score from database (only when not updating)
+  // Sync coins with real user score from database (only when not updating and when user first loads)
   useEffect(() => {
     if (currentUser?.score !== undefined && !isUpdating) {
-      setState(prev => ({
-        ...prev,
-        coins: currentUser.score,
-        level: Math.floor(currentUser.score / 100) + 1,
-        experience: currentUser.score
-      }));
+      // Only sync if the current state coins are different from user score
+      // and if this is the initial load (no previous sync)
+      const hasSyncedBefore = localStorage.getItem('fahman_hub_gamification_synced');
+      if (!hasSyncedBefore || state.coins !== currentUser.score) {
+        setState(prev => ({
+          ...prev,
+          coins: currentUser.score,
+          level: Math.floor(currentUser.score / 100) + 1,
+          experience: currentUser.score
+        }));
+        localStorage.setItem('fahman_hub_gamification_synced', 'true');
+      }
     }
-  }, [currentUser?.score, isUpdating]);
+  }, [currentUser?.score, isUpdating, state.coins]);
 
   useEffect(() => {
     localStorage.setItem('fahman_hub_gamification', JSON.stringify(state));
@@ -119,15 +147,22 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     }
     
     // Update local state for immediate UI feedback
-    setState(prev => ({
-      ...prev,
-      coins: prev.coins + amount,
-      experience: prev.experience + amount,
-      level: Math.floor((prev.experience + amount) / 100) + 1
-    }));
+    setState(prev => {
+      const newState = {
+        ...prev,
+        coins: prev.coins + amount,
+        experience: prev.experience + amount,
+        level: Math.floor((prev.experience + amount) / 100) + 1
+      };
+      return newState;
+    });
     
     // Clear updating flag after a short delay to allow database update
-    setTimeout(() => setIsUpdating(false), 1000);
+    setTimeout(() => {
+      setIsUpdating(false);
+      // Clear sync flag to allow proper sync next time
+      localStorage.removeItem('fahman_hub_gamification_synced');
+    }, 1000);
   };
 
   const removeCoins = (amount: number) => {
@@ -140,15 +175,22 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     }
     
     // Update local state for immediate UI feedback
-    setState(prev => ({
-      ...prev,
-      coins: Math.max(0, prev.coins - amount),
-      experience: Math.max(0, prev.experience - amount),
-      level: Math.floor(Math.max(0, prev.experience - amount) / 100) + 1
-    }));
+    setState(prev => {
+      const newState = {
+        ...prev,
+        coins: Math.max(0, prev.coins - amount),
+        experience: Math.max(0, prev.experience - amount),
+        level: Math.floor(Math.max(0, prev.experience - amount) / 100) + 1
+      };
+      return newState;
+    });
     
     // Clear updating flag after a short delay to allow database update
-    setTimeout(() => setIsUpdating(false), 1000);
+    setTimeout(() => {
+      setIsUpdating(false);
+      // Clear sync flag to allow proper sync next time
+      localStorage.removeItem('fahman_hub_gamification_synced');
+    }, 1000);
   };
 
   const generateDailyTasks = () => {

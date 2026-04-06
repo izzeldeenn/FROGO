@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface LocalBackgroundSelectorProps {
   selectedBackground: string;
@@ -14,6 +14,20 @@ export const LocalBackgroundSelector: React.FC<LocalBackgroundSelectorProps> = (
   const [customBackgroundUrl, setCustomBackgroundUrl] = useState('');
   const [uploadedBackground, setUploadedBackground] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load saved background on component mount
+  useEffect(() => {
+    if (selectedBackground === 'custom-upload' || selectedBackground === 'custom-url') {
+      const savedValue = typeof window !== 'undefined' ? localStorage.getItem('customBackgroundValue') : null;
+      if (savedValue) {
+        if (selectedBackground === 'custom-upload') {
+          setUploadedBackground(savedValue);
+        } else {
+          setCustomBackgroundUrl(savedValue);
+        }
+      }
+    }
+  }, [selectedBackground]);
 
   // Get current custom background value for preview
   const getCurrentCustomBackground = () => {
@@ -40,12 +54,16 @@ export const LocalBackgroundSelector: React.FC<LocalBackgroundSelectorProps> = (
         return;
       }
 
-      // Create object URL for local file
-      const objectUrl = URL.createObjectURL(file);
-      setUploadedBackground(objectUrl);
-      
-      // Auto-select the uploaded background
-      onBackgroundSelect('custom-upload', objectUrl);
+      // Convert file to base64 for persistence
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setUploadedBackground(base64String);
+        
+        // Auto-select the uploaded background
+        onBackgroundSelect('custom-upload', base64String);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
