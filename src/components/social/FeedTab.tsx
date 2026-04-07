@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
-import { socialDB, SocialComment } from '@/lib/social';
+import { socialDB, SocialComment, Group } from '@/lib/social';
 
 interface Post {
   id: string;
@@ -95,6 +95,23 @@ export function FeedTab({
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
     return `${Math.floor(seconds / 86400)} days ago`;
   };
+
+  // State for suggested groups
+  const [suggestedGroups, setSuggestedGroups] = useState<Group[]>([]);
+
+  // Load groups from database
+  useEffect(() => {
+    const loadGroups = async () => {
+      try {
+        const groups = await socialDB.getGroups(5, 0); // Get first 5 groups
+        setSuggestedGroups(groups);
+      } catch (error) {
+        console.error('Error loading groups:', error);
+      }
+    };
+
+    loadGroups();
+  }, []);
 
   return (
     <div className="grid lg:grid-cols-3 gap-8">
@@ -479,6 +496,78 @@ export function FeedTab({
             </p>
           </div>
         )}
+      </div>
+
+      {/* Right Sidebar - Suggested Groups */}
+      <div className="space-y-6">
+        <div className={`p-6 rounded-2xl border-2 ${
+          theme === 'light' ? 'bg-white border-gray-200' : 'bg-black border-gray-800'
+        }`}>
+          <h3 className={`text-lg font-semibold mb-4 ${
+            theme === 'light' ? 'text-gray-900' : 'text-white'
+          }`}>
+            {language === 'ar' ? 'مجموعات مقترحة' : 'Suggested Groups'}
+          </h3>
+          <div className="space-y-4">
+            {suggestedGroups.map((group) => (
+              <div key={group.id} className={`p-4 rounded-lg border ${
+                theme === 'light' ? 'bg-gray-50 border-gray-200' : 'bg-gray-900 border-gray-700'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <img 
+                    src={group.creator_avatar} 
+                    alt={group.creator_username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className={`font-medium text-sm mb-1 ${
+                      theme === 'light' ? 'text-gray-900' : 'text-white'
+                    }`}>
+                      {group.name}
+                    </h4>
+                    <p className={`text-xs mb-2 ${
+                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                    }`}>
+                      {group.description}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs">
+                      <span className={`${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {group.members_count} {language === 'ar' ? 'أعضاء' : 'members'}
+                      </span>
+                      <span className={`${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {group.posts_count} {language === 'ar' ? 'منشورات' : 'posts'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        // This would handle joining a group
+                        console.log('Join group:', group.id);
+                      }}
+                      className={`mt-3 w-full px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                        theme === 'light'
+                          ? 'bg-blue-500 text-white hover:bg-blue-600'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      {language === 'ar' ? 'انضمام' : 'Join'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button className={`mt-4 w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            theme === 'light'
+              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+          }`}>
+            {language === 'ar' ? 'عرض المزيد' : 'View More'}
+          </button>
+        </div>
       </div>
     </div>
   );

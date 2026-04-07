@@ -20,7 +20,7 @@ export function GroupsManager({ onGroupSelect, selectedGroup }: GroupsManagerPro
   const [userGroups, setUserGroups] = useState<Group[]>([]);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeView, setActiveView] = useState<'all' | 'my'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Create group form state
   const [groupName, setGroupName] = useState('');
@@ -113,59 +113,54 @@ export function GroupsManager({ onGroupSelect, selectedGroup }: GroupsManagerPro
     return userGroups.some(group => group.id === groupId);
   };
 
-  const displayGroups = activeView === 'my' ? userGroups : groups;
+  // Filter groups based on search term
+  const filteredGroups = groups.filter(group =>
+    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredUserGroups = userGroups.filter(group =>
+    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header with Search */}
+      <div className="flex items-center justify-between gap-4">
         <h1 className={`text-2xl font-bold ${
           theme === 'light' ? 'text-gray-900' : 'text-white'
         }`}>
           {language === 'ar' ? 'Groups' : 'Groups'}
         </h1>
-        <button
-          onClick={() => setShowCreateGroup(true)}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            theme === 'light'
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`}
-        >
-          {language === 'ar' ? 'Create Group' : 'Create Group'}
-        </button>
-      </div>
-
-      {/* View Toggle */}
-      <div className="flex gap-2 p-1 rounded-lg bg-gray-100 dark:bg-gray-800">
-        <button
-          onClick={() => setActiveView('all')}
-          className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors ${
-            activeView === 'all'
-              ? theme === 'light'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'bg-gray-700 text-white'
-              : theme === 'light'
-                ? 'text-gray-600 hover:text-gray-900'
-                : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          {language === 'ar' ? 'All Groups' : 'All Groups'}
-        </button>
-        <button
-          onClick={() => setActiveView('my')}
-          className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors ${
-            activeView === 'my'
-              ? theme === 'light'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'bg-gray-700 text-white'
-              : theme === 'light'
-                ? 'text-gray-600 hover:text-gray-900'
-                : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          {language === 'ar' ? 'My Groups' : 'My Groups'}
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={language === 'ar' ? 'ابحث عن مجموعات...' : 'Search groups...'}
+              className={`pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 ${
+                theme === 'light'
+                  ? 'bg-white border-gray-300 text-gray-900'
+                  : 'bg-gray-800 border-gray-700 text-white'
+              }`}
+            />
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              🔍
+            </div>
+          </div>
+          <button
+            onClick={() => setShowCreateGroup(true)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              theme === 'light'
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            {language === 'ar' ? 'Create Group' : 'Create Group'}
+          </button>
+        </div>
       </div>
 
       {/* Create Group Modal */}
@@ -266,106 +261,234 @@ export function GroupsManager({ onGroupSelect, selectedGroup }: GroupsManagerPro
         </div>
       )}
 
-      {/* Groups List */}
-      {loading ? (
-        <div className="text-center py-8">
-          <div className={`text-lg ${
-            theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-          }`}>
-            {language === 'ar' ? 'Loading groups...' : 'Loading groups...'}
-          </div>
+    {/* Reddit-style Groups Display */}
+    {loading ? (
+      <div className="text-center py-12">
+        <div className={`text-lg ${
+          theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+        }`}>
+          {language === 'ar' ? 'Loading groups...' : 'Loading groups...'}
         </div>
-      ) : displayGroups.length === 0 ? (
-        <div className="text-center py-12">
-          <p className={`${
-            theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-          }`}>
-            {activeView === 'my' 
-              ? (language === 'ar' ? 'You haven\'t joined any groups yet.' : 'You haven\'t joined any groups yet.')
-              : (language === 'ar' ? 'No groups available.' : 'No groups available.')
-            }
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {displayGroups.map((group) => (
-            <div
-              key={group.id}
-              className={`p-6 rounded-2xl border-2 cursor-pointer transition-all hover:scale-[1.02] ${
-                selectedGroup?.id === group.id
-                  ? theme === 'light'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-blue-400 bg-blue-900/20'
-                  : theme === 'light'
-                    ? 'border-gray-200 bg-white hover:border-gray-300'
-                    : 'border-gray-800 bg-black hover:border-gray-700'
-              }`}
-              onClick={() => onGroupSelect(group)}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                  {group.name.charAt(0).toUpperCase()}
-                </div>
-                {group.is_private && (
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+      </div>
+    ) : (
+      <div className="space-y-8">
+        {/* All Groups Section */}
+        {filteredGroups.length > 0 && (
+          <div>
+            <h2 className={`text-lg font-semibold mb-4 ${
+              theme === 'light' ? 'text-gray-900' : 'text-white'
+            }`}>
+              {language === 'ar' ? 'جميع المجموعات' : 'All Groups'}
+            </h2>
+            <div className="space-y-4">
+              {filteredGroups.map((group) => (
+                <div
+                  key={group.id}
+                  className={`p-4 rounded-lg border transition-all hover:shadow-md ${
                     theme === 'light'
-                      ? 'bg-gray-100 text-gray-600'
-                      : 'bg-gray-800 text-gray-400'
-                  }`}>
-                    {language === 'ar' ? 'Private' : 'Private'}
-                  </span>
-                )}
-              </div>
-              
-              <h3 className={`font-semibold text-lg mb-2 ${
-                theme === 'light' ? 'text-gray-900' : 'text-white'
-              }`}>
-                {group.name}
-              </h3>
-              
-              <p className={`text-sm mb-4 line-clamp-2 ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-              }`}>
-                {group.description || (language === 'ar' ? 'No description' : 'No description')}
-              </p>
-              
-              <div className="flex items-center justify-between text-sm">
-                <div className={`flex items-center gap-4 ${
-                  theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                }`}>
-                  <span>{group.members_count} {language === 'ar' ? 'members' : 'members'}</span>
-                  <span>{group.posts_count} {language === 'ar' ? 'posts' : 'posts'}</span>
+                      ? 'bg-white border-gray-200 hover:border-blue-300'
+                      : 'bg-gray-900 border-gray-700 hover:border-blue-600'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={group.creator_avatar}
+                      alt={group.creator_username}
+                      className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className={`font-bold text-lg hover:text-blue-500 cursor-pointer transition-colors ${
+                          theme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}
+                          onClick={() => onGroupSelect(group)}
+                        >
+                          {group.name}
+                        </h3>
+                        {group.is_private && (
+                          <span className="text-yellow-500">🔒</span>
+                        )}
+                      </div>
+                      <p className={`text-sm mb-3 line-clamp-2 ${
+                        theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                      }`}>
+                        {group.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className={`${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
+                            {language === 'ar' ? '👥' : '👥'} {group.members_count} {language === 'ar' ? 'أعضاء' : 'members'}
+                          </span>
+                          <span className={`${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
+                            📝 {group.posts_count} {language === 'ar' ? 'منشور' : 'posts'}
+                          </span>
+                        </div>
+                        
+                        {!isUserMember(group.id) ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleJoinGroup(group.id);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              group.is_private
+                                ? theme === 'light'
+                                  ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                                  : 'bg-yellow-600 text-white hover:bg-yellow-700'
+                                : theme === 'light'
+                                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
+                          >
+                            {group.is_private 
+                              ? (language === 'ar' ? 'طلب الانضمام' : 'Request to Join')
+                              : (language === 'ar' ? 'انضمام' : 'Join')
+                            }
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => onGroupSelect(group)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              theme === 'light'
+                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            }`}
+                          >
+                            {language === 'ar' ? 'عرض' : 'View'}
+                          </button>
+                        )}
+                      </div>
+                      <div className={`text-xs ${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {language === 'ar' ? 'أنشأها' : 'Created by'} {group.creator_username}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                {currentUser && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      isUserMember(group.id) 
-                        ? handleLeaveGroup(group.id)
-                        : handleJoinGroup(group.id);
-                    }}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                      isUserMember(group.id)
-                        ? theme === 'light'
-                          ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                        : theme === 'light'
-                          ? 'bg-blue-500 text-white hover:bg-blue-600'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
-                  >
-                    {isUserMember(group.id) 
-                      ? (language === 'ar' ? 'Leave' : 'Leave')
-                      : (language === 'ar' ? 'Join' : 'Join')
-                    }
-                  </button>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* My Groups Section */}
+        {filteredUserGroups.length > 0 && (
+          <div>
+            <h2 className={`text-lg font-semibold mb-4 ${
+              theme === 'light' ? 'text-gray-900' : 'text-white'
+            }`}>
+              {language === 'ar' ? 'مجموعاتي' : 'My Groups'}
+            </h2>
+            <div className="space-y-4">
+              {filteredUserGroups.map((group) => (
+                <div
+                  key={group.id}
+                  className={`p-4 rounded-lg border transition-all hover:shadow-md ${
+                    theme === 'light'
+                      ? 'bg-white border-gray-200 hover:border-blue-300'
+                      : 'bg-gray-900 border-gray-700 hover:border-blue-600'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={group.creator_avatar}
+                      alt={group.creator_username}
+                      className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className={`font-bold text-lg hover:text-blue-500 cursor-pointer transition-colors ${
+                          theme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}
+                          onClick={() => onGroupSelect(group)}
+                        >
+                          {group.name}
+                        </h3>
+                        {group.is_private && (
+                          <span className="text-yellow-500">🔒</span>
+                        )}
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          theme === 'light'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-green-900 text-green-300'
+                        }`}>
+                          {language === 'ar' ? 'عضو' : 'Member'}
+                        </span>
+                      </div>
+                      <p className={`text-sm mb-3 line-clamp-2 ${
+                        theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                      }`}>
+                        {group.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className={`${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
+                            {language === 'ar' ? '👥' : '👥'} {group.members_count} {language === 'ar' ? 'أعضاء' : 'members'}
+                          </span>
+                          <span className={`${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
+                            📝 {group.posts_count} {language === 'ar' ? 'منشور' : 'posts'}
+                          </span>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => onGroupSelect(group)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              theme === 'light'
+                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            }`}
+                          >
+                            {language === 'ar' ? 'عرض' : 'View'}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLeaveGroup(group.id);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              theme === 'light'
+                                ? 'bg-red-500 text-white hover:bg-red-600'
+                                : 'bg-red-600 text-white hover:bg-red-700'
+                            }`}
+                          >
+                            {language === 'ar' ? 'مغادرة' : 'Leave'}
+                          </button>
+                        </div>
+                      </div>
+                      <div className={`text-xs ${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {language === 'ar' ? 'أنشأها' : 'Created by'} {group.creator_username}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* No Results */}
+        {filteredGroups.length === 0 && filteredUserGroups.length === 0 && (
+          <div className="text-center py-12">
+            <p className={`${
+              theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+            }`}>
+              {language === 'ar' ? 'لا توجد مجموعات مطابقة للبحث' : 'No groups found matching your search'}
+            </p>
+          </div>
+        )}
+      </div>
+    )}
     </div>
   );
 }
