@@ -12,10 +12,12 @@
     "pocketbase:start": "./pocketbase serve --http=0.0.0.0:8090"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.3",
     "@supabase/supabase-js": "^2.99.1",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/analytics": "^2.0.0",
     "bcryptjs": "^3.0.3",
+    "crypto-js": "^4.2.0",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
     "pocketbase": "^0.21.1",

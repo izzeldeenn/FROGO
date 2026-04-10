@@ -10,6 +10,7 @@ import { StudySessionProvider } from "@/contexts/StudySessionContext";
 import { Analytics } from "@vercel/analytics/next";
 import { FirstTimeSetup } from "@/components/auth/FirstTimeSetup";
 import { MusicProvider } from "@/contexts/MusicContext";
+import { CustomThemeProvider } from "@/contexts/CustomThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,16 +44,18 @@ export default function RootLayout({
       >
         <LanguageProvider>
           <ThemeProvider>
-            <UserProvider>
-              <GamificationProvider>
-                <StudySessionProvider>
-                  <MusicProvider>
-                    <FirstTimeSetup />
-                    {children}
-                  </MusicProvider>
-                </StudySessionProvider>
-              </GamificationProvider>
-            </UserProvider>
+            <CustomThemeProvider>
+              <UserProvider>
+                <GamificationProvider>
+                  <StudySessionProvider>
+                    <MusicProvider>
+                      <FirstTimeSetup />
+                      {children}
+                    </MusicProvider>
+                  </StudySessionProvider>
+                </GamificationProvider>
+              </UserProvider>
+            </CustomThemeProvider>
           </ThemeProvider>
         </LanguageProvider>
         <Analytics />

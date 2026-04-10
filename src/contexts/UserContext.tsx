@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, ReactNod
 import { getAccountId, getAccountInfo } from '@/utils/deviceId';
 import { useGamification } from '@/contexts/GamificationContext';
 import { formatStudyTime } from '@/utils/timeFormat';
-import { userDB, isSupabaseAvailable, UserAccount, UserAccountFrontend } from '@/lib/supabase';
+import { userDB, resetTokenDB, isSupabaseAvailable, UserAccount, UserAccountFrontend } from '@/lib/supabase';
 import { dailyActivityDB, DailyActivityFrontend } from '@/lib/dailyActivity';
 import { supabase } from '@/lib/supabase';
 import { verifyPassword, hashPassword, validatePasswordStrength } from '@/utils/password';
@@ -56,6 +56,9 @@ interface UserContextType {
   logout: () => void;
   switchAccount: (accountId: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, username: string) => Promise<{ success: boolean; error?: string }>;
+  // Password reset methods
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -717,6 +720,91 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Request password reset
+  const requestPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      console.log('Starting password reset request for email:', email);
+      
+      // Check if user exists
+      const user = await userDB.getUserByEmail(email);
+      console.log('User found:', user ? 'Yes' : 'No');
+      
+      if (!user) {
+        // Don't reveal if email exists for security
+        console.log('User not found, returning success for security');
+        return { success: true };
+      }
+
+      // Clean up any existing tokens for this email
+      console.log('Cleaning up existing tokens...');
+      await resetTokenDB.deleteTokensByEmail(email);
+
+      // Generate reset token
+      const { generateResetToken, generateTokenExpiry, sendPasswordResetEmail } = await import('@/lib/emailService');
+      const resetToken = generateResetToken();
+      const expiresAt = generateTokenExpiry();
+      
+      console.log('Generated token:', resetToken.substring(0, 10) + '...');
+      console.log('Token expires at:', expiresAt.toISOString());
+
+      // Save token to database
+      console.log('Saving token to database...');
+      const tokenResult = await resetTokenDB.createResetToken(email, resetToken, expiresAt.toISOString(), user.id);
+      console.log('Token saved to database:', tokenResult ? 'Success' : 'Failed');
+
+      // Send email
+      console.log('Sending email...');
+      const emailResult = await sendPasswordResetEmail(email, resetToken, user.username);
+      console.log('Email result:', emailResult);
+      
+      if (!emailResult.success) {
+        return { success: false, error: emailResult.error };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      return { success: false, error: 'Failed to send password reset email' };
+    }
+  };
+
+  // Reset password with token
+  const resetPassword = async (token: string, newPassword: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Find valid token
+      const resetTokenData = await resetTokenDB.findTokenByToken(token);
+      if (!resetTokenData) {
+        return { success: false, error: 'رابط إعادة التعيين غير صالح أو منتهي الصلاحية' };
+      }
+
+      // Get user by email
+      const user = await userDB.getUserByEmail(resetTokenData.email);
+      if (!user) {
+        return { success: false, error: 'المستخدم غير موجود' };
+      }
+
+      // Hash new password
+      const hashedPassword = await hashPassword(newPassword);
+
+      // Update user password
+      const updateResult = await userDB.updateUserByAccountId(user.account_id, {
+        password: hashedPassword
+      });
+
+      if (!updateResult) {
+        return { success: false, error: 'فشل تحديث كلمة المرور' };
+      }
+
+      // Mark token as used
+      await resetTokenDB.markTokenAsUsed(token);
+
+      return { success: true };
+    } catch (error) {
+      console.error('Password reset error:', error);
+      return { success: false, error: 'فشل إعادة تعيين كلمة المرور' };
+    }
+  };
+
   return (
     <UserContext.Provider value={{
       users,
@@ -737,7 +825,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       switchAccount,
-      register
+      register,
+      requestPasswordReset,
+      resetPassword
     }}>
       {children}
     </UserContext.Provider>

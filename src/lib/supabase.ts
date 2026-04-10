@@ -52,6 +52,28 @@ export interface UserAccountFrontend {
   lastActive: string;
 }
 
+// Reset token interface for database (snake_case - matches Supabase)
+export interface ResetToken {
+  id?: string;
+  email: string;
+  token: string;
+  expires_at: string;
+  created_at: string;
+  used_at?: string;
+  user_id?: string;
+}
+
+// Reset token interface for frontend (camelCase)
+export interface ResetTokenFrontend {
+  id?: string;
+  email: string;
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+  usedAt?: string;
+  userId?: string;
+}
+
 // Database operations for user accounts
 export class UserAccountDB {
   private static instance: UserAccountDB;
@@ -86,6 +108,22 @@ export class UserAccountDB {
         .from('users')
         .select('account_id, username, email, avatar, score, last_active, created_at, hash_key')
         .eq('account_id', accountId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Get user by email
+  async getUserByEmail(email: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
         .single();
 
       if (error) throw error;
@@ -236,8 +274,125 @@ export class UserAccountDB {
   }
 }
 
-// Export singleton instance
+// Database operations for reset tokens
+export class ResetTokenDB {
+  private static instance: ResetTokenDB;
+
+  static getInstance(): ResetTokenDB {
+    if (!ResetTokenDB.instance) {
+      ResetTokenDB.instance = new ResetTokenDB();
+    }
+    return ResetTokenDB.instance;
+  }
+
+  // Create a new reset token
+  async createResetToken(email: string, token: string, expiresAt: string, userId?: string): Promise<ResetToken | null> {
+    try {
+      const { data, error } = await supabase
+        .from('reset_tokens')
+        .insert({
+          email,
+          token,
+          expires_at: expiresAt,
+          user_id: userId
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Find reset token by token
+  async findTokenByToken(token: string): Promise<ResetToken | null> {
+    try {
+      const { data, error } = await supabase
+        .from('reset_tokens')
+        .select('*')
+        .eq('token', token)
+        .eq('used_at', null) // Only return unused tokens
+        .gt('expires_at', new Date().toISOString()) // Only return non-expired tokens
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Find reset token by email
+  async findTokenByEmail(email: string): Promise<ResetToken | null> {
+    try {
+      const { data, error } = await supabase
+        .from('reset_tokens')
+        .select('*')
+        .eq('email', email)
+        .eq('used_at', null) // Only return unused tokens
+        .gt('expires_at', new Date().toISOString()) // Only return non-expired tokens
+        .order('created_at', { ascending: false }) // Get the most recent token
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Mark token as used
+  async markTokenAsUsed(token: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('reset_tokens')
+        .update({ used_at: new Date().toISOString() })
+        .eq('token', token);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Clean up expired tokens
+  async cleanupExpiredTokens(): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('reset_tokens')
+        .delete()
+        .lt('expires_at', new Date().toISOString());
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Delete all tokens for an email
+  async deleteTokensByEmail(email: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('reset_tokens')
+        .delete()
+        .eq('email', email);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+}
+
+// Export singleton instances
 export const userDB = UserAccountDB.getInstance();
+export const resetTokenDB = ResetTokenDB.getInstance();
 
 // Check if Supabase is available
 export const isSupabaseAvailable = async (): Promise<boolean> => {

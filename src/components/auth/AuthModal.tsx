@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { validatePasswordStrength } from '@/utils/password';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { login, register, isLoggedIn, getCurrentUser } = useUser();
+  const { login, register, isLoggedIn, getCurrentUser, requestPasswordReset } = useUser();
   const { language, t } = useLanguage();
   const { theme } = useTheme();
   const customTheme = useCustomThemeClasses();
@@ -25,6 +26,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [passwordValidation, setPasswordValidation] = useState<{ isValid: boolean; errors: string[] } | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Validate password as user types (only for registration)
   useEffect(() => {
@@ -36,8 +38,25 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   }, [password, isLogin]);
 
+  // Handle forgot password
+  const handleForgotPassword = async (email: string) => {
+    const result = await requestPasswordReset(email);
+    return result;
+  };
+
   // If user is already logged in, don't show the modal
   if (isLoggedIn || !isOpen) return null;
+
+  // Show forgot password modal instead of auth modal
+  if (showForgotPassword) {
+    return (
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onSubmit={handleForgotPassword}
+      />
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,7 +298,26 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </button>
           </div>
 
-          <div className="text-center pt-4">
+          {isLogin && (
+            <div className="text-center pb-2">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm font-medium transition-colors"
+                style={{ color: customTheme.colors.primary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.textDecoration = 'underline';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.textDecoration = 'none';
+                }}
+              >
+                نسيت كلمة المرور؟
+              </button>
+            </div>
+          )}
+
+          <div className="text-center pt-2">
             <button
               type="button"
               onClick={switchMode}
