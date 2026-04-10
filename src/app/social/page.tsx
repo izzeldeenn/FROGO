@@ -376,6 +376,7 @@ function SocialPageContent() {
               onDeleteComment={handleDeleteComment}
               onEditPostContentChange={handleEditPostContentChange}
               onEditCommentContentChange={handleEditCommentContentChange}
+              onExploreGroups={() => setActiveTab('groups')}
             />
           )}
 
