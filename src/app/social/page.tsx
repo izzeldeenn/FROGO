@@ -13,6 +13,7 @@ import FriendshipManager from '@/components/users/FriendshipManager';
 import { GroupsManager } from '@/components/groups/GroupsManager';
 import { GroupFeed } from '@/components/groups/GroupFeed';
 import { FeedTab } from '@/components/social/FeedTab';
+import { NotificationsTab } from '@/components/social/NotificationsTab';
 import { ProfileTab } from '@/components/social/ProfileTab';
 
 function SocialPageContent() {
@@ -402,6 +403,10 @@ function SocialPageContent() {
                 />
               )}
             </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <NotificationsTab activeTab={activeTab} />
           )}
 
           {activeTab === 'profile' && (
