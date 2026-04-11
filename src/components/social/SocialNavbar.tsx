@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
@@ -19,23 +19,7 @@ export function SocialNavbar({ activeTab, setActiveTab }: SocialNavbarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const currentUser = useUser().getCurrentUser();
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showProfileMenu) {
-        setShowProfileMenu(false);
-      }
-      if (showNotifications) {
-        setShowNotifications(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showProfileMenu, showNotifications]);
-
+  
   return (
     <>
       {/* Elegant Header */}
