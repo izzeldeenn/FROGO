@@ -142,13 +142,24 @@ export class FriendshipDB {
       if (fetchError) throw fetchError;
       if (!request) return false;
 
-      // Update request status
-      const { error: updateError } = await supabase
-        .from('friendship_requests')
-        .update({ status: 'accepted', updated_at: new Date().toISOString() })
-        .eq('id', requestId);
+      // Check if friendship already exists
+      const { data: existingFriendship } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`(user1_id.eq.${request.sender_id},user2_id.eq.${request.receiver_id}), (user1_id.eq.${request.receiver_id},user2_id.eq.${request.sender_id})`)
+        .eq('status', 'active')
+        .single();
 
-      if (updateError) throw updateError;
+      if (existingFriendship) {
+        // Friendship already exists, just delete the request
+        const { error: deleteError } = await supabase
+          .from('friendship_requests')
+          .delete()
+          .eq('id', requestId);
+
+        if (deleteError) throw deleteError;
+        return true;
+      }
 
       // Create friendship record
       const { error: friendshipError } = await supabase
@@ -161,8 +172,17 @@ export class FriendshipDB {
 
       if (friendshipError) throw friendshipError;
 
+      // Delete the request after accepting
+      const { error: deleteError } = await supabase
+        .from('friendship_requests')
+        .delete()
+        .eq('id', requestId);
+
+      if (deleteError) throw deleteError;
+
       return true;
     } catch (error) {
+      console.error('Error accepting friend request:', error);
       return false;
     }
   }
@@ -178,6 +198,7 @@ export class FriendshipDB {
       if (error) throw error;
       return true;
     } catch (error) {
+      console.error('Error rejecting friend request:', error);
       return false;
     }
   }
