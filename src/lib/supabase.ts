@@ -92,7 +92,6 @@ export class UserAccountDB {
         .from('users')
         .select('id, account_id, username, email, avatar, score, last_active, created_at, hash_key')
         .order('last_active', { ascending: false }) // Sort by last_active instead of score
-        .limit(100); // Limit to last 100 active users to reduce egress
 
       if (error) throw error;
       return data || [];
