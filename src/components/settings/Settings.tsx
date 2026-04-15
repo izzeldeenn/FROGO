@@ -66,9 +66,9 @@ export function SettingsButton() {
   const [activeSection, setActiveSection] = useState('profile');
   const [showCustomCreator, setShowCustomCreator] = useState(false);
   const [customColors, setCustomColors] = useState<ThemeColors>({
-    primary: '#84cc16',
+    primary: '#1674ccff',
     secondary: '#fbbf24',
-    accent: '#166534',
+    accent: '#0048ffff',
     background: '#fef3c7',
     surface: '#fde68a',
     text: '#000000',
@@ -159,9 +159,9 @@ export function SettingsButton() {
       setShowCustomCreator(false);
       setCustomThemeName('');
       setCustomColors({
-        primary: '#84cc16',
+        primary: '#0055ffffff',
         secondary: '#fbbf24',
-        accent: '#166534',
+        accent: '#0026ffffff',
         background: '#fef3c7',
         surface: '#fde68a',
         text: '#000000',

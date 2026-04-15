@@ -17,7 +17,7 @@ interface CustomTheme {
   colors: ThemeColors;
 }
 
-const defaultThemes: CustomTheme[] = [
+const lightThemes: CustomTheme[] = [
   {
     name: 'Tea Theme',
     colors: {
@@ -80,6 +80,71 @@ const defaultThemes: CustomTheme[] = [
   }
 ];
 
+const darkThemes: CustomTheme[] = [
+  {
+    name: 'Tea Theme',
+    colors: {
+      primary: '#22c55e', // brighter green for dark
+      secondary: '#f59e0b', // amber for dark
+      accent: '#16a34a', // green for dark
+      background: '#000000',
+      surface: '#111111',
+      text: '#ffffff',
+      border: '#374151'
+    }
+  },
+  {
+    name: 'Ocean Theme',
+    colors: {
+      primary: '#60a5fa', // brighter blue for dark
+      secondary: '#22d3ee', // brighter cyan for dark
+      accent: '#2563eb', // blue for dark
+      background: '#000000',
+      surface: '#111111',
+      text: '#ffffff',
+      border: '#1e3a8a'
+    }
+  },
+  {
+    name: 'Sunset Theme',
+    colors: {
+      primary: '#fb923c', // brighter orange for dark
+      secondary: '#fbbf24', // yellow
+      accent: '#ef4444', // red for dark
+      background: '#000000',
+      surface: '#111111',
+      text: '#ffffff',
+      border: '#7c2d12'
+    }
+  },
+  {
+    name: 'Forest Theme',
+    colors: {
+      primary: '#34d399', // brighter emerald for dark
+      secondary: '#22c55e', // green for dark
+      accent: '#059669', // dark emerald for dark
+      background: '#000000',
+      surface: '#111111',
+      text: '#ffffff',
+      border: '#064e3b'
+    }
+  },
+  {
+    name: 'Purple Dream',
+    colors: {
+      primary: '#a78bfa', // brighter violet for dark
+      secondary: '#f472b6', // pink for dark
+      accent: '#7c3aed', // violet for dark
+      background: '#000000',
+      surface: '#111111',
+      text: '#ffffff',
+      border: '#4c1d95'
+    }
+  }
+];
+
+const defaultThemes = lightThemes;
+
 interface CustomThemeContextType {
   currentTheme: CustomTheme;
   setTheme: (theme: CustomTheme) => void;
@@ -93,6 +158,28 @@ const CustomThemeContext = createContext<CustomThemeContextType | undefined>(und
 export function CustomThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<CustomTheme>(defaultThemes[0]);
   const [availableThemes, setAvailableThemes] = useState<CustomTheme[]>(defaultThemes);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Update available themes based on dark/light mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const darkMode = document.documentElement.classList.contains('dark');
+      setIsDarkMode(darkMode);
+      setAvailableThemes(darkMode ? darkThemes : lightThemes);
+    };
+
+    // Initial check
+    checkDarkMode();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     // Load saved theme from localStorage
@@ -205,11 +292,25 @@ export function useCustomTheme() {
   return context;
 }
 
+// Export theme arrays for use in other components
+export { lightThemes, darkThemes };
+
 // Helper function to get Tailwind class from color
 export function getThemeClasses(theme: CustomTheme | null, isDark: boolean = false) {
-  const colors = theme?.colors;
+  // If we have a theme, find its dark/light variant
+  if (theme) {
+    const themes = isDark ? darkThemes : lightThemes;
+    const themeVariant = themes.find(t => t.name === theme.name);
+    
+    if (themeVariant) {
+      return themeVariant.colors;
+    }
+    
+    // Fallback to theme colors if no variant found
+    return theme.colors;
+  }
   
-  // Fallback colors if theme or colors are undefined
+  // Fallback colors if no theme is provided
   const fallbackColors = {
     primary: '#84cc16',
     secondary: '#fbbf24',
@@ -220,15 +321,16 @@ export function getThemeClasses(theme: CustomTheme | null, isDark: boolean = fal
     border: '#fbbf24'
   };
   
-  const safeColors = colors || fallbackColors;
-  
-  return {
-    primary: isDark ? safeColors.primary : safeColors.primary,
-    secondary: isDark ? safeColors.secondary : safeColors.secondary,
-    accent: isDark ? safeColors.accent : safeColors.accent,
-    background: isDark ? '#000000' : safeColors.background,
-    surface: isDark ? '#111111' : safeColors.surface,
-    text: isDark ? '#ffffff' : safeColors.text,
-    border: isDark ? safeColors.accent : safeColors.border
+  // Dark mode fallback colors
+  const darkFallbackColors = {
+    primary: '#22c55e', // brighter green for dark mode
+    secondary: '#f59e0b', // amber for dark mode
+    accent: '#16a34a', // green for dark mode
+    background: '#000000',
+    surface: '#111111',
+    text: '#ffffff',
+    border: '#374151'
   };
+  
+  return isDark ? darkFallbackColors : fallbackColors;
 }
