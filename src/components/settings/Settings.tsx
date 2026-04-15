@@ -343,15 +343,15 @@ export function SettingsButton() {
             onClick={() => setShowSettings(false)}
           />
           <div 
-            className={`fixed top-0 left-0 h-full w-3/5 shadow-2xl transform transition-transform duration-300 ease-in-out z-[9999] ${
-              showSettings ? 'translate-x-0' : '-translate-x-full'
+            className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-6xl max-h-[90vh] shadow-2xl rounded-3xl transition-all duration-300 ease-in-out z-[9999] overflow-hidden ${
+              showSettings ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
             }`}
             style={{
               backgroundColor: theme === 'light' ? '#ffffff' : '#1f2937',
-              borderRight: `2px solid ${customTheme.colors.border}`
+              border: `2px solid ${customTheme.colors.border}`
             }}
           >
-            <div className="flex h-full">
+            <div className="flex h-[90vh]">
               {/* Sidebar - redesigned compact vertical layout */}
               <div
                 className="w-44 relative overflow-hidden flex-shrink-0"
