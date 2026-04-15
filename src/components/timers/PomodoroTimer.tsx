@@ -234,25 +234,33 @@ export function PomodoroTimer() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && isRunning && currentSession === 'work') {
-        // Save timestamp when tab goes to background
+        // Save timestamp and current timeLeft when tab goes to background
         const lastActiveTime = Date.now();
         localStorage.setItem('pomodoro_background_start', lastActiveTime.toString());
+        localStorage.setItem('pomodoro_background_timeleft', timeLeft.toString());
       } else if (!document.hidden && isRunning && currentSession === 'work') {
-        // Restore lost time when tab becomes visible again
+        // Calculate correct time when tab becomes visible again
         const backgroundStart = localStorage.getItem('pomodoro_background_start');
-        if (backgroundStart) {
-          const timeLost = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
-          if (timeLost > 0 && timeLost < 3600) { // Only restore if less than 1 hour lost
-            updateSessionTime(timeLost);
+        const backgroundTimeLeft = localStorage.getItem('pomodoro_background_timeleft');
+        
+        if (backgroundStart && backgroundTimeLeft) {
+          const timePassed = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
+          const newTimeLeft = Math.max(0, parseInt(backgroundTimeLeft) - timePassed);
+          
+          if (timePassed > 0 && timePassed < 3600) { // Only restore if less than 1 hour lost
+            updateSessionTime(timePassed);
+            setTimeLeft(newTimeLeft);
           }
+          
           localStorage.removeItem('pomodoro_background_start');
+          localStorage.removeItem('pomodoro_background_timeleft');
         }
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning, currentSession]);
+  }, [isRunning, currentSession, timeLeft]);
 
   const handleSessionComplete = () => {
     setIsRunning(false);

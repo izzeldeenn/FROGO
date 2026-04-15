@@ -161,25 +161,33 @@ export function Timer() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && isRunning) {
-        // Save timestamp when tab goes to background
+        // Save timestamp and current time when tab goes to background
         const lastActiveTime = Date.now();
         localStorage.setItem('timer_background_start', lastActiveTime.toString());
+        localStorage.setItem('timer_background_time', time.toString());
       } else if (!document.hidden && isRunning) {
-        // Restore lost time when tab becomes visible again
+        // Calculate correct time when tab becomes visible again
         const backgroundStart = localStorage.getItem('timer_background_start');
-        if (backgroundStart) {
-          const timeLost = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
-          if (timeLost > 0 && timeLost < 3600) { // Only restore if less than 1 hour lost
-            updateSessionTime(timeLost);
+        const backgroundTime = localStorage.getItem('timer_background_time');
+        
+        if (backgroundStart && backgroundTime) {
+          const timePassed = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
+          const newTime = parseInt(backgroundTime) + timePassed;
+          
+          if (timePassed > 0 && timePassed < 3600) { // Only restore if less than 1 hour lost
+            updateSessionTime(timePassed);
+            setTime(newTime);
           }
+          
           localStorage.removeItem('timer_background_start');
+          localStorage.removeItem('timer_background_time');
         }
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning]);
+  }, [isRunning, time]);
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);

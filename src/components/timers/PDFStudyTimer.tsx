@@ -104,25 +104,33 @@ export function PDFStudyTimer({ onClose }: PDFStudyTimerProps) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && isRunning) {
-        // Save timestamp when tab goes to background
+        // Save timestamp and current time when tab goes to background
         const lastActiveTime = Date.now();
         localStorage.setItem('pdf_background_start', lastActiveTime.toString());
+        localStorage.setItem('pdf_background_time', time.toString());
       } else if (!document.hidden && isRunning) {
-        // Restore lost time when tab becomes visible again
+        // Calculate correct time when tab becomes visible again
         const backgroundStart = localStorage.getItem('pdf_background_start');
-        if (backgroundStart) {
-          const timeLost = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
-          if (timeLost > 0 && timeLost < 3600) { // Only restore if less than 1 hour lost
-            updateSessionTime(timeLost);
+        const backgroundTime = localStorage.getItem('pdf_background_time');
+        
+        if (backgroundStart && backgroundTime) {
+          const timePassed = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
+          const newTime = parseInt(backgroundTime) + timePassed;
+          
+          if (timePassed > 0 && timePassed < 3600) { // Only restore if less than 1 hour lost
+            updateSessionTime(timePassed);
+            setTime(newTime);
           }
+          
           localStorage.removeItem('pdf_background_start');
+          localStorage.removeItem('pdf_background_time');
         }
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning]);
+  }, [isRunning, time]);
 
   
   // Timer functions
