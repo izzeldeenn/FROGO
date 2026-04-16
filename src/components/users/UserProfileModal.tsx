@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { useUser } from '@/contexts/UserContext';
 import { dailyActivityDB } from '@/lib/dailyActivity';
@@ -29,6 +30,7 @@ interface UserProfileModalProps {
 
 export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProps) {
   const { theme } = useTheme();
+  const { language, t } = useLanguage();
   const customTheme = useCustomThemeClasses();
   const { getCurrentUser } = useUser();
   const [totalStudyTime, setTotalStudyTime] = useState(0);
@@ -167,7 +169,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
               : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 text-blue-300 border border-blue-700/50'
           }`}>
             <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
-            Rank #{user.rank || Math.floor((user.score || 0) / 100) + 1}
+            {language === 'ar' ? 'المرتبة' : 'Rank'} #{user.rank || Math.floor((user.score || 0) / 100) + 1}
           </div>
         </div>
 
@@ -184,7 +186,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
             <div className={`text-xs ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
             }`}>
-              Total Study Time
+              {language === 'ar' ? 'إجمالي وقت الدراسة' : 'Total Study Time'}
             </div>
           </div>
           
@@ -199,7 +201,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
             <div className={`text-xs ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
             }`}>
-              Today's Study Time
+              {language === 'ar' ? 'وقت الدراسة اليوم' : 'Today\'s Study Time'}
             </div>
           </div>
           
@@ -214,7 +216,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
             <div className={`text-xs ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
             }`}>
-              Points
+              {language === 'ar' ? 'النقاط' : 'Points'}
             </div>
           </div>
           
@@ -229,7 +231,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
             <div className={`text-xs ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
             }`}>
-              Daily Rank
+              {language === 'ar' ? 'المرتبة اليومية' : 'Daily Rank'}
             </div>
           </div>
         </div>
@@ -240,7 +242,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
         }`}>
           <div className="flex justify-between items-center">
             <span className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-              Created:
+              {language === 'ar' ? 'تاريخ الإنشاء:' : 'Created:'}
             </span>
             <span className={`font-medium ${
               theme === 'light' ? 'text-gray-800' : 'text-gray-200'
@@ -254,7 +256,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
           </div>
           <div className="flex justify-between items-center">
             <span className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-              Last Active:
+              {language === 'ar' ? 'آخر نشاط:' : 'Last Active:'}
             </span>
             <span className={`font-medium ${
               theme === 'light' ? 'text-gray-800' : 'text-gray-200'
@@ -268,12 +270,12 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
           </div>
           <div className="flex justify-between items-center">
             <span className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-              Today's Coins:
+              {language === 'ar' ? 'عملات اليوم:' : 'Today\'s Coins:'}
             </span>
             <span className={`font-medium bg-gradient-to-r ${
               theme === 'light' ? 'from-yellow-600 to-yellow-500' : 'from-yellow-400 to-yellow-300'
             } bg-clip-text text-transparent`}>
-              {getCoinsFromStudyTime(getTodayStudyTime(user))} coins
+              {getCoinsFromStudyTime(getTodayStudyTime(user))} {language === 'ar' ? 'عملة' : 'coins'}
             </span>
           </div>
         </div>
@@ -287,7 +289,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
                 background: `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.secondary})` 
               }}
             >
-              Edit Profile
+              {language === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile'}
             </button>
           )}
           <button
@@ -298,7 +300,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
                 : 'bg-gray-600 hover:bg-gray-500 text-gray-200'
             }`}
           >
-            Close
+            {language === 'ar' ? 'إغلاق' : 'Close'}
           </button>
         </div>
       </div>
