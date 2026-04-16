@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable Turbopack and force Webpack
-  experimental: {
-    turbo: {
-      resolveAlias: {},
-      loaders: {},
-    },
+  // Turbopack configuration
+  turbopack: {
+    // Empty turbopack config to silence the error
   },
   // Force webpack bundler
   webpack: (config, { dev, isServer }) => {
