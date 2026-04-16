@@ -117,7 +117,7 @@ export function ProfileTab({ posts }: ProfileTabProps) {
               <p className={`text-lg mb-4 ${
                 isDark ? 'text-gray-300' : 'text-gray-600'
               }`}>
-                {currentUser?.email || 'لا يوجد بريد إلكتروني'}
+                {currentUser?.email ? `${currentUser.email.substring(0, 3)}***@${currentUser.email.split('@')[1]}` : 'لا يوجد بريد إلكتروني'}
               </p>
               <div className="flex items-center gap-3">
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${

@@ -158,7 +158,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
           <p className={`text-sm ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
           }`}>
-            {user.email}
+            {user.email ? `${user.email.substring(0, 3)}***@${user.email.split('@')[1]}` : ''}
           </p>
           
           <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2 transition-all duration-300 hover:scale-105 ${
