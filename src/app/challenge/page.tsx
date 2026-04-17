@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'next/navigation';
-import { challengeDB, challengeSessionDB, userDB } from '@/lib/supabase';
-import { UserAccount, UserAccountFrontend } from '@/lib/supabase';
+import { challengeDB, challengeSessionDB, userDB, waitingListDB, UserAccount, UserAccountFrontend } from '@/lib/supabase';
 
 // Opponent interface
 interface Opponent {
@@ -105,32 +104,53 @@ export default function ChallengePage() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const opponentIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Find a real opponent from the database
-  const findRealOpponent = async (currentUser: UserAccountFrontend): Promise<Opponent | null> => {
+  // Find opponent using waiting list system
+  const findOpponentFromWaitingList = async (currentUser: UserAccountFrontend): Promise<{ opponent: Opponent, matchEntry: any } | null> => {
     try {
-      // Get all users except current user
-      const allUsers = await userDB.getAllUsers();
-      const otherUsers = allUsers.filter(user => user.account_id !== currentUser.accountId);
+      console.log('Finding opponent for user:', currentUser.id);
+      // First, check if user is already in waiting list
+      const existingEntry = await waitingListDB.getUserWaitingEntry(currentUser.id!);
+      console.log('Existing entry:', existingEntry);
       
-      if (otherUsers.length === 0) {
-        return null;
+      if (existingEntry) {
+        // User is already waiting, check for a match
+        const match = await waitingListDB.findMatch(currentUser.id!);
+        console.log('Match found:', match);
+        if (match) {
+          // Found a match! Get the opponent's user data
+          const opponentUser = await userDB.getUserByAccountId(match.user_id);
+          console.log('Opponent user:', opponentUser);
+          if (opponentUser) {
+            return {
+              opponent: convertUserToOpponent(opponentUser),
+              matchEntry: match
+            };
+          }
+        }
+        return null; // Still waiting
       }
       
-      // Find a user with similar score (within 200 points)
-      const similarScoreUsers = otherUsers.filter(
-        user => Math.abs(user.score - currentUser.score) <= 200
-      );
+      // Add user to waiting list
+      console.log('Adding user to waiting list');
+      await waitingListDB.addToWaitingList(currentUser.id!);
       
-      // If no similar score users, pick random from all
-      const candidateUsers = similarScoreUsers.length > 0 ? similarScoreUsers : otherUsers;
+      // Check for immediate match
+      const match = await waitingListDB.findMatch(currentUser.id!);
+      console.log('Match found after adding:', match);
+      if (match) {
+        const opponentUser = await userDB.getUserById(match.user_id);
+        console.log('Opponent user after adding:', opponentUser);
+        if (opponentUser) {
+          return {
+            opponent: convertUserToOpponent(opponentUser),
+            matchEntry: match
+          };
+        }
+      }
       
-      // Pick random opponent
-      const randomIndex = Math.floor(Math.random() * candidateUsers.length);
-      const opponentUser = candidateUsers[randomIndex];
-      
-      return convertUserToOpponent(opponentUser);
+      return null; // No match yet, user is now in waiting list
     } catch (error) {
-      console.error('Error finding opponent:', error);
+      console.error('Error finding opponent from waiting list:', error);
       return null;
     }
   };
@@ -162,120 +182,159 @@ export default function ChallengePage() {
     setIsSearching(true);
     setSearchProgress(0);
 
-    // Simulate searching for opponent
-    const searchInterval = setInterval(() => {
-      setSearchProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(searchInterval);
-          return 100;
+    // Subscribe to waiting list for real-time matching
+    let matchFound = false;
+    const subscription = waitingListDB.subscribeToWaitingList(async (payload) => {
+      if (matchFound) return;
+      
+      // Check if a new user joined the waiting list
+      if (payload.eventType === 'INSERT' && payload.new.user_id !== currentUserId) {
+        // Try to find a match
+        const result = await findOpponentFromWaitingList(currentUser);
+        if (result && result.opponent) {
+          matchFound = true;
+          subscription?.unsubscribe();
+          await startChallengeWithOpponent(currentUser, result.opponent, result.matchEntry);
         }
-        return prev + Math.random() * 15 + 5;
-      });
-    }, 200);
+      }
+    });
 
-    setTimeout(async () => {
-      clearInterval(searchInterval);
-      
-      // Find real opponent
-      const opponent = await findRealOpponent(currentUser);
-      
-      if (!opponent || !opponent.id) {
-        setIsSearching(false);
-        setSearchProgress(0);
-        alert('لم يتم العثور على خصم حالياً. حاول مرة أخرى لاحقاً');
+    // Initial check for existing matches
+    const result = await findOpponentFromWaitingList(currentUser);
+    if (result && result.opponent) {
+      subscription?.unsubscribe();
+      await startChallengeWithOpponent(currentUser, result.opponent, result.matchEntry);
+      return;
+    }
+
+    // If no immediate match, show waiting UI
+    setSearchProgress(50);
+    
+    // Keep checking for matches periodically
+    const checkInterval = setInterval(async () => {
+      if (matchFound) {
+        clearInterval(checkInterval);
         return;
       }
       
-      // Create challenge in database
-      const challenge = await challengeDB.createChallenge(currentUserId, opponent.id, 600);
-      
-      if (!challenge) {
+      const result = await findOpponentFromWaitingList(currentUser);
+      if (result && result.opponent) {
+        matchFound = true;
+        subscription?.unsubscribe();
+        clearInterval(checkInterval);
+        await startChallengeWithOpponent(currentUser, result.opponent, result.matchEntry);
+      }
+    }, 2000);
+
+    // Auto-cancel after 5 minutes
+    setTimeout(() => {
+      if (!matchFound) {
+        clearInterval(checkInterval);
+        subscription?.unsubscribe();
+        waitingListDB.removeFromWaitingList(currentUserId);
         setIsSearching(false);
         setSearchProgress(0);
-        alert('فشل إنشاء التحدي. حاول مرة أخرى');
-        return;
+        alert('لم يتم العثور على خصم خلال 5 دقائق. حاول مرة أخرى لاحقاً');
       }
-      
-      // Create sessions for both users
-      const userSession = await challengeSessionDB.createSession(challenge.id!, currentUserId);
-      const opponentSession = await challengeSessionDB.createSession(challenge.id!, opponent.id);
-      
-      if (!userSession || !opponentSession) {
-        setIsSearching(false);
-        setSearchProgress(0);
-        alert('فشل إنشاء جلسة التحدي. حاول مرة أخرى');
-        return;
-      }
-      
-      const startTime = Date.now();
-      
-      setChallengeState({
-        isActive: true,
-        opponent,
-        startTime,
-        userStudyTime: 0,
-        opponentStudyTime: 0,
-        winner: null,
-        isUserStudying: true, // Start studying immediately
-        challengeDuration: 0,
-        userProgress: 0,
-        opponentProgress: 0,
-        challengeId: challenge.id!,
-        userSessionId: userSession.id!,
-        opponentSessionId: opponentSession.id!
-      });
-      
+    }, 5 * 60 * 1000);
+  };
+
+  // Start challenge with found opponent
+  const startChallengeWithOpponent = async (currentUser: UserAccountFrontend, opponent: Opponent, matchEntry: any) => {
+    const currentUserId = currentUser.id!;
+    
+    // Remove both users from waiting list
+    await waitingListDB.removeFromWaitingList(currentUserId);
+    await waitingListDB.removeFromWaitingList(matchEntry.user_id);
+    
+    // Create challenge in database
+    const challenge = await challengeDB.createChallenge(currentUserId, opponent.id, 600);
+    
+    if (!challenge) {
       setIsSearching(false);
       setSearchProgress(0);
-      
-      // Subscribe to opponent session updates
-      challengeSessionDB.subscribeToChallengeSessions(challenge.id!, (payload) => {
-        if (payload.new && payload.new.user_id === opponent.id) {
-          updateOpponentFromSession(payload.new);
+      alert('فشل إنشاء التحدي. حاول مرة أخرى');
+      return;
+    }
+    
+    // Create sessions for both users
+    const userSession = await challengeSessionDB.createSession(challenge.id!, currentUserId);
+    const opponentSession = await challengeSessionDB.createSession(challenge.id!, opponent.id);
+    
+    if (!userSession || !opponentSession) {
+      setIsSearching(false);
+      setSearchProgress(0);
+      alert('فشل إنشاء جلسة التحدي. حاول مرة أخرى');
+      return;
+    }
+    
+    const startTime = Date.now();
+    
+    setChallengeState({
+      isActive: true,
+      opponent,
+      startTime,
+      userStudyTime: 0,
+      opponentStudyTime: 0,
+      winner: null,
+      isUserStudying: true,
+      challengeDuration: 0,
+      userProgress: 0,
+      opponentProgress: 0,
+      challengeId: challenge.id!,
+      userSessionId: userSession.id!,
+      opponentSessionId: opponentSession.id!
+    });
+    
+    setIsSearching(false);
+    setSearchProgress(0);
+    
+    // Subscribe to opponent session updates
+    challengeSessionDB.subscribeToChallengeSessions(challenge.id!, (payload) => {
+      if (payload.new && payload.new.user_id === opponent.id) {
+        updateOpponentFromSession(payload.new);
+      }
+    });
+    
+    // Start main timer
+    intervalRef.current = setInterval(async () => {
+      setChallengeState(prev => {
+        console.log('Timer tick - startTime:', prev.startTime, 'userStudyTime:', prev.userStudyTime);
+        if (!prev.startTime) {
+          console.log('No startTime, skipping');
+          return prev;
         }
-      });
-      
-      // Start main timer
-      intervalRef.current = setInterval(async () => {
+
         const now = Date.now();
-        const elapsed = Math.floor((now - startTime) / 1000);
-        
-        setChallengeState(prev => {
-          // Update challenge duration
-          const newDuration = elapsed;
-          
-          // Update user study time (always counting)
-          const newUserTime = newDuration;
-          
-          // Calculate progress (based on study time)
-          const maxTime = 600; // 10 minutes max for progress bar
-          const newUserProgress = Math.min((newUserTime / maxTime) * 100, 100);
-          
-          // Update user session in database
-          if (prev.userSessionId && prev.isUserStudying) {
-            challengeSessionDB.updateSession(prev.userSessionId, newUserTime, true);
-          }
-          
-          // Check if user stopped (user is not studying anymore)
-          if (!prev.isUserStudying && prev.userStudyTime > 0) {
-            endChallenge('opponent');
-            return prev;
-          }
-          
-          return {
-            ...prev,
-            challengeDuration: newDuration,
-            userStudyTime: newUserTime,
-            userProgress: newUserProgress
-          };
-        });
-        
-        // Update actual user study time
-        updateUserStudyTime(1);
-      }, 1000);
-      
-      setTimerActive(true);
-    }, 2000 + Math.random() * 4000); // 2-6 seconds search time for more realistic feel
+        const elapsed = Math.floor((now - prev.startTime) / 1000);
+        const newDuration = elapsed;
+        const newUserTime = newDuration;
+        const maxTime = 600;
+        const newUserProgress = Math.min((newUserTime / maxTime) * 100, 100);
+
+        console.log('Timer update - elapsed:', elapsed, 'newUserTime:', newUserTime);
+
+        if (prev.userSessionId && prev.isUserStudying) {
+          challengeSessionDB.updateSession(prev.userSessionId, newUserTime, true);
+        }
+
+        if (!prev.isUserStudying && prev.userStudyTime > 0) {
+          endChallenge('opponent');
+          return prev;
+        }
+
+        return {
+          ...prev,
+          challengeDuration: newDuration,
+          userStudyTime: newUserTime,
+          userProgress: newUserProgress
+        };
+      });
+
+      updateUserStudyTime(1);
+    }, 1000);
+    
+    setTimerActive(true);
   };
 
   // Handle user stopping study (user can only stop, not start)
@@ -374,7 +433,8 @@ export default function ChallengePage() {
     setTimerActive(false);
   };
 
-  const goBack = () => {
+  const goBack = async () => {
+    await resetChallenge();
     router.push('/focus');
   };
 

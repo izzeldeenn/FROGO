@@ -128,6 +128,26 @@ export interface ChallengeSessionFrontend {
   updatedAt: string;
 }
 
+// Waiting list interface for database (snake_case - matches Supabase)
+export interface WaitingListEntry {
+  id?: string;
+  user_id: string;
+  joined_at: string;
+  expires_at: string;
+  status: 'waiting' | 'matched' | 'expired';
+  created_at: string;
+}
+
+// Waiting list interface for frontend (camelCase)
+export interface WaitingListEntryFrontend {
+  id?: string;
+  userId: string;
+  joinedAt: string;
+  expiresAt: string;
+  status: 'waiting' | 'matched' | 'expired';
+  createdAt: string;
+}
+
 // Database operations for user accounts
 export class UserAccountDB {
   private static instance: UserAccountDB;
@@ -161,7 +181,23 @@ export class UserAccountDB {
         .from('users')
         .select('id, account_id, username, email, avatar, score, last_active, created_at, hash_key')
         .eq('account_id', accountId)
-        .single();
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Get user by ID
+  async getUserById(id: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, account_id, username, email, avatar, score, last_active, created_at, hash_key')
+        .eq('id', id)
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -677,11 +713,145 @@ export class ChallengeSessionDB {
   }
 }
 
+// Database operations for waiting list
+export class WaitingListDB {
+  private static instance: WaitingListDB;
+
+  static getInstance(): WaitingListDB {
+    if (!WaitingListDB.instance) {
+      WaitingListDB.instance = new WaitingListDB();
+    }
+    return WaitingListDB.instance;
+  }
+
+  // Add user to waiting list
+  async addToWaitingList(userId: string): Promise<WaitingListEntry | null> {
+    try {
+      // First, delete any existing waiting entry for this user (expired or not)
+      await supabase
+        .from('challenge_waiting_list')
+        .delete()
+        .eq('user_id', userId)
+        .eq('status', 'waiting');
+
+      // Then add new entry
+      const { data, error } = await supabase
+        .from('challenge_waiting_list')
+        .insert({
+          user_id: userId,
+          status: 'waiting',
+          expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error adding to waiting list:', error);
+      return null;
+    }
+  }
+
+  // Remove user from waiting list
+  async removeFromWaitingList(userId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('challenge_waiting_list')
+        .update({ status: 'matched' })
+        .eq('user_id', userId)
+        .eq('status', 'waiting');
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error removing from waiting list:', error);
+      return false;
+    }
+  }
+
+  // Find a match in waiting list
+  async findMatch(userId: string): Promise<WaitingListEntry | null> {
+    try {
+      console.log('Finding match for user:', userId);
+      // Cleanup expired entries first
+      await supabase
+        .from('challenge_waiting_list')
+        .delete()
+        .eq('status', 'waiting')
+        .lt('expires_at', new Date().toISOString());
+
+      // Find a waiting user
+      const { data, error } = await supabase
+        .from('challenge_waiting_list')
+        .select('*')
+        .eq('status', 'waiting')
+        .neq('user_id', userId)
+        .gt('expires_at', new Date().toISOString())
+        .order('joined_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      console.log('Match query result:', data, 'Error:', error);
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error finding match:', error);
+      return null;
+    }
+  }
+
+  // Get user's current waiting entry
+  async getUserWaitingEntry(userId: string): Promise<WaitingListEntry | null> {
+    try {
+      const { data, error } = await supabase
+        .from('challenge_waiting_list')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'waiting')
+        .gt('expires_at', new Date().toISOString())
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Subscribe to waiting list changes
+  subscribeToWaitingList(callback: (payload: any) => void) {
+    try {
+      const subscription = supabase
+        .channel('waiting_list_changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'challenge_waiting_list' },
+          callback
+        )
+        .subscribe();
+
+      return subscription;
+    } catch (error) {
+      console.error('Error subscribing to waiting list:', error);
+    }
+  }
+
+  // Unsubscribe from waiting list
+  unsubscribeFromWaitingList() {
+    try {
+      supabase.channel('waiting_list_changes').unsubscribe();
+    } catch (error) {
+      console.error('Error unsubscribing from waiting list:', error);
+    }
+  }
+}
+
 // Export singleton instances
 export const userDB = UserAccountDB.getInstance();
 export const resetTokenDB = ResetTokenDB.getInstance();
 export const challengeDB = ChallengeDB.getInstance();
 export const challengeSessionDB = ChallengeSessionDB.getInstance();
+export const waitingListDB = WaitingListDB.getInstance();
 
 // Check if Supabase is available
 export const isSupabaseAvailable = async (): Promise<boolean> => {
