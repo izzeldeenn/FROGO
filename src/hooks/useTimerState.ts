@@ -62,9 +62,9 @@ export function useTimerState() {
   const realtimeUpdateRef = useRef<NodeJS.Timeout | null>(null);
   const currentTimeRef = useRef(0);
 
-  // Load timer settings from localStorage and listen for changes
+  // Load timer settings from localStorage after hydration
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && hasHydrated) {
       const savedSettings = localStorage.getItem('timer_settings');
       if (savedSettings) {
         try {
@@ -74,30 +74,33 @@ export function useTimerState() {
           console.error('Failed to load timer settings:', error);
         }
       }
-
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'timer_settings' && e.newValue) {
-          try {
-            const settings = JSON.parse(e.newValue);
-            setTimerSettings(settings);
-          } catch (error) {
-            console.error('Failed to parse timer settings:', error);
-          }
-        }
-      };
-
-      const handleCustomEvent = (e: CustomEvent) => {
-        setTimerSettings(e.detail);
-      };
-
-      window.addEventListener('storage', handleStorageChange);
-      window.addEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
-
-      return () => {
-        window.removeEventListener('storage', handleStorageChange);
-        window.removeEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
-      };
     }
+  }, [hasHydrated]);
+
+  // Listen for storage changes and custom events
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'timer_settings' && e.newValue) {
+        try {
+          const settings = JSON.parse(e.newValue);
+          setTimerSettings(settings);
+        } catch (error) {
+          console.error('Failed to parse timer settings:', error);
+        }
+      }
+    };
+
+    const handleCustomEvent = (e: CustomEvent) => {
+      setTimerSettings(e.detail);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('timerSettingsChanged', handleCustomEvent as EventListener);
+    };
   }, []);
 
   // Save timer settings to localStorage whenever they change

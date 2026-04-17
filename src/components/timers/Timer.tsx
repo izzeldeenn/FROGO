@@ -19,10 +19,10 @@ export function Timer() {
   return (
     <div className="text-center">
       {!hasHydrated ? (
-        <h1 className={`${timerSettings.size} font-bold mb-8 ${timerSettings.font}`}
+        <h1 className="text-4xl font-bold mb-8 font-mono"
           style={{ 
-            color: timerSettings.color,
-            ...getTimerDesignStyle(timerSettings.design)
+            color: '#ffffff',
+            ...getTimerDesignStyle('minimal')
           }}
         >
           00:00:00
