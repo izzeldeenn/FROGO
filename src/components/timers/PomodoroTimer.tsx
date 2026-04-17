@@ -1,292 +1,47 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useUser } from '@/contexts/UserContext';
-import { useStudySession } from '@/contexts/StudySessionContext';
-import { useTimerIndicator } from '@/contexts/TimerIndicatorContext';
+import { useState } from 'react';
 import { getTimerDesignStyle } from '@/constants/timerDesignStyles';
-
-interface PomodoroSettings {
-  workMinutes: number;
-  shortBreakMinutes: number;
-  longBreakMinutes: number;
-  longBreakInterval: number;
-}
+import { usePomodoroTimer } from '@/hooks/usePomodoroTimer';
 
 export function PomodoroTimer() {
-  const { theme } = useTheme();
-  const { getCurrentUser, setTimerActive } = useUser();
-  const { startSession, endSession, updateSessionTime, isSessionActive } = useStudySession();
-  const { setTimerActive: setTimerActiveIndicator } = useTimerIndicator();
-  
-  // Timer settings from localStorage
-  const [timerSettings, setTimerSettings] = useState({
-    color: '#ffffff',
-    font: 'font-mono',
-    design: 'minimal',
-    size: 'text-4xl',
-    completedIcon: 'star' // star, dot, heart
-  });
-  const [settings, setSettings] = useState<PomodoroSettings>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pomodoroTimer_settings');
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    }
-    return {
-      workMinutes: 25,
-      shortBreakMinutes: 5,
-      longBreakMinutes: 15,
-      longBreakInterval: 4
-    };
-  });
+  const {
+    timerSettings,
+    settings,
+    currentSession,
+    completedSessions,
+    timeLeft,
+    isRunning,
+    showSettings,
+    theme,
+    handleStart,
+    handleStop,
+    handleReset,
+    handleSessionComplete,
+    handleSkip,
+    handleResetSessions,
+    formatTime,
+    setSettings,
+    setTimeLeft,
+    setCurrentSession,
+    setCompletedSessions,
+    setShowSettings
+  } = usePomodoroTimer();
 
-  const [showSettings, setShowSettings] = useState(false);
-  const [currentSession, setCurrentSession] = useState<'work' | 'shortBreak' | 'longBreak'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pomodoroTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.currentSession || 'work';
-      }
-    }
-    return 'work';
-  });
-  const [completedSessions, setCompletedSessions] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pomodoroTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.completedSessions || 0;
-      }
-    }
-    return 0;
-  });
-  const [timeLeft, setTimeLeft] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pomodoroTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.timeLeft || settings.workMinutes * 60;
-      }
-    }
-    return settings.workMinutes * 60;
-  });
-  const [isRunning, setIsRunning] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pomodoroTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.isRunning || false;
-      }
-    }
-    return false;
-  });
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const studyTimeRef = useRef<NodeJS.Timeout | null>(null);
-  const realtimeUpdateRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Load timer settings from localStorage and listen for changes
-  useEffect(() => {
-    // Load timer settings from localStorage
-    if (typeof window !== 'undefined') {
-      const savedSettings = localStorage.getItem('pomodoro_timer_settings');
-      if (savedSettings) {
-        try {
-          const settings = JSON.parse(savedSettings);
-          setTimerSettings(settings);
-        } catch (error) {
-          console.error('Failed to load pomodoro timer settings:', error);
-        }
-      }
-
-      // Listen for storage changes from other tabs
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'pomodoro_timer_settings' && e.newValue) {
-          try {
-            const settings = JSON.parse(e.newValue);
-            setTimerSettings(settings);
-          } catch (error) {
-            console.error('Failed to parse pomodoro timer settings:', error);
-          }
-        }
-      };
-
-      // Listen for custom event from settings
-      const handleCustomEvent = (e: CustomEvent) => {
-        setTimerSettings(e.detail);
-      };
-
-      // Listen for storage changes
-      window.addEventListener('storage', handleStorageChange);
-      window.addEventListener('pomodoroTimerSettingsChanged', handleCustomEvent as EventListener);
-
-      // Also check for direct localStorage changes (same tab)
-      const checkInterval = setInterval(() => {
-        const savedSettings = localStorage.getItem('pomodoro_timer_settings');
-        if (savedSettings) {
-          try {
-            const settings = JSON.parse(savedSettings);
-            setTimerSettings(prev => {
-              // Only update if actually different
-              if (JSON.stringify(prev) !== JSON.stringify(settings)) {
-                return settings;
-              }
-              return prev;
-            });
-          } catch (error) {
-            console.error('Failed to check pomodoro timer settings:', error);
-          }
-        }
-      }, 1000);
-
-      return () => {
-        window.removeEventListener('storage', handleStorageChange);
-        window.removeEventListener('pomodoroTimerSettingsChanged', handleCustomEvent as EventListener);
-        clearInterval(checkInterval);
-      };
-    }
-  }, []);
-
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const state = {
-        currentSession,
-        completedSessions,
-        timeLeft,
-        isRunning
-      };
-      localStorage.setItem('pomodoroTimer_state', JSON.stringify(state));
-      localStorage.setItem('pomodoroTimer_settings', JSON.stringify(settings));
-    }
-  }, [currentSession, completedSessions, timeLeft, isRunning, settings]);
-
-  // Clear saved state
-  const clearSavedState = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('pomodoroTimer_state');
-      localStorage.removeItem('pomodoroTimer_settings');
+  const getSessionColor = () => {
+    switch (currentSession) {
+      case 'work': return 'border-red-500 bg-red-50';
+      case 'shortBreak': return 'border-green-500 bg-green-50';
+      case 'longBreak': return 'border-blue-500 bg-blue-50';
     }
   };
 
-  useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (isRunning && timeLeft > 0) {
-      setTimerActive(true);
-      setTimerActiveIndicator(true);
-      
-      // Start study session if this is a work session and no session is active
-      if (currentSession === 'work' && !isSessionActive && currentUser?.accountId) {
-        startSession(currentUser.accountId);
-      }
-      
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev: number) => prev - 1);
-        
-        // Update session time for work sessions
-        if (currentSession === 'work') {
-          updateSessionTime(1);
-        }
-      }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
-      setIsRunning(false);
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      
-      // End study session when work session completes
-      if (currentSession === 'work' && isSessionActive && currentUser?.accountId) {
-        endSession(currentUser.accountId);
-      }
-      // Play notification or alert
-      alert('الجلسة انتهت!');
-    } else {
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (studyTimeRef.current) {
-        clearInterval(studyTimeRef.current);
-      }
-      if (realtimeUpdateRef.current) {
-        clearInterval(realtimeUpdateRef.current);
-      }
+  const getSessionLabel = () => {
+    switch (currentSession) {
+      case 'work': return 'وقت العمل';
+      case 'shortBreak': return 'استراحة قصيرة';
+      case 'longBreak': return 'استراحة طويلة';
     }
-
-    return () => {
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (studyTimeRef.current) {
-        clearInterval(studyTimeRef.current);
-      }
-      if (realtimeUpdateRef.current) {
-        clearInterval(realtimeUpdateRef.current);
-      }
-    };
-  }, [isRunning, timeLeft, currentSession]); // Remove isSessionActive from dependencies
-
-  // Handle background tab throttling with Document Visibility API
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden && isRunning && currentSession === 'work') {
-        // Save timestamp and current timeLeft when tab goes to background
-        const lastActiveTime = Date.now();
-        localStorage.setItem('pomodoro_background_start', lastActiveTime.toString());
-        localStorage.setItem('pomodoro_background_timeleft', timeLeft.toString());
-      } else if (!document.hidden && isRunning && currentSession === 'work') {
-        // Calculate correct time when tab becomes visible again
-        const backgroundStart = localStorage.getItem('pomodoro_background_start');
-        const backgroundTimeLeft = localStorage.getItem('pomodoro_background_timeleft');
-        
-        if (backgroundStart && backgroundTimeLeft) {
-          const timePassed = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
-          const newTimeLeft = Math.max(0, parseInt(backgroundTimeLeft) - timePassed);
-          
-          if (timePassed > 0 && timePassed < 3600) { // Only restore if less than 1 hour lost
-            updateSessionTime(timePassed);
-            setTimeLeft(newTimeLeft);
-          }
-          
-          localStorage.removeItem('pomodoro_background_start');
-          localStorage.removeItem('pomodoro_background_timeleft');
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning, currentSession, timeLeft]);
-
-  const handleSessionComplete = () => {
-    setIsRunning(false);
-    
-    if (currentSession === 'work') {
-      const newCompletedSessions = completedSessions + 1;
-      setCompletedSessions(newCompletedSessions);
-      
-      if (newCompletedSessions % settings.longBreakInterval === 0) {
-        setCurrentSession('longBreak');
-        setTimeLeft(settings.longBreakMinutes * 60);
-      } else {
-        setCurrentSession('shortBreak');
-        setTimeLeft(settings.shortBreakMinutes * 60);
-      }
-    } else {
-      setCurrentSession('work');
-      setTimeLeft(settings.workMinutes * 60);
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   // Render completed sessions icons
@@ -328,79 +83,6 @@ export function PomodoroTimer() {
     return icons;
   };
 
-
-  const handleStart = async () => {
-    // Get current user and validate
-    const currentUser = getCurrentUser();
-    if (!currentUser?.accountId) {
-      console.error('❌ No current user found');
-      return;
-    }
-    
-    setIsRunning(true);
-  };
-  
-  const handleStop = async () => {
-    if (isRunning) {
-      const currentUser = getCurrentUser();
-      if (currentUser?.accountId && currentSession === 'work') {
-        await endSession(currentUser.accountId);
-      }
-    }
-    setIsRunning(false);
-  };
-  
-  const handleReset = async () => {
-    if (isRunning) {
-      await handleStop();
-    }
-    setTimeLeft(currentSession === 'work' ? settings.workMinutes * 60 : 
-               currentSession === 'shortBreak' ? settings.shortBreakMinutes * 60 : 
-               settings.longBreakMinutes * 60);
-    clearSavedState();
-  };
-
-  const handleResetSessions = () => {
-    setCompletedSessions(0);
-  };
-
-  const handleSkip = async () => {
-    if (isRunning) {
-      await handleStop();
-    }
-    setIsRunning(false);
-    if (currentSession === 'work') {
-      const newCompletedSessions = completedSessions + 1;
-      setCompletedSessions(newCompletedSessions);
-      
-      if (newCompletedSessions % settings.longBreakInterval === 0) {
-        setCurrentSession('longBreak');
-        setTimeLeft(settings.longBreakMinutes * 60);
-      } else {
-        setCurrentSession('shortBreak');
-        setTimeLeft(settings.shortBreakMinutes * 60);
-      }
-    } else {
-      setCurrentSession('work');
-      setTimeLeft(settings.workMinutes * 60);
-    }
-  };
-
-  const getSessionColor = () => {
-    switch (currentSession) {
-      case 'work': return 'border-red-500 bg-red-50';
-      case 'shortBreak': return 'border-green-500 bg-green-50';
-      case 'longBreak': return 'border-blue-500 bg-blue-50';
-    }
-  };
-
-  const getSessionLabel = () => {
-    switch (currentSession) {
-      case 'work': return 'وقت العمل';
-      case 'shortBreak': return 'استراحة قصيرة';
-      case 'longBreak': return 'استراحة طويلة';
-    }
-  };
 
   return (
     <div className="text-center">

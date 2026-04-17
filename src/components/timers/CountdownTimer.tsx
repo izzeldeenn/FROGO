@@ -1,273 +1,40 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { useStudySession } from '@/contexts/StudySessionContext';
 import { useTimerIndicator } from '@/contexts/TimerIndicatorContext';
 import { getTimerDesignStyle } from '@/constants/timerDesignStyles';
+import { useCountdownTimer } from '@/hooks/useCountdownTimer';
 
 export function CountdownTimer() {
   const { theme } = useTheme();
-  const { getCurrentUser, setTimerActive } = useUser();
-  const { startSession, endSession, updateSessionTime, isSessionActive } = useStudySession();
-  const { setTimerActive: setTimerActiveIndicator } = useTimerIndicator();
+  const {
+    timerSettings,
+    inputs,
+    state,
+    timeLeft,
+    isRunning,
+    isSet,
+    hours,
+    minutes,
+    seconds,
+    handleStart,
+    handleStop,
+    handleReset,
+    formatTime,
+    clearSavedState,
+    setTimeLeft,
+    setIsRunning,
+    setIsSet,
+    setHours,
+    setMinutes,
+    setSeconds,
+    getCurrentUser,
+    endSession
+  } = useCountdownTimer();
   
-  // Timer settings from localStorage
-  const [timerSettings, setTimerSettings] = useState({
-    color: '#ffffff',
-    font: 'font-mono',
-    design: 'minimal',
-    size: 'text-4xl'
-  });
-  const [hours, setHours] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_inputs');
-      if (saved) {
-        const inputs = JSON.parse(saved);
-        return inputs.hours || 0;
-      }
-    }
-    return 0;
-  });
-  const [minutes, setMinutes] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_inputs');
-      if (saved) {
-        const inputs = JSON.parse(saved);
-        return inputs.minutes || 5;
-      }
-    }
-    return 5;
-  });
-  const [seconds, setSeconds] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_inputs');
-      if (saved) {
-        const inputs = JSON.parse(saved);
-        return inputs.seconds || 0;
-      }
-    }
-    return 0;
-  });
-  const [timeLeft, setTimeLeft] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.timeLeft || 0;
-      }
-    }
-    return 0;
-  });
-  const [isRunning, setIsRunning] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.isRunning || false;
-      }
-    }
-    return false;
-  });
-  const [isSet, setIsSet] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('countdownTimer_state');
-      if (saved) {
-        const state = JSON.parse(saved);
-        return state.isSet || false;
-      }
-    }
-    return false;
-  });
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const studyTimeRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Load countdown timer settings from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedSettings = localStorage.getItem('countdown_timer_settings');
-      if (savedSettings) {
-        try {
-          const settings = JSON.parse(savedSettings);
-          setTimerSettings(settings);
-        } catch (error) {
-          console.error('Failed to load countdown timer settings:', error);
-        }
-      }
-    }
-  }, []);
-
-  // Listen for countdown timer settings changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'countdown_timer_settings' && e.newValue) {
-          try {
-            const settings = JSON.parse(e.newValue);
-            setTimerSettings(settings);
-          } catch (error) {
-            console.error('Failed to parse countdown timer settings:', error);
-          }
-        }
-      };
-
-      // Listen for custom event from settings
-      const handleCustomEvent = (e: CustomEvent) => {
-        setTimerSettings(e.detail);
-      };
-
-      // Listen for storage changes
-      window.addEventListener('storage', handleStorageChange);
-      window.addEventListener('countdownTimerSettingsChanged', handleCustomEvent as EventListener);
-
-      // Also check for direct localStorage changes (same tab)
-      const checkInterval = setInterval(() => {
-        const savedSettings = localStorage.getItem('countdown_timer_settings');
-        if (savedSettings) {
-          try {
-            const settings = JSON.parse(savedSettings);
-            setTimerSettings(prev => {
-              // Only update if actually different
-              if (JSON.stringify(prev) !== JSON.stringify(settings)) {
-                return settings;
-              }
-              return prev;
-            });
-          } catch (error) {
-            console.error('Failed to parse countdown timer settings:', error);
-          }
-        }
-      }, 500);
-
-      return () => {
-        window.removeEventListener('storage', handleStorageChange);
-        window.removeEventListener('countdownTimerSettingsChanged', handleCustomEvent as EventListener);
-        clearInterval(checkInterval);
-      };
-    }
-  }, []);
-
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const state = {
-        timeLeft,
-        isRunning,
-        isSet
-      };
-      const inputs = {
-        hours,
-        minutes,
-        seconds
-      };
-      localStorage.setItem('countdownTimer_state', JSON.stringify(state));
-      localStorage.setItem('countdownTimer_inputs', JSON.stringify(inputs));
-    }
-  }, [timeLeft, isRunning, isSet, hours, minutes, seconds]);
-
-  // Clear saved state
-  const clearSavedState = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('countdownTimer_state');
-      localStorage.removeItem('countdownTimer_inputs');
-    }
-  };
-
-  useEffect(() => {
-    clearSavedState();
-  }, []);
-
-  useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (isRunning && timeLeft > 0) {
-      setTimerActive(true);
-      setTimerActiveIndicator(true);
-      
-      // Start study session if not already active
-      if (!isSessionActive && currentUser?.accountId) {
-        startSession(currentUser.accountId);
-      }
-      
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev: number) => prev - 1);
-        updateSessionTime(1); // Update session time by 1 second
-      }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
-      setIsRunning(false);
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      
-      // End study session when timer completes
-      if (isSessionActive && currentUser?.accountId) {
-        endSession(currentUser.accountId);
-      }
-      
-      // Play notification or alert
-      alert('الوقت انتهى!');
-    } else {
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (studyTimeRef.current) {
-        clearInterval(studyTimeRef.current);
-      }
-    }
-
-    return () => {
-      setTimerActive(false);
-      setTimerActiveIndicator(false);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (studyTimeRef.current) {
-        clearInterval(studyTimeRef.current);
-      }
-    };
-  }, [isRunning, timeLeft]);
-
-  // Handle background tab throttling with Document Visibility API
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden && isRunning) {
-        // Save timestamp and current timeLeft when tab goes to background
-        const lastActiveTime = Date.now();
-        localStorage.setItem('countdown_background_start', lastActiveTime.toString());
-        localStorage.setItem('countdown_background_timeleft', timeLeft.toString());
-      } else if (!document.hidden && isRunning) {
-        // Calculate correct time when tab becomes visible again
-        const backgroundStart = localStorage.getItem('countdown_background_start');
-        const backgroundTimeLeft = localStorage.getItem('countdown_background_timeleft');
-        
-        if (backgroundStart && backgroundTimeLeft) {
-          const timePassed = Math.floor((Date.now() - parseInt(backgroundStart)) / 1000);
-          const newTimeLeft = Math.max(0, parseInt(backgroundTimeLeft) - timePassed);
-          
-          if (timePassed > 0 && timePassed < 3600) { // Only restore if less than 1 hour lost
-            updateSessionTime(timePassed);
-            setTimeLeft(newTimeLeft);
-          }
-          
-          localStorage.removeItem('countdown_background_start');
-          localStorage.removeItem('countdown_background_timeleft');
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning, timeLeft]);
-
-
-  const formatTime = (totalSeconds: number) => {
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
   const handleSet = () => {
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
     if (totalSeconds > 0) {
@@ -275,37 +42,6 @@ export function CountdownTimer() {
       setIsSet(true);
       setIsRunning(false);
     }
-  };
-
-  const handleStart = async () => {
-    if (isSet && timeLeft > 0) {
-      // Get current user and validate
-      const currentUser = getCurrentUser();
-      if (!currentUser?.accountId) {
-        console.error('❌ No current user found');
-        return;
-      }
-      
-      setIsRunning(true);
-    }
-  };
-
-  const handleStop = async () => {
-    if (isRunning) {
-      const currentUser = getCurrentUser();
-      if (currentUser?.accountId) {
-        await endSession(currentUser.accountId);
-      }
-    }
-    setIsRunning(false);
-  };
-  const handleReset = async () => {
-    if (isRunning) {
-      await handleStop();
-    }
-    setIsSet(false);
-    setTimeLeft(0);
-    clearSavedState();
   };
 
   return (
