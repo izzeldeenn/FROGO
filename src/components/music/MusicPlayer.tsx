@@ -94,8 +94,12 @@ export function MusicPlayer({ isVisible: externalVisible, setIsVisible: external
                 setIsPlaying(false);
               } else if (event.data === window.YT.PlayerState.ENDED) {
                 if (loop) {
-                  event.target.seekTo(0);
-                  event.target.playVideo();
+                  if (typeof event.target.seekTo === 'function') {
+                    event.target.seekTo(0);
+                  }
+                  if (typeof event.target.playVideo === 'function') {
+                    event.target.playVideo();
+                  }
                 } else {
                   nextTrack();
                 }

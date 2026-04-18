@@ -37,7 +37,7 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     formatStudyTime,
     formatSessionTime,
     getTodayStudyTime,
-    getCoinsFromStudyTime,
+    calculateCoinsFromStudyTime,
     isRecentlyActive,
     isCurrentUserActive,
     isCurrentUser
@@ -168,7 +168,7 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
               displayUsers.map((user) => {
                 const todaySeconds = getTodayStudyTime(user);
                 const todayTimeFormatted = formatStudyTime(todaySeconds);
-                const todayCoins = getCoinsFromStudyTime(todaySeconds);
+                const todayCoins = calculateCoinsFromStudyTime(todaySeconds);
                 const userIsActive = isCurrentUserActive(user);
                 const isCurrent = isCurrentUser(user);
                 

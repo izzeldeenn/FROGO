@@ -23,7 +23,7 @@ interface BackgroundData {
 export function useTimerState() {
   const { theme } = useTheme();
   const { getCurrentUser, setTimerActive } = useUser();
-  const { startSession, endSession, updateSessionTime, isSessionActive } = useStudySession();
+  const { startSession, endSession, updateSessionTime, isSessionActive, currentSession, resumeSession } = useStudySession();
   
   // Timer settings from localStorage
   const [timerSettings, setTimerSettings] = useState<TimerSettings>(() => {
@@ -156,10 +156,19 @@ export function useTimerState() {
     if (isRunning) {
       setTimerActive(true);
       
-      // Start study session if not already active
+      // Start or resume study session
       const currentUser = getCurrentUser();
-      if (!isSessionActive && currentUser?.accountId) {
-        startSession(currentUser.accountId);
+      if (currentUser?.accountId) {
+        if (!isSessionActive) {
+          // Check if there's a saved session to resume
+          if (currentSession) {
+            // Resume the existing session
+            resumeSession();
+          } else {
+            // Start a new session
+            startSession(currentUser.accountId);
+          }
+        }
       }
       
       // Update timer display every 1 second

@@ -43,13 +43,15 @@ export function StudySessionProvider({ children }: { children: ReactNode }) {
           const sessionAge = Date.now() - new Date(sessionData.startTime).getTime();
           const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
           
-          if (sessionAge < maxSessionAge && sessionData.isActive) {
+          if (sessionAge < maxSessionAge) {
+            // Restore session regardless of isActive state
+            // This allows resuming paused sessions
             setCurrentSession({
               ...sessionData,
               startTime: new Date(sessionData.startTime),
               endTime: sessionData.endTime ? new Date(sessionData.endTime) : undefined
             });
-            setIsSessionActive(true);
+            setIsSessionActive(sessionData.isActive || false);
           } else {
             // Clear old session
             localStorage.removeItem('study_session');

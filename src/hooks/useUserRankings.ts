@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useStudySession } from '@/contexts/StudySessionContext';
+import { usePoints } from '@/contexts/PointsContext';
 import { dailyActivityDB, DailyActivityFrontend } from '@/lib/dailyActivity';
 
 interface UserAccount {
@@ -21,6 +22,7 @@ interface UserAccount {
 export function useUserRankings() {
   const { users, isTimerActive, getCurrentUser, getAllDeviceUsers } = useUser();
   const { isSessionActive, getSessionDuration } = useStudySession();
+  const { calculateCoinsFromStudyTime } = usePoints();
   
   const [displayUsers, setDisplayUsers] = useState<UserAccount[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -170,11 +172,6 @@ export function useUserRankings() {
     return user.dailyStudyTime || 0;
   };
 
-  const getCoinsFromStudyTime = (studySeconds: number) => {
-    // 1 coin every 10 minutes (600 seconds)
-    return Math.floor(studySeconds / 600);
-  };
-
   const isRecentlyActive = (user: UserAccount) => {
     // Check if user was active in the last 2 minutes
     const lastActiveTime = new Date(user.lastActive);
@@ -212,7 +209,7 @@ export function useUserRankings() {
     formatStudyTime,
     formatSessionTime,
     getTodayStudyTime,
-    getCoinsFromStudyTime,
+    calculateCoinsFromStudyTime,
     isRecentlyActive,
     isCurrentUserActive,
     isCurrentUser,

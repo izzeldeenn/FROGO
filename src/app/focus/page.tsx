@@ -11,6 +11,7 @@ import { FullscreenProvider } from '@/contexts/FullscreenContext';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { useUser } from '@/contexts/UserContext';
+import { usePoints } from '@/contexts/PointsContext';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TimerIndicatorProvider } from '@/contexts/TimerIndicatorContext';
@@ -107,6 +108,7 @@ function HomeContent() {
   const { theme } = useTheme();
   const { language } = useLanguage();
   const { setTimerActive, isTimerActive, getCurrentUser } = useUser();
+  const { calculateCoinsFromStudyTime } = usePoints();
   const customTheme = useCustomThemeClasses();
   const { isFirstTime, isLoading: setupLoading, markOnboardingComplete } = useFirstTimeSetup();
   const [selectedBackground, setSelectedBackground] = useState('default');
@@ -312,10 +314,6 @@ function HomeContent() {
 
   const getTodayStudyTime = (user: UserAccount) => {
     return (user.dailyStudyTime || 0) * 60;
-  };
-
-  const getCoinsFromStudyTime = (studySeconds: number) => {
-    return Math.floor(studySeconds / 600);
   };
 
   const isCurrentUser = (user: UserAccount) => {
