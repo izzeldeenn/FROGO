@@ -76,12 +76,12 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                   <h2 className={`text-2xl font-semibold mb-2 ${
                     theme === 'light' ? 'text-gray-900' : 'text-white'
                   }`}>
-                    جاري تجهيز ترتيبك
+                    {t.preparingRanking}
                   </h2>
                   <p className={`text-sm ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                   }`}>
-                    يرجى الانتظار...
+                    {t.pleaseWait}
                   </p>
                 </div>
               </div>
@@ -112,12 +112,12 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                   <p className={`text-xs font-medium tracking-widest uppercase mb-2 ${
                     theme === 'light' ? 'text-gray-400' : 'text-gray-500'
                   }`}>
-                    Focus Mode
+                    {t.focusMode}
                   </p>
                   <h2 className={`text-2xl font-semibold ${
                     theme === 'light' ? 'text-gray-900' : 'text-white'
                   }`}>
-                    جلسة دراسية قيد التشغيل
+                    {t.sessionActive}
                   </h2>
                 </div>
 
@@ -128,12 +128,12 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                   <p className={`text-sm leading-relaxed ${
                     theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                   }`}>
-                    الترتيب مخفي مؤقتاً لمساعدتك على التركيز
+                    {t.rankingsHidden}
                   </p>
                   <p className={`text-xs mt-2 ${
                     theme === 'light' ? 'text-gray-400' : 'text-gray-500'
                   }`}>
-                    ستظهر النتائج بعد انتهاء الجلسة
+                    {t.resultsAfterSession}
                   </p>
                 </div>
 

@@ -133,31 +133,33 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
   };
 
   // Format study time
-  const formatStudyTime = (minutes: number) => {
-    if (minutes < 60) {
-      return `${minutes}${t.timeToday.includes('وقت') ? 'د' : 'm'}`;
-    } else if (minutes < 120) {
-      return `1${t.timeToday.includes('وقت') ? 'س' : 'h'} ${minutes - 60}${t.timeToday.includes('وقت') ? 'د' : 'm'}`;
+  const formatStudyTime = (seconds: number) => {
+    if (seconds < 60) {
+      return `${seconds}${t.timeToday.includes('وقت') ? 'ث' : 's'}`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes}${t.timeToday.includes('وقت') ? 'د' : 'm'} ${secs}${t.timeToday.includes('وقت') ? 'ث' : 's'}`;
     } else {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
       return `${hours}${t.timeToday.includes('وقت') ? 'س' : 'h'} ${mins}${t.timeToday.includes('وقت') ? 'د' : 'm'}`;
     }
   };
 
   // Calculate stats
   const totalContributions = contributions.length;
-  const totalStudyMinutes = contributions.reduce((sum, c) => sum + c.studyMinutes, 0);
+  const totalStudySeconds = contributions.reduce((sum, c) => sum + c.studySeconds, 0);
   const totalPoints = contributions.reduce((sum, c) => sum + c.pointsEarned, 0);
   const currentStreak = calculateCurrentStreak(contributions);
 
   function calculateCurrentStreak(contributions: ActivityContribution[]): number {
     if (contributions.length === 0) return 0;
     
-    // Create a Set of dates with study minutes > 0 for faster lookup
+    // Create a Set of dates with study seconds > 0 for faster lookup
     const studyDates = new Set(
       contributions
-        .filter(c => c.studyMinutes > 0)
+        .filter(c => c.studySeconds > 0)
         .map(c => c.date)
     );
 
@@ -203,7 +205,7 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
           <div className={`px-3 py-1 rounded-full ${
             theme === 'light' ? 'bg-green-100 text-green-700' : 'bg-green-900 text-green-300'
           }`}>
-            <strong>{formatStudyTime(totalStudyMinutes)}</strong> {t.rank === 'ترتيب' ? 'تمت الدراسة' : 'studied'}
+            <strong>{formatStudyTime(totalStudySeconds)}</strong> {t.rank === 'ترتيب' ? 'تمت الدراسة' : 'studied'}
           </div>
           <div className={`px-3 py-1 rounded-full ${
             theme === 'light' ? 'bg-yellow-100 text-yellow-700' : 'bg-yellow-900 text-yellow-300'
@@ -255,7 +257,7 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
                         onMouseLeave={() => setHoveredContribution(null)}
                         onClick={() => setSelectedDate(isSelected ? null : date)}
                         title={contribution ? 
-                          `${formatDate(date)}: ${formatStudyTime(contribution.studyMinutes)} studied, ${contribution.pointsEarned} points` :
+                          `${formatDate(date)}: ${formatStudyTime(contribution.studySeconds)} studied, ${contribution.pointsEarned} points` :
                           `${formatDate(date)}: No activity`
                         }
                       />
@@ -296,7 +298,7 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
         }}
         >
           <div className="font-semibold">{formatDate(hoveredContribution.date)}</div>
-          <div>{formatStudyTime(hoveredContribution.studyMinutes)} {t.rank === 'ترتيب' ? 'تمت الدراسة' : 'studied'}</div>
+          <div>{formatStudyTime(hoveredContribution.studySeconds)} {t.rank === 'ترتيب' ? 'تمت الدراسة' : 'studied'}</div>
           <div>{hoveredContribution.pointsEarned} {t.points}</div>
           {hoveredContribution.rank && (
             <div>{t.rank === 'ترتيب' ? 'الترتيب' : 'Rank'}: #{hoveredContribution.rank}</div>
@@ -318,7 +320,7 @@ export function ActivityGraph({ contributions, username }: ActivityGraphProps) {
             <div>
               <span className="text-gray-500">Study Time:</span>
               <div className="font-semibold">
-                {formatStudyTime(contributionsMap.get(selectedDate)!.studyMinutes)}
+                {formatStudyTime(contributionsMap.get(selectedDate)!.studySeconds)}
               </div>
             </div>
             <div>
