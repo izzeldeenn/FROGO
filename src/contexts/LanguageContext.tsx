@@ -72,6 +72,7 @@ const translations = {
     points: 'Points',
     up: 'Up',
     down: 'Down',
+    items: 'Items',
     // Task Board
     taskBoard: 'Task Board',
     todayTasks: 'Today\'s Tasks',
@@ -92,7 +93,26 @@ const translations = {
     floating: 'Floating',
     floating_desc: 'Movable floating window',
     top_popup: 'Top Popup',
-    top_popup_desc: 'Slides down from top of screen'
+    top_popup_desc: 'Slides down from top of screen',
+    // Store
+    store: 'Store',
+    storeDescription: 'Customize your experience',
+    storeAll: 'All',
+    storeThemes: 'Themes',
+    storeAvatars: 'Avatars',
+    storeBackgrounds: 'Backgrounds',
+    storeBadges: 'Badges',
+    storeEffects: 'Effects',
+    noItemsInCategory: 'No items in this category',
+    buy: 'Buy',
+    purchase: 'Purchase',
+    insufficient: 'Insufficient',
+    equipped: 'Equipped',
+    equip: 'Equip',
+    storeCancel: 'Cancel',
+    close: 'Close',
+    itemPreview: 'Item Preview',
+    specialOffer: 'Special offer! Save'
   },
   ar: {
     // Timer
@@ -161,6 +181,7 @@ const translations = {
     points: 'نقاط',
     up: 'صاعد',
     down: 'نازل',
+    items: 'العناصر',
     // Task Board
     taskBoard: 'سبورة المهام',
     todayTasks: 'مهام اليوم',
@@ -181,7 +202,26 @@ const translations = {
     floating: 'عائم',
     floating_desc: 'نافذة عائمة قابلة للتحريك',
     top_popup: 'منبثق من الأعلى',
-    top_popup_desc: 'ينزلق من أعلى الشاشة'
+    top_popup_desc: 'ينزلق من أعلى الشاشة',
+    // Store
+    store: 'المتجر',
+    storeDescription: 'اشترِ العناصر لتخصيص تجربتك',
+    storeAll: 'الكل',
+    storeThemes: 'السمات',
+    storeAvatars: 'الصور الرمزية',
+    storeBackgrounds: 'الخلفيات',
+    storeBadges: 'الشارات',
+    storeEffects: 'التأثيرات',
+    noItemsInCategory: 'لا توجد عناصر في هذه الفئة',
+    buy: 'شراء',
+    purchase: 'شراء',
+    insufficient: 'غير كافٍ',
+    equipped: 'مُجهز',
+    equip: 'تجهيز',
+    storeCancel: 'إلغاء',
+    close: 'إغلاق',
+    itemPreview: 'معاينة العنصر',
+    specialOffer: 'عرض خاص! وفر'
   }
 };
 
