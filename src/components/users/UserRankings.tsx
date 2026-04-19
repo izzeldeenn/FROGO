@@ -40,7 +40,12 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     calculateCoinsFromStudyTime,
     isRecentlyActive,
     isCurrentUserActive,
-    isCurrentUser
+    isCurrentUser,
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    goToPage
   } = useUserRankings();
 
   // Show loading message for 2 seconds when session ends
@@ -253,6 +258,51 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                 );
               })
             )}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && !loading && displayUsers.length > 0 && (
+          <div className={`flex items-center justify-between px-4 py-3 mt-2 ${
+            theme === 'light' ? 'bg-gray-50 border-t border-gray-200' : 'bg-gray-800 border-t border-gray-700'
+          }`}>
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                currentPage === 1
+                  ? theme === 'light'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : theme === 'light'
+                    ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                    : 'bg-gray-700 text-gray-200 border border-gray-600 hover:bg-gray-600 hover:border-gray-500'
+              }`}
+            >
+              السابق
+            </button>
+
+            <div className={`text-sm font-medium ${
+              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+            }`}>
+              صفحة {currentPage} من {totalPages}
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                currentPage === totalPages
+                  ? theme === 'light'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : theme === 'light'
+                    ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                    : 'bg-gray-700 text-gray-200 border border-gray-600 hover:bg-gray-600 hover:border-gray-500'
+              }`}
+            >
+              التالي
+            </button>
           </div>
         )}
       </div>

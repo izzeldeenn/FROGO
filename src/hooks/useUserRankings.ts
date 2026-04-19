@@ -23,11 +23,13 @@ export function useUserRankings() {
   const { users, isTimerActive, getCurrentUser, getAllDeviceUsers } = useUser();
   const { isSessionActive, getSessionDuration } = useStudySession();
   const { calculateCoinsFromStudyTime } = usePoints();
-  
+
   const [displayUsers, setDisplayUsers] = useState<UserAccount[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dailyRankings, setDailyRankings] = useState<DailyActivityFrontend[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     // Don't update rankings if there's an active session
@@ -56,11 +58,11 @@ export function useUserRankings() {
     if (isSessionActive) {
       return;
     }
-    
+
     // Get all users including virtual ones and merge with daily rankings
     const allUsers = getAllDeviceUsers();
     const currentUser = getCurrentUser();
-    
+
     const usersWithDailyRank = allUsers.map(user => {
       const dailyActivity = dailyRankings.find(dr => dr.accountId === user.accountId);
       const result = {
@@ -68,14 +70,33 @@ export function useUserRankings() {
         dailyRank: dailyActivity?.dailyRank || 999,
         dailyStudyTime: dailyActivity?.studySeconds || 0
       };
-      
+
       return result;
     });
-    
+
     // Sort by daily rank
     const sortedUsers = usersWithDailyRank.sort((a, b) => a.dailyRank - b.dailyRank);
-    setDisplayUsers(sortedUsers);
-  }, [users, dailyRankings, isSessionActive]);
+
+    // Find current user's position in sorted list
+    if (currentUser) {
+      const currentUserIndex = sortedUsers.findIndex(user => user.accountId === currentUser.accountId);
+      if (currentUserIndex !== -1) {
+        // Calculate which page the current user is on
+        const userPage = Math.floor(currentUserIndex / itemsPerPage) + 1;
+        // Automatically navigate to the page containing the current user
+        if (userPage !== currentPage) {
+          setCurrentPage(userPage);
+        }
+      }
+    }
+
+    // Apply pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
+
+    setDisplayUsers(paginatedUsers);
+  }, [users, dailyRankings, isSessionActive, currentPage, itemsPerPage]);
 
   const loadDailyRankings = async (showLoading = true, forceUpdate = false) => {
     try {
@@ -196,6 +217,28 @@ export function useUserRankings() {
     return currentUser?.accountId === user.accountId;
   };
 
+  // Calculate total pages
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  // Pagination functions
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return {
     // State
     displayUsers,
@@ -204,7 +247,10 @@ export function useUserRankings() {
     loading,
     isSessionActive,
     getSessionDuration,
-    
+    currentPage,
+    totalPages,
+    itemsPerPage,
+
     // Functions
     formatStudyTime,
     formatSessionTime,
@@ -213,6 +259,9 @@ export function useUserRankings() {
     isRecentlyActive,
     isCurrentUserActive,
     isCurrentUser,
-    loadDailyRankings
+    loadDailyRankings,
+    nextPage,
+    prevPage,
+    goToPage
   };
 }
