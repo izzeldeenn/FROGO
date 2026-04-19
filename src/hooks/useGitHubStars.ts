@@ -12,7 +12,7 @@ export function useGitHubStars() {
     const fetchStars = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://api.github.com/repos/izzeldeenn/FROGO');
+        const response = await fetch('https://api.github.com/repos/izzeldeenn/goatly');
         if (!response.ok) {
           throw new Error('Failed to fetch GitHub stars');
         }

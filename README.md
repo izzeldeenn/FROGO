@@ -11,7 +11,7 @@
 **🌟 An open-source community-driven study time management platform built by students, for students.**
 
 [![Live Demo](https://img.shields.io/badge/Demo-Live-brightgreen.svg)](https://goatly-community.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Contribute-purple.svg)](https://github.com/izzeldeenn/GOATLY)
+[![GitHub](https://img.shields.io/badge/GitHub-Contribute-purple.svg)](https://github.com/izzeldeenn/goatly)
 [![Discord](https://img.shields.io/badge/Discord-Join-7289da.svg)](https://discord.gg/5wBNne8Z3f)
 
 </div>
@@ -97,7 +97,7 @@ This simple yet profound principle guides everything we build - every feature, e
 
 ```bash
 # Clone the repository
-git clone https://github.com/izzeldeenn/GOATLY.git
+git clone https://github.com/izzeldeenn/goatly.git
 cd GOATLY
 
 # Install dependencies
@@ -338,7 +338,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Platform | Link |
 |----------|------|
-| **🚀 GitHub** | [github.com/izzeldeenn/GOATLY](https://github.com/izzeldeenn/GOATLY) |
+| **🚀 GitHub** | [github.com/izzeldeenn/GOATLY](https://github.com/izzeldeenn/goatly) |
 | **💬 Discord** | [discord.gg/5wBNne8Z3f](https://discord.gg/5wBNne8Z3f) |
 | **🌐 Live Demo** | [goatly-community.vercel.app](https://goatly-community.vercel.app) |
 | **📧 Email** | [support@goatly.app](mailto:support@goatly.app) |
