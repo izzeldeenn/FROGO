@@ -223,18 +223,34 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500/30 border-t-blue-500"></div>
+        <p className={`text-sm ${
+          theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+        }`}>
+          {t.rank === 'ترتيب' ? 'جاري تحميل النشاط...' : 'Loading activity...'}
+        </p>
       </div>
     );
   }
 
   if (!targetAccountId) {
     return (
-      <div className={`text-center py-8 ${
+      <div className={`flex flex-col items-center justify-center py-16 space-y-3 ${
         theme === 'light' ? 'text-gray-500' : 'text-gray-400'
       }`}>
-        {t.rank === 'ترتيب' ? 'لم يتم تحديد مستخدم' : 'No user selected'}
+        <div className={`p-4 rounded-full ${
+          theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'
+        }`}>
+          <div className={`h-8 w-8 ${
+            theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            ⚠️
+          </div>
+        </div>
+        <p className="text-lg font-medium">
+          {t.rank === 'ترتيب' ? 'لم يتم تحديد مستخدم' : 'No user selected'}
+        </p>
       </div>
     );
   }
@@ -242,31 +258,38 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
   const stats = calculateStats();
 
   return (
-    <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
+    <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2 -mb-16">
       {/* Header */}
-      <div className={`flex justify-between items-center ${
+      <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${
         theme === 'light' ? 'text-gray-900' : 'text-gray-100'
       }`}>
-        <h2 className="text-2xl font-bold">
-          {currentUser?.username}{t.rank === 'ترتيب' ? ' لوحة تحكم النشاط' : "'s Activity Dashboard"}
-        </h2>
+        <div>
+          <h2 className="text-2xl font-bold">
+            {currentUser?.username}{t.rank === 'ترتيب' ? ' لوحة تحكم النشاط' : "'s Activity Dashboard"}
+          </h2>
+          <p className={`text-sm mt-1 ${
+            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+          }`}>
+            {t.rank === 'ترتيب' ? 'تتبع تقدمك الدراسي' : 'Track your study progress'}
+          </p>
+        </div>
         
         {/* Period selector */}
-        <div className={`flex rounded-lg overflow-hidden ${
-          theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'
+        <div className={`flex rounded-xl overflow-hidden ${
+          theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'
         }`}>
           {(['week', 'month', 'year'] as const).map(period => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
+              className={`px-4 py-2.5 text-sm font-medium capitalize transition-all duration-200 ${
                 selectedPeriod === period
                   ? theme === 'light' 
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-blue-600 text-white'
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'bg-blue-600 text-white shadow-md'
                   : theme === 'light'
                     ? 'text-gray-600 hover:bg-gray-200'
-                    : 'text-gray-400 hover:bg-gray-700'
+                    : 'text-gray-400 hover:bg-gray-800'
               }`}
             >
               {period === 'week' ? (t.rank === 'ترتيب' ? 'أسبوع' : 'Week') : 
@@ -279,10 +302,10 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`p-4 rounded-lg ${
-          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
+        <div className={`p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
         }`}>
-          <div className={`text-sm font-medium mb-1 ${
+          <div className={`text-sm font-medium mb-2 ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
           }`}>
             {t.rank === 'ترتيب' ? 'إجمالي وقت الدراسة' : 'Total Study Time'}
@@ -294,10 +317,10 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
           </div>
         </div>
 
-        <div className={`p-4 rounded-lg ${
-          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
+        <div className={`p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
         }`}>
-          <div className={`text-sm font-medium mb-1 ${
+          <div className={`text-sm font-medium mb-2 ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
           }`}>
             {t.rank === 'ترتيب' ? 'النقاط المكتسبة' : 'Points Earned'}
@@ -309,10 +332,10 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
           </div>
         </div>
 
-        <div className={`p-4 rounded-lg ${
-          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
+        <div className={`p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
         }`}>
-          <div className={`text-sm font-medium mb-1 ${
+          <div className={`text-sm font-medium mb-2 ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
           }`}>
             {t.rank === 'ترتيب' ? 'السلسلة الحالية' : 'Current Streak'}
@@ -324,10 +347,10 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
           </div>
         </div>
 
-        <div className={`p-4 rounded-lg ${
-          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
+        <div className={`p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
         }`}>
-          <div className={`text-sm font-medium mb-1 ${
+          <div className={`text-sm font-medium mb-2 ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
           }`}>
             {t.rank === 'ترتيب' ? 'متوسط الدراسة اليومي' : 'Daily Average'}
@@ -340,66 +363,87 @@ export function UserActivityDashboard({ accountId }: UserActivityDashboardProps)
         </div>
       </div>
 
-      {/* Activity Graph */}
-      <div className={`p-6 rounded-lg ${
-        theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
-      }`}>
-        <ActivityGraph 
-          contributions={contributions} 
-          username={currentUser?.username}
-        />
-      </div>
-
-      {/* Recent Activities */}
-      <div className={`p-6 rounded-lg ${
-        theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-800 border border-gray-700'
-      }`}>
-        <h3 className={`text-lg font-semibold mb-4 ${
-          theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+      {/* Main Content - Side by Side Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Activity Graph - Takes 2 columns */}
+        <div className={`lg:col-span-2 p-6 rounded-xl shadow-sm ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
         }`}>
-          {t.rank === 'ترتيب' ? 'الأنشطة الحديثة' : 'Recent Activities'}
-        </h3>
-        
-        {dailyActivities.length === 0 ? (
-          <p className={`text-center py-8 ${
-            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+          <ActivityGraph 
+            contributions={contributions} 
+            username={currentUser?.username}
+          />
+        </div>
+
+        {/* Recent Activities - Takes 1 column */}
+        <div className={`p-6 rounded-xl shadow-sm ${
+          theme === 'light' ? 'bg-white border border-gray-200' : 'bg-black border border-gray-800'
+        }`}>
+          <h3 className={`text-lg font-bold mb-4 ${
+            theme === 'light' ? 'text-gray-900' : 'text-gray-100'
           }`}>
-            {t.rank === 'ترتيب' ? 'لا توجد أنشطة حديثة' : 'No recent activities'}
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {dailyActivities.slice(0, 10).map(activity => (
-              <div key={activity.id} className={`flex justify-between items-center p-3 rounded-lg ${
-                theme === 'light' ? 'bg-gray-50' : 'bg-gray-700'
+            {t.rank === 'ترتيب' ? 'الأنشطة الحديثة' : 'Recent Activities'}
+          </h3>
+          
+          {dailyActivities.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 space-y-3">
+              <div className={`p-4 rounded-full ${
+                theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'
               }`}>
-                <div>
-                  <div className={`font-medium ${
-                    theme === 'light' ? 'text-gray-900' : 'text-gray-100'
-                  }`}>
-                    {formatDate(activity.date)}
-                  </div>
-                  <div className={`text-sm ${
-                    theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                  }`}>
-                    {activity.sessionsCount} {t.rank === 'ترتيب' ? 'جلسات' : 'sessions'} • {t.rank === 'ترتيب' ? 'الترتيب' : 'Rank'} #{activity.dailyRank}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`font-semibold ${
-                    theme === 'light' ? 'text-gray-900' : 'text-gray-100'
-                  }`}>
-                    {formatStudyTime(activity.studySeconds)}
-                  </div>
-                  <div className={`text-sm ${
-                    theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                  }`}>
-                    {activity.pointsEarned} {t.points}
-                  </div>
+                <div className={`h-8 w-8 ${
+                  theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  📅
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              <p className={`text-center text-sm ${
+                theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+              }`}>
+                {t.rank === 'ترتيب' ? 'لا توجد أنشطة حديثة' : 'No recent activities'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+              {dailyActivities.slice(0, 10).map((activity, index) => (
+                <div key={activity.id} className={`flex justify-between items-center p-4 rounded-xl transition-all duration-200 hover:shadow-md ${
+                  theme === 'light' ? 'bg-gray-50 hover:bg-gray-100' : 'bg-gray-900 hover:bg-gray-800'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-lg ${
+                      theme === 'light' ? 'bg-blue-100 text-blue-600' : 'bg-blue-900 text-blue-400'
+                    }`}>
+                      <span className="text-sm font-bold">{index + 1}</span>
+                    </div>
+                    <div>
+                      <div className={`font-semibold ${
+                        theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+                      }`}>
+                        {formatDate(activity.date)}
+                      </div>
+                      <div className={`text-sm ${
+                        theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                      }`}>
+                        {activity.sessionsCount} {t.rank === 'ترتيب' ? 'جلسات' : 'sessions'} • {t.rank === 'ترتيب' ? 'الترتيب' : 'Rank'} #{activity.dailyRank}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`font-bold ${
+                      theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+                    }`}>
+                      {formatStudyTime(activity.studySeconds)}
+                    </div>
+                    <div className={`text-sm font-medium ${
+                      theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'
+                    }`}>
+                      {activity.pointsEarned} {t.points}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

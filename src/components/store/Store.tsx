@@ -8,9 +8,6 @@ import { usePoints } from '@/contexts/PointsContext';
 import { StoreItem, defaultStoreItems, specialOfferItems } from './storeProducts';
 
 interface UserInventory {
-  coins: number;
-  level: number;
-  experience: number;
   purchasedItems: string[];
   equippedItems: {
     theme?: string;
@@ -34,9 +31,6 @@ export function Store({ isOpen, onClose }: StoreProps) {
   const [storeItems, setStoreItems] = useState<StoreItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [userInventory, setUserInventory] = useState<UserInventory>({
-    coins: 0,
-    level: 1,
-    experience: 0,
     purchasedItems: [],
     equippedItems: {}
   });
@@ -65,13 +59,18 @@ export function Store({ isOpen, onClose }: StoreProps) {
     if (savedInventory) {
       try {
         const parsed = JSON.parse(savedInventory);
-        setUserInventory(parsed);
+        // Handle old format with coins, level, experience
+        const inventory = {
+          purchasedItems: parsed.purchasedItems || [],
+          equippedItems: parsed.equippedItems || {}
+        };
+        setUserInventory(inventory);
         
         setStoreItems(prevItems => 
           prevItems.map(item => ({
             ...item,
-            purchased: parsed.purchasedItems.includes(item.id),
-            equipped: Object.values(parsed.equippedItems).includes(item.id)
+            purchased: inventory.purchasedItems.includes(item.id),
+            equipped: Object.values(inventory.equippedItems).includes(item.id)
           }))
         );
       } catch (error) {

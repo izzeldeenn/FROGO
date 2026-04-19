@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { useUser } from '@/contexts/UserContext';
+import { usePoints } from '@/contexts/PointsContext';
 import { dailyActivityDB } from '@/lib/dailyActivity';
 import { SettingsButton } from '@/components/settings/Settings';
 
@@ -33,6 +34,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
   const { theme } = useTheme();
   const { language, t } = useLanguage();
   const customTheme = useCustomThemeClasses();
+  const { coins } = usePoints();
   const { getCurrentUser } = useUser();
   const [totalStudyTime, setTotalStudyTime] = useState(0);
   const [loadingTotalTime, setLoadingTotalTime] = useState(true);
@@ -224,7 +226,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
             <div className={`text-2xl font-bold mb-1 bg-gradient-to-r ${
               theme === 'light' ? 'from-yellow-600 to-orange-500' : 'from-yellow-400 to-orange-300'
             } bg-clip-text text-transparent`}>
-              {user.score}
+              {isCurrentUser(user) ? coins : user.score}
             </div>
             <div className={`text-xs ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
