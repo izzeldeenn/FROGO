@@ -35,6 +35,7 @@ export interface UserAccount {
   password?: string; // Added for authentication
   avatar?: string;
   score: number;
+  referral_code?: string;
   created_at: string;
   last_active: string;
 }
@@ -48,6 +49,7 @@ export interface UserAccountFrontend {
   hashKey: string;
   avatar?: string;
   score: number;
+  referralCode?: string;
   createdAt: string;
   lastActive: string;
 }
@@ -145,6 +147,26 @@ export interface WaitingListEntryFrontend {
   joinedAt: string;
   expiresAt: string;
   status: 'waiting' | 'matched' | 'expired';
+  createdAt: string;
+}
+
+// Referral interface for database (snake_case - matches Supabase)
+export interface Referral {
+  id?: string;
+  referrer_id: string;
+  referred_user_id: string;
+  referral_code: string;
+  points_rewarded: number;
+  created_at: string;
+}
+
+// Referral interface for frontend (camelCase)
+export interface ReferralFrontend {
+  id?: string;
+  referrerId: string;
+  referredUserId: string;
+  referralCode: string;
+  pointsRewarded: number;
   createdAt: string;
 }
 
@@ -846,12 +868,146 @@ export class WaitingListDB {
   }
 }
 
+// Database operations for referrals
+export class ReferralDB {
+  private static instance: ReferralDB;
+
+  static getInstance(): ReferralDB {
+    if (!ReferralDB.instance) {
+      ReferralDB.instance = new ReferralDB();
+    }
+    return ReferralDB.instance;
+  }
+
+  // Generate a unique referral code
+  generateReferralCode(): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return code;
+  }
+
+  // Create a new referral
+  async createReferral(referrerId: string, referredUserId: string, referralCode: string): Promise<Referral | null> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .insert({
+          referrer_id: referrerId,
+          referred_user_id: referredUserId,
+          referral_code: referralCode,
+          points_rewarded: 40
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('Error creating referral:', error);
+      return null;
+    }
+  }
+
+  // Get referral by code
+  async getReferralByCode(referralCode: string): Promise<Referral | null> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referral_code', referralCode)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting referral by code:', error);
+      return null;
+    }
+  }
+
+  // Get all referrals for a referrer
+  async getReferralsByReferrer(referrerId: string): Promise<Referral[]> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_id', referrerId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting referrals by referrer:', error);
+      return [];
+    }
+  }
+
+  // Check if a user has already been referred
+  async hasUserBeenReferred(userId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('id')
+        .eq('referred_user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data !== null;
+    } catch (error) {
+      console.error('Error checking if user has been referred:', error);
+      return false;
+    }
+  }
+
+  // Get total points earned from referrals
+  async getTotalReferralPoints(referrerId: string): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('points_rewarded')
+        .eq('referrer_id', referrerId);
+
+      if (error) throw error;
+
+      const totalPoints = data?.reduce((sum, referral) => sum + referral.points_rewarded, 0) || 0;
+      return totalPoints;
+    } catch (error) {
+      console.error('Error getting total referral points:', error);
+      return 0;
+    }
+  }
+
+  // Get user by referral code
+  async getUserByReferralCode(referralCode: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('referral_code', referralCode)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting user by referral code:', error);
+      return null;
+    }
+  }
+}
+
 // Export singleton instances
 export const userDB = UserAccountDB.getInstance();
 export const resetTokenDB = ResetTokenDB.getInstance();
 export const challengeDB = ChallengeDB.getInstance();
 export const challengeSessionDB = ChallengeSessionDB.getInstance();
 export const waitingListDB = WaitingListDB.getInstance();
+export const referralDB = ReferralDB.getInstance();
 
 // Check if Supabase is available
 export const isSupabaseAvailable = async (): Promise<boolean> => {

@@ -5,6 +5,7 @@ import { DEFAULT_PRESETS, UserPreset, applyPreset, getDefaultPreset } from '@/co
 import { useTheme } from '@/contexts/ThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { useUser } from '@/contexts/UserContext';
+import { ReferralInput } from '@/components/referral/ReferralInput';
 
 interface OnboardingWizardProps {
   onComplete?: () => void;
@@ -23,6 +24,7 @@ export function OnboardingWizard({ onComplete, isOpen }: OnboardingWizardProps) 
     { title: 'مرحباً!', description: 'دعنا نعد شكل التطبيق لك' },
     { title: 'اختر شكلك', description: 'اختر الإعدادات المسبقة التي تناسبك' },
     { title: 'اسمك', description: 'كيف نناديك؟' },
+    { title: 'كود الإحالة', description: 'هل لديك كود إحالة؟' },
     { title: 'نظام العملات', description: 'اكتشف كيف تكسب عملات ومستويات' },
     { title: 'الترتيب والإحصائيات', description: 'تتبع تقدمك وتنافس مع الآخرين' },
     { title: 'المؤقت الذكي', description: 'استخدم أدوات الدراسة الفعالة' },
@@ -261,6 +263,20 @@ export function OnboardingWizard({ onComplete, isOpen }: OnboardingWizardProps) 
           )}
 
           {step === 3 && (
+            <div className="py-8">
+              <h3
+                className="text-lg font-bold mb-6 text-center"
+                style={{ color: theme === 'light' ? '#1f2937' : '#f9fafb' }}
+              >
+                كود الإحالة
+              </h3>
+              <div className="max-w-md mx-auto">
+                <ReferralInput />
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
             <div className="py-8">
               <h3 
                 className="text-lg font-bold mb-6 text-center"

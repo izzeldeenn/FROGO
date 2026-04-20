@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { getAccountId, getAccountInfo } from '@/utils/deviceId';
 import { formatStudyTime } from '@/utils/timeFormat';
-import { userDB, resetTokenDB, isSupabaseAvailable, UserAccount, UserAccountFrontend } from '@/lib/supabase';
+import { userDB, resetTokenDB, referralDB, isSupabaseAvailable, UserAccount, UserAccountFrontend } from '@/lib/supabase';
 import { dailyActivityDB, DailyActivityFrontend } from '@/lib/dailyActivity';
 import { supabase } from '@/lib/supabase';
 import { verifyPassword, hashPassword, validatePasswordStrength } from '@/utils/password';
@@ -17,6 +17,7 @@ const convertToUserAccountFrontend = (dbUser: UserAccount): UserAccountFrontend 
   hashKey: dbUser.hash_key,
   avatar: dbUser.avatar,
   score: dbUser.score,
+  referralCode: dbUser.referral_code,
   createdAt: dbUser.created_at,
   lastActive: dbUser.last_active
 });
@@ -30,6 +31,7 @@ const convertToUserAccount = (user: UserAccountFrontend): UserAccount => ({
   hash_key: user.hashKey,
   avatar: user.avatar,
   score: user.score,
+  referral_code: user.referralCode,
   created_at: user.createdAt,
   last_active: user.lastActive
 });
@@ -668,6 +670,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const randomAvatarSeed = `avatar${Math.floor(Math.random() * 1000)}`;
       const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomAvatarSeed}`;
 
+      // Generate referral code
+      const referralCode = referralDB.generateReferralCode();
+
       // Update current user's account with email, hashed password, and new username
       const updatedUserData: Partial<UserAccount> = {
         account_id: currentUser.accountId,
@@ -676,6 +681,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         password: hashedPassword, // Add hashed password
         avatar: avatarUrl, // Generate DiceBear avatar with random number
         score: currentUser.score, // Keep existing score
+        referral_code: referralCode, // Add referral code
         created_at: currentUser.createdAt, // Keep original creation date
         last_active: new Date().toISOString(), // Update last active
         hash_key: currentUser.hashKey // Keep existing hash key

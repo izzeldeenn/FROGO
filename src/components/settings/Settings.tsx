@@ -25,6 +25,7 @@ import { ActivityContribution } from '@/lib/dailyActivity';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { PresetSelector } from '@/components/settings/PresetSelector';
 import { LocalBackgroundSelector } from '@/components/backgrounds/LocalBackgroundSelector';
+import { ReferralCard } from '@/components/referral/ReferralCard';
 
 // Generate 250 avatars dynamically
 const AVATARS = Array.from({ length: 250 }, (_, i) => 
@@ -54,6 +55,7 @@ export function SettingsButton() {
   const getSettingsSections = () => [
     { id: 'presets', name: t.presets || 'الإعدادات المسبقة', icon: '🎨' },
     { id: 'profile', name: t.profile || 'الملف الشخصي', icon: '👤' },
+    { id: 'referral', name: t.referral || 'الإحالات', icon: '🎁' },
     { id: 'appearance', name: t.appearance || 'المظهر', icon: '🎨' },
     { id: 'themes', name: t.themes || 'الثيمات', icon: '🎭' },
     { id: 'backgrounds', name: t.backgrounds || 'الخلفيات', icon: '🖼️' },
@@ -745,6 +747,7 @@ export function SettingsButton() {
                       }`}>
                         {activeSection === 'presets' && 'اختر شكلاً جاهزاً مع إعدادات متكاملة'}
                         {activeSection === 'profile' && 'إدارة ملفك الشخصي والصورة الرمزية'}
+                        {activeSection === 'referral' && 'شارك كود الإحالة واكسب نقاط'}
                         {activeSection === 'appearance' && 'تخصيص المظهر واللغة'}
                         {activeSection === 'themes' && 'اختيار وتخصيص الثيمات'}
                         {activeSection === 'backgrounds' && 'اختيار خلفيات'}
@@ -1103,6 +1106,12 @@ export function SettingsButton() {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {activeSection === 'referral' && (
+                    <div className="space-y-6">
+                      <ReferralCard />
                     </div>
                   )}
 
