@@ -45,7 +45,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
     description: 'مثالي للعمل والدراسة بتركيز عالي',
     icon: '🚀',
     settings: {
-      background: 'focus3',
+      background: 'focus8',
       theme: 'dark',
       timer: {
         color: '#10b981',
@@ -75,7 +75,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
     description: 'مريح ومناسب للتأمل والاسترخاء',
     icon: '🌸',
     settings: {
-      background: 'focus4',
+      background: 'focus9',
       theme: 'light',
       customTheme: {
         primary: '#a78bfa',
@@ -114,7 +114,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
     description: 'مثير ومحفز للطاقة والحيوية',
     icon: '⚡',
     settings: {
-      background: 'focus5',
+      background: 'focus10',
       theme: 'dark',
       customTheme: {
         primary: '#f97316',
@@ -153,7 +153,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
     description: 'بسيط ونظيف بدون تشتيت',
     icon: '🎯',
     settings: {
-      background: 'default',
+      background: 'focus11',
       theme: 'light',
       timer: {
         color: '#374151',
@@ -183,7 +183,7 @@ export const DEFAULT_PRESETS: UserPreset[] = [
     description: 'إلهام من الطبيعة والهدوء',
     icon: '🌿',
     settings: {
-      background: 'focus1',
+      background: 'focus12',
       theme: 'light',
       customTheme: {
         primary: '#16a34a',

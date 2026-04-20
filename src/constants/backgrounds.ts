@@ -14,5 +14,11 @@ export const BACKGROUNDS = [
   { id: 'focus4', name: 'شاطئ هادئ', value: 'url("/backgrounds/photos/idat-beach-7511632.jpg")' },
   { id: 'focus5', name: 'غروب الشمس', value: 'url("/backgrounds/photos/kanenori-sunset-7133867.jpg")' },
   { id: 'focus6', name: 'شاطئ صيفي', value: 'url("/backgrounds/photos/pexels-beach-1850059.jpg")' },
-  { id: 'focus7', name: 'غروب ملون', value: 'url("/backgrounds/photos/pok_rie-sunset-1637376.jpg")' }
+  { id: 'focus7', name: 'غروب ملون', value: 'url("/backgrounds/photos/pok_rie-sunset-1637376.jpg")' },
+  // New Unsplash backgrounds
+  { id: 'focus8', name: 'مركبات على قمة الجبل', value: 'url("/backgrounds/photos/hilltop-vehicles.jpg")' },
+  { id: 'focus9', name: 'كثبان رملية صحراوية', value: 'url("/backgrounds/photos/desert-dunes.jpg")' },
+  { id: 'focus10', name: 'غرفة مع شاشات', value: 'url("/backgrounds/photos/bedroom-screens.jpg")' },
+  { id: 'focus11', name: 'مدينة حديثة', value: 'url("/backgrounds/photos/modern-city.jpg")' },
+  { id: 'focus12', name: 'نخيل silhouetted', value: 'url("/backgrounds/photos/palm-trees.jpg")' }
 ];
