@@ -76,13 +76,13 @@ function ExtensionLandingPageContent() {
   return (
     <LanguageLayout>
       <div className={`min-h-screen ${
-        theme === 'light' ? 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50' : 'bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900'
+        theme === 'light' ? 'bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100' : 'bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900'
       }`}>
         {/* Header */}
         <header className={`fixed top-0 w-full z-50 backdrop-blur-lg border-b ${
-          theme === 'light' 
-            ? 'bg-blue-50/80 border-indigo-200' 
-            : 'bg-slate-900/90 border-blue-700/50'
+          theme === 'light'
+            ? 'bg-white/80 border-gray-200'
+            : 'bg-slate-900/90 border-gray-800'
         }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -97,13 +97,13 @@ function ExtensionLandingPageContent() {
                   <div className="flex flex-col">
                     <div className="text-xl font-bold tracking-tight">
                       <span className={`inline-block font-black ${
-                        theme === 'light' ? 'text-blue-900' : 'text-blue-100'
+                        theme === 'light' ? 'text-gray-900' : 'text-white'
                       }`}>
                         Goatly
                       </span>
                     </div>
                     <div className={`text-xs font-medium tracking-wide ${
-                      theme === 'light' ? 'text-blue-700' : 'text-blue-200'
+                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                     }`}>
                       Focus Extension
                     </div>
@@ -113,18 +113,18 @@ function ExtensionLandingPageContent() {
               
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-8">
-                <a href="#features" className={`transition-colors hover:text-blue-400 ${
-                  theme === 'light' ? 'text-blue-800' : 'text-blue-200'
+                <a href="#features" className={`transition-colors hover:text-blue-600 ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                 }`}>
                   {texts.features}
                 </a>
-                <a href="#browsers" className={`transition-colors hover:text-blue-400 ${
-                  theme === 'light' ? 'text-blue-800' : 'text-blue-200'
+                <a href="#browsers" className={`transition-colors hover:text-blue-600 ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                 }`}>
                   {texts.browsers}
                 </a>
-                <a href="#testimonials" className={`transition-colors hover:text-blue-400 ${
-                  theme === 'light' ? 'text-blue-800' : 'text-blue-200'
+                <a href="#testimonials" className={`transition-colors hover:text-blue-600 ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                 }`}>
                   {texts.reviews}
                 </a>
@@ -137,8 +137,8 @@ function ExtensionLandingPageContent() {
                   onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
                   className={`px-3 py-1 rounded-lg text-sm transition-colors ${
                     theme === 'light'
-                      ? 'bg-blue-50 border-indigo-300 text-blue-800'
-                      : 'bg-slate-800 border-blue-600 text-blue-200'
+                      ? 'bg-gray-100 border-gray-300 text-gray-800'
+                      : 'bg-slate-800 border-gray-700 text-gray-300'
                   }`}
                 >
                   <option value="en">EN</option>
@@ -151,17 +151,17 @@ function ExtensionLandingPageContent() {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`md:hidden p-2 rounded-lg transition-all ${
-                  theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200' : 'bg-slate-800 hover:bg-slate-700'
+                  theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-slate-800 hover:bg-slate-700'
                 }`}
               >
                 <div className={`w-6 h-0.5 transition-all ${
-                  theme === 'light' ? 'bg-blue-700' : 'bg-blue-300'
+                  theme === 'light' ? 'bg-gray-700' : 'bg-gray-300'
                 } ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
                 <div className={`w-6 h-0.5 mt-1.5 transition-all ${
-                  theme === 'light' ? 'bg-blue-700' : 'bg-blue-300'
+                  theme === 'light' ? 'bg-gray-700' : 'bg-gray-300'
                 } ${isMenuOpen ? 'opacity-0' : ''}`} />
                 <div className={`w-6 h-0.5 mt-1.5 transition-all ${
-                  theme === 'light' ? 'bg-blue-700' : 'bg-blue-300'
+                  theme === 'light' ? 'bg-gray-700' : 'bg-gray-300'
                 } ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
               </button>
             </div>
@@ -172,33 +172,33 @@ function ExtensionLandingPageContent() {
             isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
           }`}>
             <div className={`px-4 py-4 border-t ${
-              theme === 'light' ? 'border-indigo-200' : 'border-blue-700/50'
+              theme === 'light' ? 'border-gray-200' : 'border-gray-800'
             }`}>
               {/* Mobile Navigation */}
               <nav className="flex flex-col gap-3 mb-4">
-                <a 
-                  href="#features" 
+                <a
+                  href="#features"
                   onClick={() => setIsMenuOpen(false)}
                   className={`px-3 py-2 rounded-lg transition-colors text-center ${
-                    theme === 'light' ? 'text-blue-800 hover:bg-indigo-100' : 'text-blue-200 hover:bg-slate-800'
+                    theme === 'light' ? 'text-gray-800 hover:bg-gray-100' : 'text-gray-200 hover:bg-slate-800'
                   }`}
                 >
                   {texts.features}
                 </a>
-                <a 
-                  href="#browsers" 
+                <a
+                  href="#browsers"
                   onClick={() => setIsMenuOpen(false)}
                   className={`px-3 py-2 rounded-lg transition-colors text-center ${
-                    theme === 'light' ? 'text-blue-800 hover:bg-indigo-100' : 'text-blue-200 hover:bg-slate-800'
+                    theme === 'light' ? 'text-gray-800 hover:bg-gray-100' : 'text-gray-200 hover:bg-slate-800'
                   }`}
                 >
                   {texts.browsers}
                 </a>
-                <a 
-                  href="#testimonials" 
+                <a
+                  href="#testimonials"
                   onClick={() => setIsMenuOpen(false)}
                   className={`px-3 py-2 rounded-lg transition-colors text-center ${
-                    theme === 'light' ? 'text-blue-800 hover:bg-indigo-100' : 'text-blue-200 hover:bg-slate-800'
+                    theme === 'light' ? 'text-gray-800 hover:bg-gray-100' : 'text-gray-200 hover:bg-slate-800'
                   }`}
                 >
                   {texts.reviews}
@@ -212,8 +212,8 @@ function ExtensionLandingPageContent() {
                   onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
                   className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                     theme === 'light'
-                      ? 'bg-blue-50 border-indigo-300 text-blue-800'
-                      : 'bg-slate-800 border-blue-600 text-blue-200'
+                      ? 'bg-gray-200 border-gray-400 text-gray-700'
+                      : 'bg-gray-700 border-gray-600 text-gray-300'
                   }`}
                 >
                   <option value="en">EN</option>
@@ -227,7 +227,7 @@ function ExtensionLandingPageContent() {
 
         {/* Hero Section - Enhanced Extension Store Style */}
         <section className={`relative py-20 px-4 sm:px-6 lg:px-8 ${
-          theme === 'light' ? 'bg-white' : 'bg-gray-900'
+          theme === 'light' ? 'bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100' : 'bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900'
         }`}>
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -236,18 +236,18 @@ function ExtensionLandingPageContent() {
                 {/* Trust Badges */}
                 <div className="flex items-center gap-3 mb-6">
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full flex items-center gap-1 ${
-                    theme === 'light' ? 'bg-green-100 text-green-800' : 'bg-green-900 text-green-200'
+                    theme === 'light' ? 'bg-blue-100 text-blue-800' : 'bg-blue-900 text-blue-200'
                   }`}>
-                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                     {texts.featured}
                   </span>
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    theme === 'light' ? 'bg-blue-100 text-blue-800' : 'bg-blue-900 text-blue-200'
+                    theme === 'light' ? 'bg-gray-100 text-gray-800' : 'bg-gray-800 text-gray-200'
                   }`}>
                     {texts.categoryProductivity}
                   </span>
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                    theme === 'light' ? 'bg-purple-100 text-purple-800' : 'bg-purple-900 text-purple-200'
+                    theme === 'light' ? 'bg-gray-100 text-gray-800' : 'bg-gray-800 text-gray-200'
                   }`}>
                     {texts.categoryFocus}
                   </span>
@@ -256,7 +256,7 @@ function ExtensionLandingPageContent() {
                 {/* Extension Header */}
                 <div className="flex items-start gap-6 mb-8">
                   <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg ${
-                    theme === 'light' ? 'bg-blue-100' : 'bg-gray-800'
+                    theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
                   }`}>
                     <img src="/goat.png" alt="Goatly" className="w-14 h-14 object-contain" />
                   </div>
@@ -264,7 +264,7 @@ function ExtensionLandingPageContent() {
                     <h1 className={`text-4xl font-bold mb-3 ${
                       theme === 'light' ? 'text-gray-900' : 'text-white'
                     }`}>
-                      {texts.extensionTitle}
+                      Goatly Focus
                     </h1>
                     <div className="flex items-center gap-6 mb-3">
                       <div className="flex items-center gap-1">
@@ -310,9 +310,9 @@ function ExtensionLandingPageContent() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl ${
-                      theme === 'light' 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                      theme === 'light'
+                        ? 'bg-gradient-to-r from-blue-600 to-gray-700 text-white hover:from-blue-700 hover:to-gray-800'
+                        : 'bg-gradient-to-r from-blue-500 to-gray-600 text-white hover:from-blue-600 hover:to-gray-700'
                     }`}
                   >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">

@@ -6,18 +6,18 @@ export const landingTexts = {
     stats: 'Community Impact',
     community: 'Community',
     startNow: 'Join Community',
-    
+
     // Hero Section
     newFeature: 'Open Source Community',
-    heroTitle: 'Focus Together',
+    heroTitle: 'Study Together',
     heroSubtitle: 'Succeed Together',
-    heroDescription: 'Join our open-source community dedicated to helping students achieve deep focus and academic excellence. Together we build, learn, and succeed.',
+    heroDescription: 'Join our free open-source community for collaborative study. Study with thousands of students, motivate each other, and achieve your academic goals together. Always free and open source.',
     startFreeStudy: 'Join Our Community',
     watchDemo: 'See How It Works',
-    
+
     // Stats
     activeStudents: 'Community Members',
-    focusHours: 'Collective Focus Hours',
+    focusHours: 'Collective Study Hours',
     levelsCompleted: 'Goals Achieved',
     userSatisfaction: 'Community Success Rate',
     
@@ -126,18 +126,18 @@ export const landingTexts = {
     stats: 'تأثير المجتمع',
     community: 'المجتمع',
     startNow: 'انضم للمجتمع',
-    
+
     // Hero Section
     newFeature: 'مجتمع مفتوح المصدر',
-    heroTitle: 'ركزوا معاً',
+    heroTitle: 'ادرسوا معاً',
     heroSubtitle: 'نجحوا معاً',
-    heroDescription: 'انضم إلى مجتمعنا المفتوح المصدر المخصص لمساعدة الطلاب على تحقيق التركيز العميق والتميز الأكاديمي. معاً نبني ونتعلم ونجح.',
+    heroDescription: 'انضم لمجتمعنا المفتوح المصدر والمجاني للدراسة الجماعية. درس مع آلاف الطلاب، حفزوا بعضكم البعض، وحققوا أهدافكم الأكاديمية معاً. مجاني دائماً ومفتوح المصدر.',
     startFreeStudy: 'انضم لمجتمعنا',
     watchDemo: 'شاهد كيف يعمل',
-    
+
     // Stats
     activeStudents: 'أعضاء المجتمع',
-    focusHours: 'ساعات تركيز جماعية',
+    focusHours: 'ساعات دراسة جماعية',
     levelsCompleted: 'أهداف تحققت',
     userSatisfaction: 'معدل نجاح المجتمع',
     

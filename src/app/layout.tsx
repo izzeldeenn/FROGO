@@ -23,8 +23,48 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Goatly",
-  description: "تطبيق ويب للترتيب والمؤقت",
+  title: "Goatly - مجتمع مفتوح المصدر للدراسة الجماعية | Open Source Study Community",
+  description: "Goatly هو مجتمع مفتوح المصدر ومجاني للدراسة الجماعية. انضم لآلاف الطلاب للدراسة معاً، تحفيز بعضكم البعض، وتحقيق أهدافكم الأكاديمية معاً. مجاني دائماً ومفتوح المصدر.",
+  keywords: ["مجتمع دراسة", "دراسة جماعية", "مجتمع مفتوح المصدر", "طلاب", "دراسة معاً", "تحفيز أكاديمي", "Goatly", "مجتمع مجاني", "open source community", "study together", "student community", "collaborative study"],
+  authors: [{ name: "Izzeldeenn" }],
+  creator: "Izzeldeenn",
+  publisher: "Goatly Community",
+  robots: "index, follow",
+  openGraph: {
+    type: "website",
+    locale: "ar_AR",
+    alternateLocale: ["en_US"],
+    url: "https://goatly.app",
+    siteName: "Goatly",
+    title: "Goatly - مجتمع مفتوح المصدر للدراسة الجماعية",
+    description: "انضم لمجتمعنا المفتوح المصدر والمجاني للدراسة الجماعية. درس معاً، تحفزوا معاً، ونجحوا معاً. مجاني دائماً ومفتوح المصدر.",
+    images: [
+      {
+        url: "/goat.png",
+        width: 1200,
+        height: 630,
+        alt: "Goatly - مجتمع مفتوح المصدر للدراسة الجماعية"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Goatly - مجتمع مفتوح المصدر للدراسة الجماعية",
+    description: "انضم لمجتمعنا المفتوح المصدر والمجاني للدراسة الجماعية. درس معاً، تحفزوا معاً، ونجحوا معاً.",
+    images: ["/goat.png"],
+    creator: "@izzeldeenn"
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico"
+  },
+  manifest: "/manifest.json",
+  category: "Education",
+  metadataBase: new URL("https://goatly.app"),
+  alternates: {
+    canonical: "https://goatly.app"
+  }
 };
 
 export default function RootLayout({

@@ -12,6 +12,7 @@ import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { landingTexts, features, testimonials, stats } from '@/constants/landingTexts';
 import { useGitHubStars } from '@/hooks/useGitHubStars';
 import { useRealTimeStats } from '@/hooks/useRealTimeStats';
+import { GoatlyStructuredData } from '@/components/seo/StructuredData';
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +72,7 @@ function LandingPageContent() {
 
   return (
     <LanguageLayout>
+      <GoatlyStructuredData />
       <div className={`min-h-screen ${
         theme === 'light' ? 'bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100' : 'bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900'
       }`}>
@@ -87,7 +89,7 @@ function LandingPageContent() {
                 <div className="flex items-center space-x-3">
                   <img 
                     src="/goat.png" 
-                    alt="Mr Goatly" 
+                    alt="شعار Goatly - مجتمع مفتوح المصدر للدراسة الجماعية" 
                     className="w-10 h-10 object-contain"
                   />
                   <div className="flex flex-col">
@@ -309,8 +311,7 @@ function LandingPageContent() {
                 <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight ${
                    theme === 'light' ? 'text-gray-900' : 'text-white'
                 }`}>
-                  {texts.heroTitle}
-                  <br />
+                  <span className="block">{texts.heroTitle}</span>
                   <span className="block">{texts.heroSubtitle}</span>
                 </h1>
 
@@ -768,8 +769,8 @@ function LandingPageContent() {
       <div className="flex items-center space-x-3 space-x-reverse">
         <img 
           src="/goat.png" 
-          alt="Mr Goatly" 
-          className="w-20 h-20 object-contain"
+          alt="شعار Goatly - مجتمع مفتوح المصدر للدراسة الجماعية" 
+          className="w-10 h-10 object-contain"
         />
         <div className="flex flex-col items-center">
           <div className="text-4xl font-bold tracking-tight">
