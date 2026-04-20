@@ -184,7 +184,7 @@ export function UserProfileModal({ isOpen, user, onClose }: UserProfileModalProp
               : 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 text-blue-300 border border-blue-700/50'
           }`}>
             <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
-            {language === 'ar' ? 'المرتبة' : 'Rank'} #{user.rank || Math.floor((user.score || 0) / 100) + 1}
+            {language === 'ar' ? 'المرتبة' : 'Rank'} #{user.dailyRank}
           </div>
         </div>
 
