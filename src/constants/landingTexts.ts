@@ -8,7 +8,7 @@ export const landingTexts = {
     startNow: 'Join Community',
     
     // Hero Section
-    newFeature: '� Open Source Community',
+    newFeature: 'Open Source Community',
     heroTitle: 'Focus Together',
     heroSubtitle: 'Succeed Together',
     heroDescription: 'Join our open-source community dedicated to helping students achieve deep focus and academic excellence. Together we build, learn, and succeed.',
@@ -128,7 +128,7 @@ export const landingTexts = {
     startNow: 'انضم للمجتمع',
     
     // Hero Section
-    newFeature: '� مجتمع مفتوح المصدر',
+    newFeature: 'مجتمع مفتوح المصدر',
     heroTitle: 'ركزوا معاً',
     heroSubtitle: 'نجحوا معاً',
     heroDescription: 'انضم إلى مجتمعنا المفتوح المصدر المخصص لمساعدة الطلاب على تحقيق التركيز العميق والتميز الأكاديمي. معاً نبني ونتعلم ونجح.',
