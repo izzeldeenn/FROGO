@@ -259,7 +259,7 @@ export function StudyRoom({ roomId, roomName }: StudyRoomProps) {
   // Handle leave room
   const handleLeave = async () => {
     if (currentUser) {
-      const userId = currentUser.accountId || '';
+      const userId = currentUser.id || '';
 
       await leaveRoomTimer();
       await leaveRoom(safeRoomId, userId);
@@ -270,7 +270,7 @@ export function StudyRoom({ roomId, roomName }: StudyRoomProps) {
 
   // Calculate study time for each member
   const getMemberStudyTime = (member: RoomMemberType): number => {
-    if (currentUser && member.user_id === currentUser.accountId) {
+    if (currentUser && member.user_id === currentUser.id) {
       return localSeconds;
     }
     // Calculate from joined_at timestamp

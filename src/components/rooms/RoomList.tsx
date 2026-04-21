@@ -19,7 +19,7 @@ interface RoomWithInfo extends StudyRoomType {
 }
 
 export function RoomList({ onJoinRoom }: RoomListProps) {
-  const { rooms, loading, createRoom, loadRooms } = useRoom();
+  const { rooms, loading, createRoom, loadRooms, joinRoom } = useRoom();
   const { getCurrentUser } = useUser();
   const router = useRouter();
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
@@ -76,8 +76,19 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
     }
   };
 
-  const handleJoinRoom = (roomId: string) => {
-    router.push(`/rooms?roomId=${roomId}`);
+  const handleJoinRoom = async (roomId: string) => {
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.id) {
+      alert('Please log in to join a room');
+      return;
+    }
+
+    // Join the room first
+    const success = await joinRoom(roomId, currentUser.id);
+    if (success) {
+      // Then navigate to the room
+      router.push(`/rooms?roomId=${roomId}`);
+    }
   };
 
   return (

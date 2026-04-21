@@ -80,35 +80,6 @@ export function useRoomTimer(roomId: string, userId: string, accountId?: string)
     };
   }, [isRunning, roomId, userId]);
 
-  // Update study time every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (accountId && localSeconds > 0) {
-        const delta = localSeconds - lastUpdateRef.current;
-
-        if (delta >= 30) {
-          await dailyActivityDB.updateStudyTimeRealtime(accountId, delta);
-          lastUpdateRef.current = localSeconds;
-          totalSecondsRef.current += delta;
-        }
-      }
-    }, 10000); // Check every 10 seconds, but only update if 30+ seconds passed
-
-    return () => clearInterval(interval);
-  }, [accountId, localSeconds]);
-
-  // Save study time on unmount (when closing tab/browser)
-  useEffect(() => {
-    return () => {
-      if (accountId && localSeconds > 0) {
-        const remainingDelta = localSeconds - lastUpdateRef.current;
-        if (remainingDelta > 0) {
-          dailyActivityDB.updateStudyTimeRealtime(accountId, remainingDelta);
-        }
-      }
-    };
-  }, [accountId, localSeconds]);
-
   // Check if user is still in the room before starting timer
   useEffect(() => {
     const checkMembership = async () => {
@@ -134,6 +105,19 @@ export function useRoomTimer(roomId: string, userId: string, accountId?: string)
 
     // Handle beforeunload event - leave room when closing tab/browser
     const handleBeforeUnload = async () => {
+      // Calculate total session time before leaving
+      const sessionEndTime = Date.now();
+      const totalSessionSeconds = Math.floor((sessionEndTime - joinedAtRef.current) / 1000);
+
+      // Save session time to database if accountId is provided
+      if (accountId && totalSessionSeconds > 0) {
+        try {
+          await dailyActivityDB.updateStudyTimeRealtime(accountId, totalSessionSeconds);
+        } catch (err) {
+          console.error('Error saving session time on unload:', err);
+        }
+      }
+
       // Use fetch with keepalive to ensure request completes during unload
       try {
         await fetch('/api/rooms/leave', {
@@ -174,6 +158,19 @@ export function useRoomTimer(roomId: string, userId: string, accountId?: string)
       }
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
+      }
+
+      // Calculate total session time from join to leave
+      const sessionEndTime = Date.now();
+      const totalSessionSeconds = Math.floor((sessionEndTime - joinedAtRef.current) / 1000);
+
+      // Save total session time to database if accountId is provided
+      if (accountId && totalSessionSeconds > 0) {
+        try {
+          await dailyActivityDB.updateStudyTimeRealtime(accountId, totalSessionSeconds);
+        } catch (err) {
+          console.error('Error saving session time:', err);
+        }
       }
 
       // Leave room in database
