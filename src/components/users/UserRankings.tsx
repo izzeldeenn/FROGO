@@ -45,7 +45,8 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
     totalPages,
     nextPage,
     prevPage,
-    goToPage
+    goToPage,
+    loadDailyRankings
   } = useUserRankings();
 
   // Show loading message for 2 seconds when session ends
@@ -63,10 +64,34 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
 
   return (
     <div className="flex-1">
-      <div className="flex justify-center items-center mb-6">
+      <div className="flex justify-center items-center mb-6 gap-4">
         <h2 className={`text-2xl font-bold text-center ${
           theme === 'light' ? 'text-black' : 'text-white'
         }`}>{t.dailyRankings}</h2>
+        <button
+          onClick={() => loadDailyRankings(true, true)}
+          disabled={loading}
+          className={`p-2 rounded-full transition-colors ${
+            theme === 'light'
+              ? 'hover:bg-gray-200 text-gray-600 disabled:opacity-50'
+              : 'hover:bg-gray-700 text-gray-300 disabled:opacity-50'
+          }`}
+          title="تحديث الترتيب"
+        >
+          <svg
+            className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+        </button>
       </div>
       <div className="h-[calc(100vh-180px)] overflow-y-auto">
         {sessionLoading ? (
