@@ -137,6 +137,16 @@ export function StudyRoom({ roomId, roomName }: StudyRoomProps) {
     fetchMemberUsers();
   }, [currentRoomMembers]);
 
+  // Auto-center on user when joining the room
+  useEffect(() => {
+    if (currentUser && currentRoomMembers.length > 0) {
+      const currentMember = currentRoomMembers.find(m => m.user_id === currentUser.id);
+      if (currentMember && currentMember.id && memberPositions[currentMember.id]) {
+        handleResetToCenter();
+      }
+    }
+  }, [currentUser, currentRoomMembers, memberPositions]);
+
   // Handle drag start
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDragging(true);

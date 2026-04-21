@@ -38,11 +38,14 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
         const memberCount = members.length;
 
         let creatorName = 'Unknown';
+        let creatorAvatar = '';
         if (room.creator_id) {
           try {
             const users = await roomDB.getUsersByIds([room.creator_id]);
             if (users.length > 0) {
               creatorName = users[0].username || 'Unknown';
+              creatorAvatar = users[0].avatar || '';
+              console.log('Creator data:', { creatorName, creatorAvatar, fullUser: users[0] });
             }
           } catch (err) {
             console.error('Error fetching creator:', err);
@@ -52,7 +55,8 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
         return {
           ...room,
           memberCount,
-          creatorName
+          creatorName,
+          creatorAvatar
         };
       });
 
@@ -171,47 +175,78 @@ function RoomCard({ room, onJoin }: RoomCardProps) {
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-gray-600 transition-all duration-300 hover:scale-105 cursor-pointer group">
-      <div className="mb-4">
-        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-gray-200 transition-colors">
+    <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/20 cursor-pointer group">
+      {/* Room Header */}
+      <div className="p-5 pb-4">
+        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
           {room.name}
         </h3>
-        <div className="flex items-center space-x-4 text-sm text-gray-400">
-          <span className="flex items-center">
-            <span className="mr-1">👤</span>
-            {room.creatorName}
-          </span>
-          <span className="flex items-center">
-            <span className="mr-1">📅</span>
-            {new Date(room.created_at).toLocaleDateString()}
-          </span>
+        
+        {/* Creator Info with Avatar */}
+        <div className="flex items-center space-x-3 mb-4">
+          {room.creatorAvatar && room.creatorAvatar.length > 0 ? (
+            <img
+              src={room.creatorAvatar}
+              alt={room.creatorName}
+              className="w-10 h-10 rounded-full object-cover border-2 border-indigo-500/50"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+              {room.creatorName?.charAt(0).toUpperCase() || '?'}
+            </div>
+          )}
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white">{room.creatorName}</p>
+            <p className="text-xs text-gray-400">Room Creator</p>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">👥</span>
-          <span className="text-lg font-semibold text-white">{room.memberCount}</span>
-          <span className="text-sm text-gray-400">
-            {room.memberCount === 1 ? 'studying' : 'studying'}
-          </span>
-        </div>
-      </div>
+      {/* Divider */}
+      <div className="h-px bg-gray-700/50"></div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={onJoin}
-          className="flex-1 px-4 py-3 bg-white hover:bg-gray-100 text-black rounded-lg font-medium transition-colors"
-        >
-          Join Room
-        </button>
-        <button
-          onClick={handleShare}
-          className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
-          title="Share room link"
-        >
-          🔗
-        </button>
+      {/* Room Stats */}
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center border border-emerald-500/30">
+                <span className="text-2xl">👥</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {room.memberCount}
+              </div>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-white">{room.memberCount}</p>
+              <p className="text-xs text-gray-400">Active Members</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">Created</p>
+            <p className="text-sm text-gray-300">{new Date(room.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={onJoin}
+            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25"
+          >
+            Join Now
+          </button>
+          <button
+            onClick={handleShare}
+            className="px-3 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-xl text-sm font-medium transition-colors"
+            title="Share room link"
+          >
+            🔗
+          </button>
+        </div>
       </div>
     </div>
   );
