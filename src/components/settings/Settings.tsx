@@ -55,30 +55,31 @@ export function SettingsButton() {
 
   // Settings sections configuration
   const getSettingsSections = () => [
-    { id: 'presets', name: t.presets || 'الإعدادات المسبقة', icon: '🎨' },
-    { id: 'profile', name: t.profile || 'الملف الشخصي', icon: '👤' },
-    { id: 'referral', name: t.referral || 'الإحالات', icon: '🎁' },
-    { id: 'appearance', name: t.appearance || 'المظهر', icon: '🎨' },
-    { id: 'themes', name: t.themes || 'الثيمات', icon: '🎭' },
-    { id: 'backgrounds', name: t.backgrounds || 'الخلفيات', icon: '🖼️' },
-    { id: 'rankings', name: t.rankings || 'عرض الترتيب', icon: '🏆' },
-    { id: 'services', name: t.services || 'الخدمات', icon: '⚡' },
-    { id: 'unifiedTimer', name: t.unifiedTimer || 'تنسيق موحد', icon: '⚙️' },
-    { id: 'timer', name: t.timer || 'التايمر', icon: '⏱️' },
-    { id: 'countdown', name: t.countdown || 'العد التنازلي', icon: '⏳' },
-    { id: 'pomodoro', name: t.pomodoro || 'بومودورو', icon: '🍅' },
-    { id: 'account', name: t.account || 'الحساب', icon: '🔐' },
+    { id: 'presets', name: texts.presets, icon: '🎨' },
+    { id: 'profile', name: texts.profile, icon: '👤' },
+    { id: 'referral', name: texts.referral, icon: '🎁' },
+    { id: 'appearance', name: texts.appearance, icon: '🎨' },
+    { id: 'themes', name: texts.themes, icon: '🎭' },
+    { id: 'backgrounds', name: texts.backgrounds, icon: '🖼️' },
+    { id: 'rankings', name: texts.rankings, icon: '🏆' },
+    { id: 'services', name: texts.services, icon: '⚡' },
+    { id: 'unifiedTimer', name: texts.unifiedTimer, icon: '⚙️' },
+    { id: 'timer', name: texts.timer, icon: '⏱️' },
+    { id: 'countdown', name: texts.countdown, icon: '⏳' },
+    { id: 'pomodoro', name: texts.pomodoro, icon: '🍅' },
+    { id: 'account', name: texts.account, icon: '🔐' },
   ];
 
   // Ranking display modes
   const getRankingDisplayModes = () => [
-    { id: 'bottom', name: t.bottom_popup || 'منبثق من الأسفل', icon: '⬆️', description: t.bottom_popup_desc || 'ينزلق من أسفل الشاشة' },
-    { id: 'side', name: t.side_bar || 'شريط جانبي', icon: '➡️', description: t.side_bar_desc || 'شريط ثابت على الجانب' },
-    { id: 'floating', name: t.floating || 'عائم', icon: '🎈', description: t.floating_desc || 'نافذة عائمة قابلة للتحريك' },
-    { id: 'top', name: t.top_popup || 'منبثق من الأعلى', icon: '⬇️', description: t.top_popup_desc || 'ينزلق من أعلى الشاشة' },
+    { id: 'bottom', name: texts.bottomPopup, icon: '⬆️', description: texts.bottomPopupDesc },
+    { id: 'side', name: texts.sideBar, icon: '➡️', description: texts.sideBarDesc },
+    { id: 'floating', name: texts.floating, icon: '🎈', description: texts.floatingDesc },
+    { id: 'top', name: texts.topPopup, icon: '⬇️', description: texts.topPopupDesc },
   ];
   const [showSettings, setShowSettings] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'upgrade'>('login');
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
   const [showCustomCreator, setShowCustomCreator] = useState(false);
@@ -132,12 +133,12 @@ export function SettingsButton() {
   });
 
   const servicesList = [
-    { id: 'stopwatch', name: t.stopwatchService || 'ساعة إيقاف', icon: '⏱️' },
-    { id: 'pomodoro', name: t.pomodoroService || 'مؤقت بومودورو', icon: '🍅' },
-    { id: 'countdown', name: t.countdownService || 'مؤقت العد التنازلي', icon: '⏳' },
-    { id: 'youtube', name: t.youtubeService || 'مؤقت يوتيوب', icon: '🎬' },
-    { id: 'dashboard', name: t.dashboardService || 'لوحة التحكم', icon: '📈' },
-    { id: 'pdf', name: t.pdfService || 'دراسة PDF', icon: '📚' }
+    { id: 'stopwatch', name: texts.stopwatchService, icon: '⏱️' },
+    { id: 'pomodoro', name: texts.pomodoroService, icon: '🍅' },
+    { id: 'countdown', name: texts.countdownService, icon: '⏳' },
+    { id: 'youtube', name: texts.youtubeService, icon: '🎬' },
+    { id: 'dashboard', name: texts.dashboardService, icon: '📈' },
+    { id: 'pdf', name: texts.pdfService, icon: '📚' }
   ];
 
   const toggleService = (serviceId: string) => {
@@ -592,7 +593,7 @@ export function SettingsButton() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className={`text-sm font-bold truncate`} style={{ color: theme === 'light' ? '#0b1220' : '#f8fafc' }}>{currentUser?.username || t.settings}</div>
-                      <div className="text-xxs opacity-70" style={{ fontSize: 11, color: theme === 'light' ? '#475569' : '#cbd5e1' }}>{coins} {t.coins || 'عملات'} · Lv {level}</div>
+                      <div className="text-xxs opacity-70" style={{ fontSize: 11, color: theme === 'light' ? '#475569' : '#cbd5e1' }}>{coins} {texts.coins} · Lv {level}</div>
                     </div>
                   </div>
 
@@ -622,10 +623,10 @@ export function SettingsButton() {
                               <div className="text-right flex-1 min-w-0">
                                 <div className="text-sm font-semibold truncate" style={{ color: theme === 'light' ? '#0b1220' : '#f8fafc' }}>{section.name}</div>
                                 <div className="text-xxs opacity-70 truncate" style={{ fontSize: 11, color: theme === 'light' ? '#64748b' : '#9aa4b2' }}>
-                                  {section.id === 'profile' && 'المعلومات الشخصية'}
-                                  {section.id === 'appearance' && 'الشكل والمظهر'}
-                                  {section.id === 'themes' && 'تخصيص الثيمات'}
-                                  {section.id === 'account' && 'إدارة الحساب'}
+                                  {section.id === 'profile' && texts.profileInfo}
+                                  {section.id === 'appearance' && texts.appearanceInfo}
+                                  {section.id === 'themes' && texts.themesInfo}
+                                  {section.id === 'account' && texts.accountInfo}
                                 </div>
                               </div>
                             </button>
@@ -661,7 +662,7 @@ export function SettingsButton() {
                         {currentUser?.username || t.settings}
                       </div>
                       <div className="text-xs opacity-70" style={{ color: theme === 'light' ? '#64748b' : '#9aa4b2' }}>
-                        {coins} {t.coins || 'عملات'} · Lv {level}
+                        {coins} {texts.coins} · Lv {level}
                       </div>
                     </div>
                   </div>
@@ -747,19 +748,19 @@ export function SettingsButton() {
                       <div className={`text-xs opacity-70 mt-1 ${
                         theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                       }`}>
-                        {activeSection === 'presets' && 'اختر شكلاً جاهزاً مع إعدادات متكاملة'}
-                        {activeSection === 'profile' && 'إدارة ملفك الشخصي والصورة الرمزية'}
-                        {activeSection === 'referral' && 'شارك كود الإحالة واكسب نقاط'}
-                        {activeSection === 'appearance' && 'تخصيص المظهر واللغة'}
-                        {activeSection === 'themes' && 'اختيار وتخصيص الثيمات'}
-                        {activeSection === 'backgrounds' && 'اختيار خلفيات'}
-                        {activeSection === 'rankings' && 'اختر طريقة عرض الترتيب التي تناسبك'}
-                        {activeSection === 'services' && 'اختر الخدمات التي تريد استخدامها'}
-                        {activeSection === 'timer' && 'تخصيص شكل وألوان المؤقت'}
-                        {activeSection === 'countdown' && 'إعداد العد التنازلي'}
-                        {activeSection === 'pomodoro' && 'تخصيص مؤقت بومودورو'}
-                        {activeSection === 'unifiedTimer' && 'تنسيق موحد لكل المؤقتات'}
-                        {activeSection === 'account' && 'إعدادات الحساب والأمان'}
+                        {activeSection === 'presets' && texts.presetsDesc}
+                        {activeSection === 'profile' && texts.profileDesc}
+                        {activeSection === 'referral' && texts.referralDesc}
+                        {activeSection === 'appearance' && texts.appearanceDesc}
+                        {activeSection === 'themes' && texts.themesDesc}
+                        {activeSection === 'backgrounds' && texts.backgroundsDesc}
+                        {activeSection === 'rankings' && texts.rankingsDesc}
+                        {activeSection === 'services' && texts.servicesDesc}
+                        {activeSection === 'timer' && texts.timerDesc}
+                        {activeSection === 'countdown' && texts.countdownDesc}
+                        {activeSection === 'pomodoro' && texts.pomodoroDesc}
+                        {activeSection === 'unifiedTimer' && texts.unifiedTimerDesc}
+                        {activeSection === 'account' && texts.accountDesc}
                       </div>
                     </div>
                     
@@ -899,7 +900,7 @@ export function SettingsButton() {
                                   setCustomAvatarUrl(e.target.value);
                                   setSelectedAvatar('');
                                 }}
-                                placeholder="أدخل رابط الصورة المخصص..."
+                                placeholder={texts.enterCustomImageUrl}
                                 className="w-full px-5 py-4 rounded-2xl focus:outline-none transition-all duration-300 text-sm font-medium peer"
                                 style={{
                                   backgroundColor: customTheme.colors.surface + '40',
@@ -965,12 +966,12 @@ export function SettingsButton() {
                               <div className={`text-sm font-medium ${
                                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                               }`}>
-                                أو اختر من المجموعة
+                                {texts.orChooseFromCollection}
                               </div>
                               <div className={`text-xs ${
                                 theme === 'light' ? 'text-gray-500' : 'text-gray-500'
                               }`}>
-                                {AVATARS.length} صورة متاحة
+                                {AVATARS.length} {texts.imagesAvailable}
                               </div>
                             </div>
                             
@@ -980,7 +981,7 @@ export function SettingsButton() {
                                 type="text"
                                 value={avatarSearch}
                                 onChange={(e) => setAvatarSearch(e.target.value)}
-                                placeholder="بحث بالرقم..."
+                                placeholder={texts.searchByNumber}
                                 className="w-full px-5 py-3 rounded-2xl focus:outline-none transition-all duration-300 text-sm peer"
                                 style={{
                                   backgroundColor: customTheme.colors.surface + '40',
@@ -1225,7 +1226,7 @@ export function SettingsButton() {
                               }}
                             >
                               <option value="en">{texts.english}</option>
-                              <option value="ar">العربية</option>
+                              <option value="ar">{texts.arabic}</option>
                             </select>
                             <div 
                               className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
@@ -1275,12 +1276,12 @@ export function SettingsButton() {
                               <h3 className={`text-lg font-black tracking-tight ${
                                 theme === 'light' ? 'text-gray-900' : 'text-gray-50'
                               }`}>
-                                الإعدادات المسبقة
+                                {texts.presetsSection}
                               </h3>
                               <p className={`text-sm opacity-70 ${
                                 theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                               }`}>
-                                اختر شكلاً جاهزاً مع إعدادات متكاملة
+                                {texts.presetsSectionDesc}
                               </p>
                             </div>
                           </div>
@@ -1324,7 +1325,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-700' : 'text-white'
                             }`}>
-                              الثيمات الجاهزة
+                              {texts.readyMadeThemes}
                             </label>
                           </div>
                           
@@ -1409,8 +1410,8 @@ export function SettingsButton() {
                         >
                           <span className="relative z-10">
                             {showCustomCreator 
-                              ? 'إغلاق'
-                              : 'إنشاء ثيم مخصص'
+                              ? texts.close
+                              : texts.createCustomTheme
                             }
                           </span>
                           <div 
@@ -1457,7 +1458,7 @@ export function SettingsButton() {
                             <label className={`text-base font-bold ${
                               theme === 'light' ? 'text-gray-800' : 'text-white'
                             }`}>
-                              {t.rank === 'ترتيب' ? 'الخلفيات' : 'Backgrounds'}
+                              {texts.backgroundsLabel}
                             </label>
                           </div>
                           
@@ -1487,12 +1488,12 @@ export function SettingsButton() {
                                   <h4 className={`text-lg font-bold ${
                                     theme === 'light' ? 'text-gray-800' : 'text-white'
                                   }`}>
-                                    {t.rank === 'ترتيب' ? 'بحث عن خلفيات' : 'Search Backgrounds'}
+                                    {texts.searchBackgrounds}
                                   </h4>
                                   <p className={`text-sm ${
                                     theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                   }`}>
-                                    {t.rank === 'ترتيب' ? 'اكتشف آلاف الخلفيات الجميلة من Unsplash' : 'Discover thousands of beautiful backgrounds from Unsplash'}
+                                    {texts.discoverBackgrounds}
                                   </p>
                                 </div>
                               </div>
@@ -1503,7 +1504,7 @@ export function SettingsButton() {
                                     type="text"
                                     value={unsplashSearchQuery}
                                     onChange={(e) => setUnsplashSearchQuery(e.target.value)}
-                                    placeholder={t.rank === 'ترتيب' ? 'ابحث عن طبيعة، مدينة، تجريدي...' : 'Search nature, city, abstract...'}
+                                    placeholder={texts.searchPlaceholder}
                                     disabled={isSearchingUnsplash || isApplyingBackground}
                                     className={`w-full px-5 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:border-blue-500 ${
                                       theme === 'dark'
@@ -1524,14 +1525,14 @@ export function SettingsButton() {
                                   {isSearchingUnsplash ? (
                                     <>
                                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                      {t.rank === 'ترتيب' ? 'جاري البحث' : 'Searching'}
+                                      {texts.searching}
                                     </>
                                   ) : (
                                     <>
                                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                       </svg>
-                                      {t.rank === 'ترتيب' ? 'بحث' : 'Search'}
+                                      {texts.search}
                                     </>
                                   )}
                                 </button>
@@ -1549,8 +1550,8 @@ export function SettingsButton() {
                                       theme === 'light' ? 'text-gray-600' : 'text-gray-400'
                                     }`}>
                                       {isApplyingBackground 
-                                        ? (t.rank === 'ترتيب' ? 'جاري تطبيق الخلفية...' : 'Applying background...')
-                                        : (t.rank === 'ترتيب' ? 'جاري البحث عن الخلفيات...' : 'Searching for backgrounds...')
+                                        ? texts.applyingBackground
+                                        : texts.searchingBackgrounds
                                       }
                                     </p>
                                   </div>
@@ -1635,7 +1636,7 @@ export function SettingsButton() {
                         />
                         
                         <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                          🏆 طريقة عرض الترتيب
+                          🏆 {texts.rankingDisplayMethod}
                         </h4>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1678,7 +1679,7 @@ export function SettingsButton() {
                               </p>
                               {rankingDisplayMode === mode.id && (
                                 <div className="mt-2 text-xs font-medium" style={{ color: customTheme.colors.primary }}>
-                                  ✓ محدد
+                                  ✓ {texts.selected}
                                 </div>
                               )}
                             </button>
@@ -1718,7 +1719,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                             }`}>
-                              إعدادات التايمر
+                              {texts.timerSettings}
                             </label>
                           </div>
 
@@ -1728,7 +1729,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                لون التايمر
+                                {texts.timerColor}
                               </label>
                               <div className="flex items-center space-x-reverse space-x-3">
                                 <input
@@ -1759,7 +1760,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                نوع الخط
+                                {texts.fontType}
                               </label>
                               <select
                                 value={timerFont}
@@ -1784,7 +1785,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                التصميم
+                                {texts.design}
                               </label>
                               <div className="grid grid-cols-2 gap-3">
                                 {['minimal', 'modern', 'classic', 'digital'].map((design) => (
@@ -1805,10 +1806,10 @@ export function SettingsButton() {
                                       outlineColor: timerDesign === design ? customTheme.colors.primary : 'transparent'
                                     }}
                                   >
-                                    {design === 'minimal' && 'بسيط'}
-                                    {design === 'modern' && 'حديث'}
-                                    {design === 'classic' && 'كلاسيكي'}
-                                    {design === 'digital' && 'رقمي'}
+                                    {design === 'minimal' && texts.minimal}
+                                    {design === 'modern' && texts.modern}
+                                    {design === 'classic' && texts.classic}
+                                    {design === 'digital' && texts.digital}
                                   </button>
                                 ))}
                               </div>
@@ -1819,13 +1820,13 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                الحجم
+                                {texts.size}
                               </label>
                               <div className="grid grid-cols-3 gap-3">
                                 {[
-                                  { value: 'text-2xl', label: 'صغير' },
-                                  { value: 'text-4xl', label: 'متوسط' },
-                                  { value: 'text-6xl', label: 'كبير' }
+                                  { value: 'text-2xl', label: texts.small },
+                                  { value: 'text-4xl', label: texts.medium },
+                                  { value: 'text-6xl', label: texts.large }
                                 ].map((size) => (
                                   <button
                                     key={size.value}
@@ -1866,7 +1867,7 @@ export function SettingsButton() {
                                 <p className={`text-xs mt-2 ${
                                   theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                 }`}>
-                                  معاينة التايمر
+                                  {texts.timerPreview}
                                 </p>
                               </div>
                             </div>
@@ -1906,7 +1907,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                             }`}>
-                              إعدادات العد التنازلي
+                              {texts.countdownSettings}
                             </label>
                           </div>
 
@@ -1916,7 +1917,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                لون العد التنازلي
+                                {texts.countdownColor}
                               </label>
                               <div className="flex items-center space-x-reverse space-x-3">
                                 <input
@@ -1947,7 +1948,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                نوع الخط
+                                {texts.fontType}
                               </label>
                               <select
                                 value={countdownFont}
@@ -1972,7 +1973,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                التصميم
+                                {texts.design}
                               </label>
                               <div className="grid grid-cols-2 gap-3">
                                 {['minimal', 'modern', 'classic', 'digital'].map((design) => (
@@ -1993,10 +1994,10 @@ export function SettingsButton() {
                                       outlineColor: countdownDesign === design ? customTheme.colors.primary : 'transparent'
                                     }}
                                   >
-                                    {design === 'minimal' && 'بسيط'}
-                                    {design === 'modern' && 'حديث'}
-                                    {design === 'classic' && 'كلاسيكي'}
-                                    {design === 'digital' && 'رقمي'}
+                                    {design === 'minimal' && texts.minimal}
+                                    {design === 'modern' && texts.modern}
+                                    {design === 'classic' && texts.classic}
+                                    {design === 'digital' && texts.digital}
                                   </button>
                                 ))}
                               </div>
@@ -2007,13 +2008,13 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                الحجم
+                                {texts.size}
                               </label>
                               <div className="grid grid-cols-3 gap-3">
                                 {[
-                                  { value: 'text-2xl', label: 'صغير' },
-                                  { value: 'text-4xl', label: 'متوسط' },
-                                  { value: 'text-6xl', label: 'كبير' }
+                                  { value: 'text-2xl', label: texts.small },
+                                  { value: 'text-4xl', label: texts.medium },
+                                  { value: 'text-6xl', label: texts.large }
                                 ].map((size) => (
                                   <button
                                     key={size.value}
@@ -2054,7 +2055,7 @@ export function SettingsButton() {
                                 <p className={`text-xs mt-2 ${
                                   theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                 }`}>
-                                  معاينة العد التنازلي
+                                  {texts.countdownPreview}
                                 </p>
                               </div>
                             </div>
@@ -2096,7 +2097,7 @@ export function SettingsButton() {
                             <h3 className={`text-lg font-semibold ${
                               theme === 'light' ? 'text-gray-900' : 'text-white'
                             }`}>
-                              إعدادات مؤقت بومودورو
+                              {texts.pomodoroSettings}
                             </h3>
                           </div>
 
@@ -2106,7 +2107,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                لون المؤقت
+                                {texts.pomodoroColor}
                               </label>
                               <div className="flex items-center space-x-reverse space-x-2">
                                 <input
@@ -2134,7 +2135,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                خط المؤقت
+                                {texts.pomodoroFont}
                               </label>
                               <select
                                 value={pomodoroFont}
@@ -2156,7 +2157,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                تصميم المؤقت
+                                {texts.pomodoroDesign}
                               </label>
                               <div className="grid grid-cols-2 gap-2">
                                 {['minimal', 'modern', 'classic', 'digital'].map((design) => (
@@ -2173,10 +2174,10 @@ export function SettingsButton() {
                                           : 'border-gray-600 hover:border-gray-500'
                                     }`}
                                   >
-                                    {design === 'minimal' && 'بسيط'}
-                                    {design === 'modern' && 'عصري'}
-                                    {design === 'classic' && 'كلاسيكي'}
-                                    {design === 'digital' && 'رقمي'}
+                                    {design === 'minimal' && texts.minimal}
+                                    {design === 'modern' && texts.modern}
+                                    {design === 'classic' && texts.classic}
+                                    {design === 'digital' && texts.digital}
                                   </button>
                                 ))}
                               </div>
@@ -2187,7 +2188,7 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                حجم المؤقت
+                                {texts.pomodoroSize}
                               </label>
                               <div className="grid grid-cols-2 gap-2">
                                 {['text-2xl', 'text-4xl', 'text-6xl', 'text-8xl'].map((size) => (
@@ -2204,10 +2205,10 @@ export function SettingsButton() {
                                           : 'border-gray-600 hover:border-gray-500'
                                     }`}
                                   >
-                                    {size === 'text-2xl' && 'صغير'}
-                                    {size === 'text-4xl' && 'متوسط'}
-                                    {size === 'text-6xl' && 'كبير'}
-                                    {size === 'text-8xl' && 'كبير جداً'}
+                                    {size === 'text-2xl' && texts.small}
+                                    {size === 'text-4xl' && texts.medium}
+                                    {size === 'text-6xl' && texts.large}
+                                    {size === 'text-8xl' && texts.extraLarge}
                                   </button>
                                 ))}
                               </div>
@@ -2218,13 +2219,13 @@ export function SettingsButton() {
                               <label className={`block text-sm font-medium mb-2 ${
                                 theme === 'light' ? 'text-black' : 'text-gray-300'
                               }`}>
-                                شكل الجلسات المكتملة
+                                {texts.completedSessionsShape}
                               </label>
                               <div className="grid grid-cols-3 gap-2">
                                 {[
-                                  { id: 'star', name: 'نجمة', icon: '⭐' },
-                                  { id: 'dot', name: 'نقطة', icon: '🔵' },
-                                  { id: 'heart', name: 'قلب', icon: '❤️' }
+                                  { id: 'star', name: texts.star, icon: '⭐' },
+                                  { id: 'dot', name: texts.dot, icon: '🔵' },
+                                  { id: 'heart', name: texts.heart, icon: '❤️' }
                                 ].map((icon) => (
                                   <button
                                     key={icon.id}
@@ -2262,7 +2263,7 @@ export function SettingsButton() {
                                 <p className={`text-xs mt-2 ${
                                   theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                 }`}>
-                                  معاينة بومودورو
+                                  {texts.pomodoroPreview}
                                 </p>
                               </div>
                             </div>
@@ -2302,7 +2303,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-900' : 'text-white'
                             }`}>
-                              {language === 'ar' ? 'تنسيق موحد' : 'Unified Settings'}
+                              {texts.unifiedSettings}
                             </label>
                           </div>
 
@@ -2312,7 +2313,7 @@ export function SettingsButton() {
                               <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                {language === 'ar' ? 'اللون' : 'Color'}
+                                {texts.unifiedColor}
                               </label>
                               <div className="flex items-center space-x-3">
                                 <input
@@ -2341,7 +2342,7 @@ export function SettingsButton() {
                               <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                {language === 'ar' ? 'الخط' : 'Font'}
+                                {texts.unifiedFont}
                               </label>
                               <select
                                 value={unifiedFont}
@@ -2364,7 +2365,7 @@ export function SettingsButton() {
                               <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                {language === 'ar' ? 'التصميم' : 'Design'}
+                                {texts.unifiedDesign}
                               </label>
                               <div className="grid grid-cols-3 gap-3">
                                 {['minimal', 'modern', 'classic'].map((design) => (
@@ -2394,7 +2395,7 @@ export function SettingsButton() {
                               <label className={`text-xs font-bold uppercase tracking-wider mb-2 block ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                {language === 'ar' ? 'الحجم' : 'Size'}
+                                {texts.unifiedSize}
                               </label>
                               <div className="grid grid-cols-4 gap-3">
                                 {['text-2xl', 'text-4xl', 'text-6xl', 'text-8xl'].map((size) => (
@@ -2429,7 +2430,7 @@ export function SettingsButton() {
                                   boxShadow: `0 4px 16px ${customTheme.colors.primary}40`
                                 }}
                               >
-                                {language === 'ar' ? 'تطبيق على جميع المؤقتات' : 'Apply to All Timers'}
+                                {texts.applyToAllTimers}
                               </button>
                             </div>
 
@@ -2449,7 +2450,7 @@ export function SettingsButton() {
                                 <p className={`text-xs mt-2 ${
                                   theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                 }`}>
-                                  {language === 'ar' ? 'معاينة التنسيق الموحد' : 'Unified Preview'}
+                                  {texts.unifiedPreview}
                                 </p>
                               </div>
                             </div>
@@ -2489,7 +2490,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                             }`}>
-                              {t.serviceDescription || 'اختر الخدمات التي تريد إظهارها'}
+                              {texts.serviceDescription}
                             </label>
                           </div>
 
@@ -2570,7 +2571,7 @@ export function SettingsButton() {
                             <label className={`text-sm font-black uppercase tracking-wider ${
                               theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                             }`}>
-                              الحساب
+                              {texts.account}
                             </label>
                           </div>
                           
@@ -2610,7 +2611,7 @@ export function SettingsButton() {
                                     <div className={`text-base font-black ${
                                       theme === 'light' ? 'text-gray-900' : 'text-gray-50'
                                     }`}>
-                                      {currentUser?.username || 'مستخدم'}
+                                      {currentUser?.username || texts.user}
                                     </div>
                                     <div className={`text-sm opacity-80 ${
                                       theme === 'light' ? 'text-gray-600' : 'text-gray-400'
@@ -2642,12 +2643,12 @@ export function SettingsButton() {
                                     <div className={`text-base font-medium ${
                                       theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                                     }`}>
-                                      حساب ضيف
+                                      {texts.guestAccount}
                                     </div>
                                     <div className={`text-sm opacity-70 ${
                                       theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                                     }`}>
-                                      قم بترقية الحساب للحفاظ على بياناتك
+                                      {texts.upgradeAccount}
                                     </div>
                                   </div>
                                 </div>
@@ -2657,7 +2658,10 @@ export function SettingsButton() {
                             <div className="grid grid-cols-2 gap-4">
                               {!isLoggedIn ? (
                                 <button
-                                  onClick={() => setShowAuthModal(true)}
+                                  onClick={() => {
+                                    setAuthModalMode('login');
+                                    setShowAuthModal(true);
+                                  }}
                                   className="px-5 py-4 rounded-2xl font-black transition-all duration-300 text-sm hover:scale-105 relative overflow-hidden group"
                                   style={{
                                     background: `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`,
@@ -2673,7 +2677,7 @@ export function SettingsButton() {
                                     e.currentTarget.style.boxShadow = `0 12px 48px ${customTheme.colors.primary}40`;
                                   }}
                                 >
-                                  <span className="relative z-10">تسجيل الدخول</span>
+                                  <span className="relative z-10">{texts.login}</span>
                                   <div 
                                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     style={{
@@ -2699,13 +2703,14 @@ export function SettingsButton() {
                                     e.currentTarget.style.boxShadow = `0 8px 32px ${customTheme.colors.border}30`;
                                   }}
                                 >
-                                  تبديل الحساب
+                                  {t.switchAccount}
                                 </button>
                               )}
                               
                               {!isLoggedIn && (
                                 <button
                                   onClick={() => {
+                                    setAuthModalMode('upgrade');
                                     setShowAuthModal(true);
                                   }}
                                   className="px-5 py-4 rounded-2xl font-black transition-all duration-300 text-sm hover:scale-105"
@@ -2723,7 +2728,7 @@ export function SettingsButton() {
                                     e.currentTarget.style.boxShadow = `0 8px 32px ${customTheme.colors.border}30`;
                                   }}
                                 >
-                                  ترقية الحساب
+                                  {t.upgradeAccount}
                                 </button>
                               )}
                             </div>
@@ -2831,9 +2836,10 @@ export function SettingsButton() {
       )}
 
       {/* Authentication Modals */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authModalMode}
       />
       
       <AccountSwitcher 
