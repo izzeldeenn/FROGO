@@ -21,7 +21,7 @@ interface RoomWithInfo extends StudyRoomType {
 }
 
 export function RoomList({ onJoinRoom }: RoomListProps) {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const texts = landingTexts[language];
   const { rooms, loading, createRoom, loadRooms, joinRoom } = useRoom();
   const { getCurrentUser } = useUser();
@@ -107,15 +107,21 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
           <div className="flex items-center space-x-6">
             <Logo />
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">🚀 {texts.studyRooms}</h1>
-              <p className="text-gray-400">{texts.joinRoomDescription}</p>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition-colors"
+              >
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+              </select>
             </div>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="px-6 py-3 bg-white hover:bg-gray-100 text-black rounded-lg font-medium transition-colors"
           >
-            + Create Room
+            + {texts.createRoom}
           </button>
         </div>
       </div>
@@ -134,7 +140,7 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
                 onClick={() => setIsCreateModalOpen(true)}
                 className="text-white hover:text-gray-300"
               >
-                Create the first room
+                {texts.createRoom}
               </button>
             </div>
           ) : (

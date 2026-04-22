@@ -127,6 +127,8 @@ export const landingTexts = {
     invalidRoomId: 'Invalid room ID',
     studyTogether: 'Study together in real-time',
     waitingForMembers: 'Waiting for members to join...',
+    enterRoomName: 'Enter room name...',
+    creating: 'Creating...',
 
     // Social
     likedYourPost: 'liked your post',
@@ -431,6 +433,8 @@ export const landingTexts = {
     invalidRoomId: 'معرف الغرفة غير صالح',
     studyTogether: 'ادرسوا معاً في الوقت الفعلي',
     waitingForMembers: 'في انتظار انضمام الأعضاء...',
+    enterRoomName: 'أدخل اسم الغرفة...',
+    creating: 'جاري الإنشاء...',
 
     // Social
     likedYourPost: 'أعجب بمنشورك',

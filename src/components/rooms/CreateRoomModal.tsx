@@ -50,7 +50,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreateRoom }: CreateRoomMod
               type="text"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
-              placeholder="Enter room name..."
+              placeholder={texts.enterRoomName}
               className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
               disabled={loading}
               autoFocus
@@ -64,14 +64,14 @@ export function CreateRoomModal({ isOpen, onClose, onCreateRoom }: CreateRoomMod
               disabled={loading}
               className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
             >
-              Cancel
+              {texts.cancel}
             </button>
             <button
               type="submit"
               disabled={loading || !roomName.trim()}
               className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating...' : 'Create Room'}
+              {loading ? texts.creating : texts.createRoom}
             </button>
           </div>
         </form>
