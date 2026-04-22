@@ -6,10 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "pocketbase:setup": "node scripts/setup-pocketbase.js",
-    "pocketbase:init": "node scripts/init-pocketbase.js",
-    "pocketbase:start": "./pocketbase serve --http=0.0.0.0:8090"
+    "lint": "eslint"
   },
   "dependencies": {
     "@getbrevo/brevo": "^5.0.3",
@@ -20,10 +17,8 @@
     "crypto-js": "^4.2.0",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
-    "pocketbase": "^0.21.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "spotify-web-api-node": "^5.0.2"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -35,7 +30,6 @@
     "eslint-config-next": "16.1.6",
     "supabase": "^2.92.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "yauzl": "^2.10.0"
+    "typescript": "^5"
   }
 }
