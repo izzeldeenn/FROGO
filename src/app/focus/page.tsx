@@ -483,12 +483,12 @@ function HomeContent() {
           {/* Mobile Content */}
           <div className="flex-1 flex flex-col min-h-0 relative">
             {/* Timer Section - Takes most space */}
-            <div className="flex-1 flex items-center justify-center p-4 min-h-[60vh] relative">
+            <div className="flex-1 flex items-center justify-center p-4 min-h-[60vh]">
               <ServiceSelector />
             </div>
             
-            {/* Fixed Buttons Container */}
-            <div className="absolute top-4 right-4 flex flex-col gap-3">
+            {/* Buttons Section - Fixed position above timer */}
+            <div className="absolute top-4 left-4 flex flex-col gap-3 z-[100]">
               <ActionButtons />
               <RankingDisplay studyStreak={studyStreak} onUserClick={openUserProfile} />
             </div>
