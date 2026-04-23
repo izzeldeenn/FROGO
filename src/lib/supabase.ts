@@ -39,6 +39,10 @@ export interface UserAccount {
   country?: string; // User's country
   browser_id?: string; // Unique browser identifier
   device_id?: string; // Unique device identifier
+  subscription_plan?: 'free' | 'monthly' | 'yearly'; // Subscription plan
+  subscription_start_date?: string; // Subscription start date
+  subscription_end_date?: string; // Subscription end date
+  auto_renew?: boolean; // Auto-renew subscription
   created_at: string;
   last_active: string;
 }
@@ -56,6 +60,10 @@ export interface UserAccountFrontend {
   country?: string; // User's country
   browserId?: string; // Unique browser identifier
   deviceId?: string; // Unique device identifier
+  subscriptionPlan?: 'free' | 'monthly' | 'yearly'; // Subscription plan
+  subscriptionStartDate?: string; // Subscription start date
+  subscriptionEndDate?: string; // Subscription end date
+  autoRenew?: boolean; // Auto-renew subscription
   createdAt: string;
   lastActive: string;
 }

@@ -27,6 +27,7 @@ import { PresetSelector } from '@/components/settings/PresetSelector';
 import { LocalBackgroundSelector } from '@/components/backgrounds/LocalBackgroundSelector';
 import { ReferralCard } from '@/components/referral/ReferralCard';
 import { QuickActionsModal } from '@/components/settings/QuickActionsModal';
+import { PremiumModal } from '@/components/settings/PremiumModal';
 import { landingTexts } from '@/constants/landingTexts';
 import { discordOTPDB, supabase } from '@/lib/supabase';
 
@@ -80,6 +81,7 @@ export function SettingsButton() {
   ];
   const [showSettings, setShowSettings] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
+  const [showPremium, setShowPremium] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'upgrade'>('login');
   const [showAccountSwitcher, setShowAccountSwitcher] = useState(false);
@@ -540,6 +542,24 @@ export function SettingsButton() {
           ⚡
         </button>
         <button
+          onClick={() => setShowPremium(true)}
+          className="p-2 rounded-xl transition-all duration-200 hover:scale-110"
+          style={{
+            backgroundColor: customTheme.colors.surface,
+            color: customTheme.colors.text
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#FFD700';
+            e.currentTarget.style.color = '#ffffff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = customTheme.colors.surface;
+            e.currentTarget.style.color = customTheme.colors.text;
+          }}
+        >
+          👑
+        </button>
+        <button
           data-settings-button="true"
           onClick={handleLoadSettings}
           className="p-2 rounded-xl transition-all duration-200 hover:scale-110"
@@ -561,6 +581,7 @@ export function SettingsButton() {
       </div>
 
       <QuickActionsModal isOpen={showQuickActions} onClose={() => setShowQuickActions(false)} />
+      <PremiumModal isOpen={showPremium} onClose={() => setShowPremium(false)} />
 
       {showSettings && (
         <>

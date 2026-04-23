@@ -183,17 +183,25 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
   const renderBottomSlideUp = () => (
     <>
       {renderRankingButton()}
+      {/* Backdrop overlay - mobile only */}
+      {isRankingsOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => setIsRankingsOpen(false)}
+        />
+      )}
       <div 
-        className={`absolute bottom-0 left-0 right-0 transition-all duration-500 ease-out z-50 ${
+        className={`fixed bottom-0 left-0 right-0 transition-all duration-500 ease-out z-50 ${
           isRankingsOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         <div 
-          className="w-full max-w-4xl mx-auto m-4 rounded-t-3xl shadow-2xl overflow-hidden"
+          className="w-full max-w-4xl mx-auto md:m-4 rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden"
           style={{
             backgroundColor: customTheme.colors.surface,
             border: `2px solid ${customTheme.colors.border}`,
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            maxHeight: '85vh'
           }}
         >
           {/* Drag Handle */}
@@ -205,7 +213,7 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
           </div>
           
           {/* Rankings Content */}
-          <div className="p-6 max-h-96 overflow-y-auto">
+          <div className="p-4 md:p-6 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 60px)' }}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold" style={{ color: customTheme.colors.text }}>
                 🏆 {language === 'ar' ? 'الترتيب' : 'Rankings'}
@@ -240,17 +248,25 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
   const renderTopSlideDown = () => (
     <>
       {renderRankingButton()}
+      {/* Backdrop overlay - mobile only */}
+      {isRankingsOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => setIsRankingsOpen(false)}
+        />
+      )}
       <div 
-        className={`absolute top-0 left-0 right-0 transition-all duration-500 ease-out z-50 ${
+        className={`fixed top-0 left-0 right-0 transition-all duration-500 ease-out z-50 ${
           isRankingsOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
         <div 
-          className="w-full max-w-4xl mx-auto m-4 rounded-b-3xl shadow-2xl overflow-hidden"
+          className="w-full max-w-4xl mx-auto md:m-4 rounded-b-3xl md:rounded-3xl shadow-2xl overflow-hidden"
           style={{
             backgroundColor: customTheme.colors.surface,
             border: `2px solid ${customTheme.colors.border}`,
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            maxHeight: '85vh'
           }}
         >
           {/* Drag Handle */}
@@ -262,7 +278,7 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
           </div>
           
           {/* Rankings Content */}
-          <div className="p-6 max-h-96 overflow-y-auto">
+          <div className="p-4 md:p-6 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 60px)' }}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold" style={{ color: customTheme.colors.text }}>
                 🏆 {language === 'ar' ? 'الترتيب' : 'Rankings'}
@@ -297,13 +313,20 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
   const renderSideBar = () => (
     <>
       {renderRankingButton()}
+      {/* Backdrop overlay - mobile only */}
+      {isRankingsOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          onClick={() => setIsRankingsOpen(false)}
+        />
+      )}
       <div 
-        className={`absolute top-20 right-0 transition-all duration-300 z-50 ${
+        className={`md:absolute md:top-20 fixed top-0 right-0 md:h-[calc(100vh-5rem)] h-full transition-all duration-300 z-50 ${
           isRankingsOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div 
-          className="h-[calc(100vh-5rem)] w-80 shadow-2xl overflow-hidden"
+          className="h-full w-80 md:w-96 shadow-2xl overflow-hidden"
           style={{
             backgroundColor: customTheme.colors.surface,
             border: `2px solid ${customTheme.colors.border}`,
@@ -313,7 +336,7 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
           }}
         >
           {/* Rankings Content */}
-          <div className="p-6 h-full overflow-y-auto">
+          <div className="p-4 md:p-6 h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold" style={{ color: customTheme.colors.text }}>
                 🏆 {language === 'ar' ? 'الترتيب' : 'Rankings'}

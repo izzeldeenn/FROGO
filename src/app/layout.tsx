@@ -12,6 +12,7 @@ import { FirstTimeSetup } from "@/components/auth/FirstTimeSetup";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { CustomThemeProvider } from "@/contexts/CustomThemeContext";
 import { RoomProvider } from "@/contexts/RoomContext";
+import { PremiumProvider } from "@/contexts/PremiumContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -97,14 +98,16 @@ export default function RootLayout({
             <CustomThemeProvider>
               <UserProvider>
                 <PointsProvider>
-                  <StudySessionProvider>
-                    <MusicProvider>
-                      <RoomProvider>
-                        <FirstTimeSetup />
-                        {children}
-                      </RoomProvider>
-                    </MusicProvider>
-                  </StudySessionProvider>
+                  <PremiumProvider>
+                    <StudySessionProvider>
+                      <MusicProvider>
+                        <RoomProvider>
+                          <FirstTimeSetup />
+                          {children}
+                        </RoomProvider>
+                      </MusicProvider>
+                    </StudySessionProvider>
+                  </PremiumProvider>
                 </PointsProvider>
               </UserProvider>
             </CustomThemeProvider>
