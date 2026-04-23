@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useStudySession } from '@/contexts/StudySessionContext';
 import { usePoints } from '@/contexts/PointsContext';
@@ -226,10 +226,10 @@ export function useUserRankings() {
     return user.dailyStudyTime || 0;
   };
 
-  const isRecentlyActive = (user: UserAccount) => {
-    // Check if user has an active session in the database
+  const isRecentlyActive = useCallback((user: UserAccount): boolean => {
+    // Check if user has an active session based on the activeUsers state
     return activeUsers.has(user.accountId);
-  };
+  }, [activeUsers]);
 
   const isCurrentUserActive = (user: UserAccount) => {
     // Check if this is the current account and timer is active
