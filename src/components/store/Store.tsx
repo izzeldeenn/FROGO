@@ -292,14 +292,14 @@ export function Store({ isOpen, onClose }: StoreProps) {
         onClick={onClose}
       />
       
-      <div 
-        className={`fixed inset-4 md:inset-8 lg:inset-12 rounded-2xl shadow-2xl overflow-hidden z-[9999] flex flex-col ${
-          theme === 'light' ? 'bg-white' : 'bg-gray-900'
+      <div
+        className={`fixed inset-4 md:inset-8 lg:inset-12 rounded-2xl shadow-2xl overflow-hidden z-[9999] flex flex-col md:flex-row ${
+          theme === 'light' ? 'bg-white' : 'bg-black'
         }`}
       >
-        {/* Header */}
-        <div className={`p-4 md:p-6 border-b ${
-          theme === 'light' ? 'border-gray-200' : 'border-gray-800'
+        {/* Mobile Header */}
+        <div className={`p-4 md:hidden border-b ${
+          theme === 'light' ? 'border-gray-200' : 'border-gray-900'
         }`}>
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -309,7 +309,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                 {t.store}
               </h2>
               <p className={`text-sm ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {t.storeDescription}
               </p>
@@ -319,7 +319,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
               className={`p-2 rounded-lg transition-colors ${
                 theme === 'light'
                   ? 'hover:bg-gray-100 text-gray-600'
-                  : 'hover:bg-gray-800 text-gray-400'
+                  : 'hover:bg-gray-900 text-gray-300'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,13 +328,13 @@ export function Store({ isOpen, onClose }: StoreProps) {
             </button>
           </div>
 
-          {/* User Stats Bar */}
+          {/* User Stats Bar - Mobile */}
           <div className={`flex gap-4 p-3 rounded-xl ${
-            theme === 'light' ? 'bg-gray-50' : 'bg-gray-800'
+            theme === 'light' ? 'bg-gray-50' : 'bg-gray-900'
           }`}>
             <div className="flex items-center gap-2">
               <span className={`text-sm ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {t.coins}
               </span>
@@ -343,7 +343,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
             <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
             <div className="flex items-center gap-2">
               <span className={`text-sm ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {t.level}
               </span>
@@ -354,7 +354,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
             <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
             <div className="flex items-center gap-2">
               <span className={`text-sm ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {t.items}
               </span>
@@ -364,7 +364,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
             </div>
           </div>
 
-          {/* Category Tabs */}
+          {/* Category Tabs - Mobile */}
           <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map(category => (
               <button
@@ -377,7 +377,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                       : 'bg-blue-600 text-white'
                     : theme === 'light'
                       ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
                 }`}
               >
                 <span className="mr-1">{category.icon}</span>
@@ -387,23 +387,118 @@ export function Store({ isOpen, onClose }: StoreProps) {
           </div>
         </div>
 
-        {/* Items Grid */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          {filteredItems.length === 0 ? (
-            <div className="text-center py-12">
-              <p className={`text-lg ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+        {/* Desktop Sidebar */}
+        <div className={`hidden md:flex flex-col w-64 border-l ${
+          theme === 'light' ? 'border-gray-200 bg-gray-50' : 'border-gray-900 bg-black'
+        }`}>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-900">
+            <h2 className={`text-2xl font-bold mb-1 ${
+              theme === 'light' ? 'text-gray-900' : 'text-white'
+            }`}>
+              {t.store}
+            </h2>
+            <p className={`text-sm ${
+              theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+            }`}>
+              {t.storeDescription}
+            </p>
+          </div>
+
+          {/* User Stats Bar - Desktop */}
+          <div className={`p-4 mx-4 mt-4 rounded-xl ${
+            theme === 'light' ? 'bg-white border border-gray-200' : 'bg-gray-900 border border-gray-800'
+          }`}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-sm ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
-                {t.noItemsInCategory}
-              </p>
+                {t.coins}
+              </span>
+              <span className={`font-bold text-yellow-500`}>{coins}</span>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-sm ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+              }`}>
+                {t.level}
+              </span>
+              <span className={`font-bold ${
+                theme === 'light' ? 'text-purple-600' : 'text-purple-400'
+              }`}>{level}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+              }`}>
+                {t.items}
+              </span>
+              <span className={`font-bold ${
+                theme === 'light' ? 'text-blue-600' : 'text-blue-400'
+              }`}>{userInventory.purchasedItems.length}</span>
+            </div>
+          </div>
+
+          {/* Category List - Desktop */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <h3 className={`text-xs font-semibold uppercase mb-3 ${
+              theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+            }`}>
+              {t.categories}
+            </h3>
+            <div className="space-y-1">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`w-full px-4 py-3 rounded-lg font-medium text-sm text-right transition-all flex items-center gap-3 ${
+                    selectedCategory === category.id
+                      ? theme === 'light'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-blue-600 text-white'
+                      : theme === 'light'
+                        ? 'text-gray-700 hover:bg-gray-200'
+                        : 'text-gray-300 hover:bg-gray-900'
+                  }`}
+                >
+                  <span className="text-lg">{category.icon}</span>
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-4 border-t border-gray-200 dark:border-gray-900">
+            <button
+              onClick={onClose}
+              className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+                theme === 'light'
+                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-gray-900 text-gray-300 hover:bg-gray-800'
+              }`}
+            >
+              {t.close}
+            </button>
+          </div>
+        </div>
+
+        {/* Items Grid */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
+            {filteredItems.length === 0 ? (
+              <div className="text-center py-12">
+                <p className={`text-lg ${
+                  theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                }`}>
+                  {t.noItemsInCategory}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredItems.map(item => (
                 <div
                   key={item.id}
                   className={`group relative rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] ${
-                    theme === 'light' ? 'bg-white border border-gray-200 shadow-sm hover:shadow-lg' : 'bg-gray-800 border border-gray-700 hover:shadow-xl'
+                    theme === 'light' ? 'bg-white border border-gray-200 shadow-sm hover:shadow-lg' : 'bg-gray-900 border border-gray-800 hover:shadow-xl'
                   }`}
                 >
                   {/* Item Preview */}
@@ -509,7 +604,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                       className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                         theme === 'light'
                           ? 'bg-white/90 text-blue-600 hover:bg-white'
-                          : 'bg-gray-800/90 text-blue-400 hover:bg-gray-800'
+                          : 'bg-gray-900/90 text-blue-400 hover:bg-gray-900'
                       }`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -539,7 +634,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                     </div>
 
                     <p className={`text-xs mb-3 line-clamp-2 ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                      theme === 'light' ? 'text-gray-600' : 'text-gray-300'
                     }`}>
                       {language === 'ar' ? item.descriptionAr : item.description}
                     </p>
@@ -550,7 +645,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                       }`}>
                         {specialOfferItems.includes(item.id) && (
                           <span className={`text-xs line-through mr-1 ${
-                            theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+                            theme === 'light' ? 'text-gray-400' : 'text-gray-900'
                           }`}>
                             {item.price}
                           </span>
@@ -565,7 +660,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             coins >= actualPrice(item)
                               ? 'bg-green-500 text-white hover:bg-green-600'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-gray-900 text-gray-500 cursor-not-allowed'
                           }`}
                         >
                           {coins >= actualPrice(item) 
@@ -593,6 +688,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
             </div>
           )}
         </div>
+        </div>
       </div>
 
       {/* Purchase Modal */}
@@ -613,7 +709,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                 {language === 'ar' ? selectedItem.nameAr : selectedItem.name}
               </h3>
               <p className={`text-sm mb-4 ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {language === 'ar' ? selectedItem.descriptionAr : selectedItem.description}
               </p>
@@ -633,7 +729,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                   className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                     theme === 'light'
                       ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      : 'bg-gray-900 hover:bg-gray-800 text-gray-300'
                   }`}
                 >
                   {t.storeCancel}
@@ -644,7 +740,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                   className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                     coins >= actualPrice(selectedItem)
                       ? 'bg-green-500 hover:bg-green-600 text-white'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   }`}
                 >
                   {coins >= actualPrice(selectedItem) 
@@ -766,7 +862,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                 {language === 'ar' ? itemForPreview.nameAr : itemForPreview.name}
               </h3>
               <p className={`text-sm mb-4 ${
-                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                theme === 'light' ? 'text-gray-600' : 'text-gray-300'
               }`}>
                 {language === 'ar' ? itemForPreview.descriptionAr : itemForPreview.description}
               </p>
@@ -777,7 +873,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
                   className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                     theme === 'light'
                       ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                      : 'bg-gray-900 hover:bg-gray-800 text-gray-300'
                   }`}
                 >
                   {t.close}
