@@ -226,9 +226,10 @@ export function useUserRankings() {
   };
 
   const isRecentlyActive = useCallback((user: UserAccount): boolean => {
-    // Check if user has an active session based on the activeUsers state
-    return activeUsers.has(user.accountId);
-  }, [activeUsers]);
+    // Check if user has an active session from dailyRankings data (end_time is null)
+    const activitySession = dailyRankings.find(dr => dr.accountId === user.accountId);
+    return activitySession?.endTime === null;
+  }, [dailyRankings]);
 
   const isCurrentUserActive = (user: UserAccount) => {
     // Check if this is the current account and timer is active

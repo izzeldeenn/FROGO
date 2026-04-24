@@ -163,13 +163,14 @@ export class ActivitySessionDB {
       .is('end_time', null)
       .order('start_time', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') { // No rows returned
-        return null;
-      }
       console.error('Error getting active session:', error);
+      return null;
+    }
+
+    if (!data) {
       return null;
     }
 
