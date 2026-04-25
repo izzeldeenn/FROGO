@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageLayout } from '@/components/ui/LanguageLayout';
 import { Logo } from '@/components/ui/Logo';
+import { LandingLogo } from '@/components/ui/LandingLogo';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
@@ -111,7 +112,7 @@ function PricingPageContent() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <Logo />
+                <LandingLogo theme={theme} />
               </div>
               
               <nav className="hidden md:flex items-center gap-8">

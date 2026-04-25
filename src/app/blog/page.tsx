@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageLayout } from '@/components/ui/LanguageLayout';
 import { Logo } from '@/components/ui/Logo';
+import { LandingLogo } from '@/components/ui/LandingLogo';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
@@ -493,27 +494,7 @@ function BlogPageContent() {
         }`}>
           <div className="max-w-7xl mx-auto text-center">
             <div className="flex items-center justify-center mb-6">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src="/goat.png" 
-                  alt="Goatly Logo" 
-                  className="w-10 h-10 object-contain"
-                />
-                <div className="flex flex-col">
-                  <div className="text-2xl font-bold tracking-tight">
-                    <span className={`inline-block font-black ${
-                      theme === 'light' ? 'text-gray-900' : 'text-white'
-                    }`}>
-                      Goatly
-                    </span>
-                  </div>
-                  <div className={`text-xs mt-1 font-medium tracking-wider ${
-                    theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                  }`}>
-                    great of all time
-                  </div>
-                </div>
-              </div>
+              <LandingLogo theme={theme} />
             </div>
             
             <div className={`text-sm mb-6 ${

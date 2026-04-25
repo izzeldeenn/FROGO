@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageLayout } from '@/components/ui/LanguageLayout';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Logo } from '@/components/ui/Logo';
+import { LandingLogo } from '@/components/ui/LandingLogo';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
@@ -86,27 +87,7 @@ function LandingPageContent() {
             <div className="flex justify-between items-center h-16">
               {/* Logo - Mobile Optimized */}
               <div className="flex items-center">
-                <div className="flex items-center space-x-3">
-                  <img 
-                    src="/goat.png" 
-                    alt="شعار Goatly - مجتمع مفتوح المصدر للدراسة الجماعية" 
-                    className="w-10 h-10 object-contain"
-                  />
-                  <div className="flex flex-col">
-                    <div className="text-xl font-bold tracking-tight">
-                      <span className={`inline-block font-black ${
-                        theme === 'light' ? 'text-gray-900' : 'text-white'
-                      }`}>
-                        Goatly
-                      </span>
-                    </div>
-                    <div className={`text-xs font-medium tracking-wide ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      great of all time
-                    </div>
-                  </div>
-                </div>
+                <LandingLogo theme={theme} />
               </div>
               
               {/* Desktop Navigation */}
