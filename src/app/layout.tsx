@@ -14,6 +14,7 @@ import { MusicProvider } from "@/contexts/MusicContext";
 import { CustomThemeProvider } from "@/contexts/CustomThemeContext";
 import { RoomProvider } from "@/contexts/RoomContext";
 import { PremiumProvider } from "@/contexts/PremiumContext";
+import { ProductAPIProvider } from "@/contexts/ProductAPIContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -147,8 +148,10 @@ export default function RootLayout({
                       <StudySessionProvider>
                         <MusicProvider>
                           <RoomProvider>
-                            <FirstTimeSetup />
-                            {children}
+                            <ProductAPIProvider>
+                              <FirstTimeSetup />
+                              {children}
+                            </ProductAPIProvider>
                           </RoomProvider>
                         </MusicProvider>
                       </StudySessionProvider>

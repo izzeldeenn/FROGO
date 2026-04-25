@@ -5,12 +5,27 @@ export interface StoreItem {
   description: string;
   descriptionAr: string;
   price: number;
-  category: 'themes' | 'avatars' | 'backgrounds' | 'badges' | 'effects' | 'services';
+  category: 'themes' | 'avatars' | 'backgrounds' | 'badges' | 'effects' | 'services' | 'developer';
   icon: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   purchased: boolean;
   equipped?: boolean;
   data?: any;
+  // Developer marketplace fields
+  isDeveloperProduct?: boolean;
+  developerId?: string;
+  developerName?: string;
+  developerAvatar?: string;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  downloads?: number;
+  rating?: number;
+  version?: string;
+  githubUrl?: string;
+  documentationUrl?: string;
+  rejectionReason?: string;
+  // Product code fields
+  code?: string;
+  codeType?: 'javascript' | 'css' | 'html';
 }
 
 export const defaultStoreItems: StoreItem[] = [

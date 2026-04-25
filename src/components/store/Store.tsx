@@ -5,6 +5,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 import { usePoints } from '@/contexts/PointsContext';
+import { useProductAPI } from '@/contexts/ProductAPIContext';
+import { executeProductCode } from '@/utils/productSandbox';
 import { StoreItem, defaultStoreItems, specialOfferItems } from './storeProducts';
 
 interface UserInventory {
@@ -27,6 +29,7 @@ export function Store({ isOpen, onClose }: StoreProps) {
   const { language, t } = useLanguage();
   const { getCurrentUser } = useUser();
   const { coins, level, addCoins, removeCoins } = usePoints();
+  const { api: productAPI, registerProduct, unregisterProduct } = useProductAPI();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [storeItems, setStoreItems] = useState<StoreItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -48,9 +51,51 @@ export function Store({ isOpen, onClose }: StoreProps) {
   useEffect(() => {
     if (currentUser) {
       loadUserInventory();
+      loadDeveloperProducts();
     }
     setStoreItems(defaultStoreItems);
   }, [currentUser]);
+
+  const loadDeveloperProducts = async () => {
+    if (!currentUser) return;
+
+    try {
+      const response = await fetch('/api/developer-products?status=approved');
+      const data = await response.json();
+      
+      if (data.products) {
+        const developerProducts: StoreItem[] = data.products.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          nameAr: p.name_ar,
+          description: p.description,
+          descriptionAr: p.description_ar,
+          price: p.price,
+          category: p.category,
+          icon: p.icon,
+          rarity: p.rarity,
+          purchased: false,
+          isDeveloperProduct: true,
+          developerId: p.developer_id,
+          developerName: p.developer_name || 'Unknown Developer',
+          developerAvatar: p.developer_avatar || '',
+          approvalStatus: p.approval_status,
+          downloads: p.downloads,
+          rating: p.rating,
+          version: p.version,
+          githubUrl: p.github_url,
+          documentationUrl: p.documentation_url,
+          rejectionReason: p.rejection_reason,
+          code: p.code,
+          codeType: p.code_type
+        }));
+
+        setStoreItems(prevItems => [...prevItems, ...developerProducts]);
+      }
+    } catch (error) {
+      console.error('Failed to load developer products:', error);
+    }
+  };
 
   const loadUserInventory = () => {
     if (!currentUser) return;
@@ -141,7 +186,36 @@ export function Store({ isOpen, onClose }: StoreProps) {
     applyItemEffects(selectedItem);
   };
 
-  const applyItemEffects = (item: StoreItem) => {
+  const applyItemEffects = async (item: StoreItem) => {
+    // Execute developer product code if present
+    if (item.isDeveloperProduct && item.code && productAPI) {
+      try {
+        const result = await executeProductCode(
+          item.code,
+          item.codeType || 'javascript',
+          item.id,
+          productAPI,
+          {
+            allowLocalStorage: true,
+            maxExecutionTime: 5000
+          }
+        );
+
+        if (result.success) {
+          console.log('Product code executed successfully');
+          // Register cleanup function
+          if (result.cleanup) {
+            registerProduct(item.id, result.cleanup);
+          }
+        } else {
+          console.error('Product code execution failed:', result.error);
+        }
+      } catch (error) {
+        console.error('Error executing product code:', error);
+      }
+    }
+
+    // Apply regular item effects
     switch (item.category) {
       case 'themes':
         if (item.data?.colors) {
@@ -261,7 +335,8 @@ export function Store({ isOpen, onClose }: StoreProps) {
     { id: 'backgrounds', name: t.storeBackgrounds, icon: '🖼️' },
     { id: 'badges', name: t.storeBadges, icon: '🏆' },
     { id: 'effects', name: t.storeEffects, icon: '✨' },
-    { id: 'services', name: t.newServices, icon: '⚡' }
+    { id: 'services', name: t.newServices, icon: '⚡' },
+    { id: 'developer', name: t.developerProducts, icon: '👨‍💻' }
   ];
 
   if (!mounted) {

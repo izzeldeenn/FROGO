@@ -10,7 +10,8 @@ import {
   LogOut,
   UserPlus,
   Bot,
-  Bell
+  Bell,
+  Code
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -26,6 +27,7 @@ export default function AdminSidebar() {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
     { icon: Users, label: 'Users', path: '/admin/users' },
     { icon: Shield, label: 'Admins', path: '/admin/admins', superAdminOnly: true },
+    { icon: Code, label: 'Developer Products', path: '/admin/developer-products' },
     { icon: Bot, label: 'AI', path: '/admin/ai' },
     { icon: Bell, label: 'Notifications', path: '/admin/notifications' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
