@@ -1209,21 +1209,25 @@ export class SocialDB {
     }
   }
 
-  // Get notifications for a user
-  async getNotifications(userId: string): Promise<Notification[]> {
+  // Get notifications for user by account_id
+  async getNotifications(accountId: string): Promise<Notification[]> {
     try {
-      const { data, error } = await this.supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+      const { data, error } = await this.supabase.rpc('get_user_notifications', {
+        p_account_id: accountId
+      });
 
       if (error) {
         console.error('Error getting notifications:', error);
         return [];
       }
 
-      return data || [];
+      // Check if data is an error object
+      if (data && typeof data === 'object' && 'error' in data) {
+        console.error('RPC error getting notifications:', (data as any).error);
+        return [];
+      }
+
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error('Error getting notifications:', error);
       return [];
@@ -1233,10 +1237,9 @@ export class SocialDB {
   // Mark notification as read
   async markNotificationAsRead(notificationId: string): Promise<boolean> {
     try {
-      const { error } = await this.supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('id', notificationId);
+      const { error } = await this.supabase.rpc('mark_notification_read', {
+        p_notification_id: notificationId
+      });
 
       if (error) {
         console.error('Error marking notification as read:', error);
@@ -1251,12 +1254,11 @@ export class SocialDB {
   }
 
   // Mark all notifications as read for a user
-  async markAllNotificationsAsRead(userId: string): Promise<boolean> {
+  async markAllNotificationsAsRead(accountId: string): Promise<boolean> {
     try {
-      const { error } = await this.supabase
-        .from('notifications')
-        .update({ read: true })
-        .eq('user_id', userId);
+      const { error } = await this.supabase.rpc('mark_all_notifications_read', {
+        p_account_id: accountId
+      });
 
       if (error) {
         console.error('Error marking all notifications as read:', error);

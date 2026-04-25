@@ -37,7 +37,6 @@ interface AdminContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  register: (email: string, password: string, username: string, isSuperAdmin?: boolean) => Promise<{ success: boolean; error?: string }>;
   updateAdminProfile: (username?: string, avatar?: string) => Promise<{ success: boolean; error?: string }>;
   getAllAdmins: () => Promise<AdminAccountFrontend[]>;
   deleteAdmin: (adminId: string) => Promise<{ success: boolean; error?: string }>;
@@ -141,74 +140,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (
-    email: string,
-    password: string,
-    username: string,
-    isSuperAdmin: boolean = false
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      // Validation
-      if (!email || !password || !username) {
-        return { success: false, error: 'All fields are required' };
-      }
-
-      // Validate password strength
-      const passwordValidation = validatePasswordStrength(password);
-      if (!passwordValidation.isValid) {
-        return { success: false, error: passwordValidation.errors.join(', ') };
-      }
-
-      if (!email.includes('@')) {
-        return { success: false, error: 'Invalid email address' };
-      }
-
-      // Check if admin already exists
-      const existingAdmin = await adminDB.getAdminByEmail(email);
-      if (existingAdmin) {
-        return { success: false, error: 'Email already registered' };
-      }
-
-      // Check if current user is super admin (only super admins can create new admins)
-      if (currentAdmin && !currentAdmin.isSuperAdmin) {
-        return { success: false, error: 'Only super admins can create new admins' };
-      }
-
-      // Hash password before storing
-      const hashedPassword = await hashPassword(password);
-
-      // Generate admin ID
-      const adminId = `admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Generate random avatar seed
-      const randomAvatarSeed = `admin${Math.floor(Math.random() * 1000)}`;
-      const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${randomAvatarSeed}`;
-
-      // Create new admin
-      const newAdminData: Partial<AdminAccount> = {
-        admin_id: adminId,
-        username: username,
-        email: email,
-        password: hashedPassword,
-        avatar: avatarUrl,
-        role: 'admin',
-        is_super_admin: isSuperAdmin,
-        created_at: new Date().toISOString(),
-        last_active: new Date().toISOString()
-      };
-
-      const result = await adminDB.createAdmin(newAdminData);
-
-      if (result) {
-        return { success: true };
-      } else {
-        return { success: false, error: 'Admin creation failed' };
-      }
-    } catch (error) {
-      return { success: false, error: 'Admin creation failed' };
-    }
-  };
-
   const updateAdminProfile = async (
     username?: string,
     avatar?: string
@@ -276,7 +207,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       isLoading,
       login,
       logout,
-      register,
       updateAdminProfile,
       getAllAdmins,
       deleteAdmin

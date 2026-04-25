@@ -44,6 +44,11 @@ export interface UserAccount {
   auto_renew?: boolean; // Auto-renew subscription
   created_at: string;
   last_active: string;
+  role?: 'user' | 'moderator' | 'admin'; // User role
+  status?: 'active' | 'inactive' | 'banned'; // User status
+  banned_until?: string; // Ban expiration date
+  ban_reason?: string; // Reason for ban
+  admin_notes?: string; // Admin notes
 }
 
 // User account interface for frontend (camelCase)
@@ -64,6 +69,11 @@ export interface UserAccountFrontend {
   autoRenew?: boolean; // Auto-renew subscription
   createdAt: string;
   lastActive: string;
+  role?: 'user' | 'moderator' | 'admin'; // User role
+  status?: 'active' | 'inactive' | 'banned'; // User status
+  bannedUntil?: string; // Ban expiration date
+  banReason?: string; // Reason for ban
+  adminNotes?: string; // Admin notes
 }
 
 // Reset token interface for database (snake_case - matches Supabase)
@@ -409,6 +419,114 @@ export class UserAccountDB {
       return !error;
     } catch (error) {
       return false;
+    }
+  }
+
+  // Ban user
+  async banUser(accountId: string, banReason: string, bannedUntil?: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({
+          status: 'banned',
+          ban_reason: banReason,
+          banned_until: bannedUntil || null
+        })
+        .eq('account_id', accountId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Unban user
+  async unbanUser(accountId: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({
+          status: 'active',
+          ban_reason: null,
+          banned_until: null
+        })
+        .eq('account_id', accountId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Delete user
+  async deleteUser(accountId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('account_id', accountId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Update user status
+  async updateUserStatus(accountId: string, status: 'active' | 'inactive' | 'banned'): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ status })
+        .eq('account_id', accountId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Update user role
+  async updateUserRole(accountId: string, role: 'user' | 'moderator' | 'admin'): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ role })
+        .eq('account_id', accountId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Update admin notes
+  async updateAdminNotes(accountId: string, adminNotes: string): Promise<UserAccount | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ admin_notes: adminNotes })
+        .eq('account_id', accountId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      return null;
     }
   }
 }
@@ -1461,6 +1579,114 @@ export class AdminDB {
       supabase.channel('admins_changes').unsubscribe();
     } catch (error) {
       // Error unsubscribing from admins
+    }
+  }
+
+  // Send admin notification to users
+  async sendNotification(message: string, type: string, sendToAll: boolean = true, targetUsers?: string[]): Promise<{ success: boolean; sentCount?: number; error?: string }> {
+    try {
+      let targetUuids: string[] = [];
+
+      if (sendToAll) {
+        // Get all user UUIDs
+        const { data: allUsers } = await supabase
+          .from('users')
+          .select('id');
+        
+        targetUuids = allUsers?.map(user => user.id) || [];
+      } else if (targetUsers && targetUsers.length > 0) {
+        // Convert accountIds to UUIDs
+        for (const accountId of targetUsers) {
+          const { data: user } = await supabase
+            .from('users')
+            .select('id')
+            .eq('account_id', accountId)
+            .single();
+          
+          if (user) {
+            targetUuids.push(user.id);
+          }
+        }
+      }
+
+      if (targetUuids.length === 0) {
+        return { success: false, error: 'No target users found' };
+      }
+
+      // Use RPC function to bypass RLS
+      const { data, error } = await supabase.rpc('send_admin_notifications', {
+        p_message: message,
+        p_type: type,
+        p_target_user_ids: targetUuids
+      });
+
+      if (error) {
+        console.error('Error sending notifications:', error);
+        return { success: false, error: error.message };
+      }
+
+      const result = data as { success: boolean; sentCount?: number; error?: string };
+      return result;
+    } catch (error: any) {
+      console.error('Error sending notification:', error);
+      return { success: false, error: error?.message || 'Unknown error' };
+    }
+  }
+
+  // Get notification statistics
+  async getNotificationStats(): Promise<{ total: number; sent: number; read: number; unread: number }> {
+    try {
+      const { data, error } = await supabase.rpc('get_notification_stats');
+
+      if (error) {
+        console.error('Error getting notification stats:', error);
+        return { total: 0, sent: 0, read: 0, unread: 0 };
+      }
+
+      const result = data as { total: number; sent: number; read: number; unread: number };
+      return result;
+    } catch (error) {
+      console.error('Error getting notification stats:', error);
+      return { total: 0, sent: 0, read: 0, unread: 0 };
+    }
+  }
+
+  // Get notification templates
+  async getNotificationTemplates(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_notification_templates');
+
+      if (error) {
+        console.error('Error getting notification templates:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error getting notification templates:', error);
+      return [];
+    }
+  }
+
+  // Create notification template
+  async createNotificationTemplate(template: { name: string; message: string; type: string }): Promise<any | null> {
+    try {
+      const { data, error } = await supabase.rpc('create_notification_template', {
+        p_name: template.name,
+        p_message: template.message,
+        p_type: template.type
+      });
+
+      if (error) {
+        console.error('Error creating notification template:', error);
+        return null;
+      }
+
+      const result = data as { success: boolean; template?: any; error?: string };
+      return result.template || null;
+    } catch (error) {
+      console.error('Error creating notification template:', error);
+      return null;
     }
   }
 }

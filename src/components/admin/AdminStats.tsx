@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { userDB } from '@/lib/supabase';
-import { Users, UserCheck, Clock, TrendingUp } from 'lucide-react';
+import { Users, UserCheck, CreditCard, TrendingUp } from 'lucide-react';
 
 export default function AdminStats() {
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
-    totalStudyTime: 0
+    paidSubscriptions: 0,
+    newUsersThisMonth: 0
   });
 
   useEffect(() => {
@@ -23,10 +24,21 @@ export default function AdminStats() {
           return lastActive > sevenDaysAgo;
         }).length;
 
+        const paidSubscriptions = users.filter(user => 
+          user.subscription_plan && user.subscription_plan !== 'free'
+        ).length;
+
+        const now = new Date();
+        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const newUsersThisMonth = users.filter(user => 
+          new Date(user.created_at) >= firstDayOfMonth
+        ).length;
+
         setStats({
           totalUsers,
           activeUsers,
-          totalStudyTime: 0 // Will be calculated from daily activity if needed
+          paidSubscriptions,
+          newUsersThisMonth
         });
       } catch (error) {
         console.error('Error loading stats:', error);
@@ -50,15 +62,21 @@ export default function AdminStats() {
       bgColor: 'bg-gray-800'
     },
     {
-      title: 'Study Sessions',
-      value: stats.totalStudyTime,
-      icon: Clock,
+      title: 'Paid Subscriptions',
+      value: stats.paidSubscriptions,
+      icon: CreditCard,
+      bgColor: 'bg-gray-800'
+    },
+    {
+      title: 'New Users (This Month)',
+      value: stats.newUsersThisMonth,
+      icon: TrendingUp,
       bgColor: 'bg-gray-800'
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {statCards.map((stat) => {
         const Icon = stat.icon;
         return (

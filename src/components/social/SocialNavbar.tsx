@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { landingTexts } from '@/constants/landingTexts';
+import { socialDB, Notification } from '@/lib/social';
 
 interface SocialNavbarProps {
   activeTab: string;
@@ -19,7 +20,32 @@ export function SocialNavbar({ activeTab, setActiveTab }: SocialNavbarProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
   const currentUser = useUser().getCurrentUser();
+
+  // Load notifications when dropdown opens
+  useEffect(() => {
+    if (showNotifications && currentUser) {
+      loadNotifications();
+    }
+  }, [showNotifications, currentUser]);
+
+  const loadNotifications = async () => {
+    if (!currentUser) return;
+    
+    setLoadingNotifications(true);
+    try {
+      const userNotifications = await socialDB.getNotifications(currentUser.accountId);
+      setNotifications(userNotifications);
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   
   return (
@@ -97,11 +123,15 @@ export function SocialNavbar({ activeTab, setActiveTab }: SocialNavbarProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   {/* Notification badge */}
-                  <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full text-xs font-bold ${
-                    theme === 'light'
-                      ? 'bg-black text-white'
-                      : 'bg-white text-black'
-                  }`}></span>
+                  {unreadCount > 0 && (
+                    <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ${
+                      theme === 'light'
+                        ? 'bg-black text-white'
+                        : 'bg-white text-black'
+                    }`}>
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </button>
 
                 {/* Notifications Dropdown */}
@@ -122,62 +152,58 @@ export function SocialNavbar({ activeTab, setActiveTab }: SocialNavbarProps) {
                     </div>
                     
                     <div className="max-h-96 overflow-y-auto">
-                      {/* Sample notification items */}
-                      <div className={`px-4 py-3 border-b transition-colors duration-200 ${
-                        theme === 'light' ? 'border-gray-200 hover:bg-gray-50' : 'border-gray-800 hover:bg-gray-900'
-                      }`}>
-                        <div className="flex items-start gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                            theme === 'light'
-                              ? 'bg-gray-200 text-black'
-                              : 'bg-gray-700 text-white'
-                          }`}>
-                            JD
-                          </div>
-                          <div className="flex-1">
-                            <p className={`text-sm ${
-                              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
-                            }`}>
-                              <span className={`font-semibold ${
-                                theme === 'light' ? 'text-black' : 'text-white'
-                              }`}>John Doe</span> {texts.likedYourPost}
-                            </p>
-                            <p className={`text-xs mt-1 ${
-                              theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                            }`}>
-                              2 {language === 'ar' ? 'minutes ago' : 'minutes ago'}
-                            </p>
-                          </div>
+                      {loadingNotifications ? (
+                        <div className="px-4 py-8 text-center">
+                          <div className="inline-block w-6 h-6 border-2 border-t-current border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
                         </div>
-                      </div>
-                      
-                      <div className={`px-4 py-3 border-b transition-colors duration-200 ${
-                        theme === 'light' ? 'border-gray-200 hover:bg-gray-50' : 'border-gray-800 hover:bg-gray-900'
-                      }`}>
-                        <div className="flex items-start gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                            theme === 'light'
-                              ? 'bg-gray-200 text-black'
-                              : 'bg-gray-700 text-white'
+                      ) : notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center">
+                          <p className={`text-sm ${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
                           }`}>
-                            SM
-                          </div>
-                          <div className="flex-1">
-                            <p className={`text-sm ${
-                              theme === 'light' ? 'text-gray-700' : 'text-gray-300'
-                            }`}>
-                              <span className={`font-semibold ${
-                                theme === 'light' ? 'text-black' : 'text-white'
-                              }`}>Sarah Miller</span> {texts.commentedOnYourPost}
-                            </p>
-                            <p className={`text-xs mt-1 ${
-                              theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                            }`}>
-                              15 {language === 'ar' ? 'minutes ago' : 'minutes ago'}
-                            </p>
-                          </div>
+                            {language === 'ar' ? 'No notifications' : 'No notifications'}
+                          </p>
                         </div>
-                      </div>
+                      ) : (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`px-4 py-3 border-b transition-colors duration-200 ${
+                              !notification.read ? (theme === 'light' ? 'bg-blue-50' : 'bg-blue-900/20') : ''
+                            } ${theme === 'light' ? 'border-gray-200 hover:bg-gray-50' : 'border-gray-800 hover:bg-gray-900'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                                theme === 'light'
+                                  ? 'bg-gray-200 text-black'
+                                  : 'bg-gray-700 text-white'
+                              }`}>
+                                {notification.username?.charAt(0).toUpperCase() || '?'}
+                              </div>
+                              <div className="flex-1">
+                                <p className={`text-sm ${
+                                  theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                                }`}>
+                                  <span className={`font-semibold ${
+                                    theme === 'light' ? 'text-black' : 'text-white'
+                                  }`}>{notification.username || 'Admin'}</span> {notification.message}
+                                </p>
+                                <p className={`text-xs mt-1 ${
+                                  theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                  {new Date(notification.created_at).toLocaleString()}
+                                </p>
+                              </div>
+                              {!notification.read && (
+                                <div className={`w-2 h-2 rounded-full ${
+                                  theme === 'light' ? 'bg-blue-500' : 'bg-blue-400'
+                                }`}></div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                     
                     <div className={`px-4 py-3 border-t ${

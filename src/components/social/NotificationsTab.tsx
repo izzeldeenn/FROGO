@@ -25,14 +25,8 @@ export function NotificationsTab({ activeTab }: NotificationsTabProps) {
       
       setLoading(true);
       try {
-        // Get user UUID from accountId
-        const userUuid = await socialDB.getUserUuid(currentUser.accountId);
-        if (!userUuid) {
-          console.error('Could not get user UUID for notifications');
-          return;
-        }
-        
-        const userNotifications = await socialDB.getNotifications(userUuid);
+        // Get notifications using account_id directly
+        const userNotifications = await socialDB.getNotifications(currentUser.accountId);
         setNotifications(userNotifications);
       } catch (error) {
         console.error('Error loading notifications:', error);
@@ -161,14 +155,8 @@ export function NotificationsTab({ activeTab }: NotificationsTabProps) {
     if (!currentUser) return;
     
     try {
-      // Get user UUID from accountId
-      const userUuid = await socialDB.getUserUuid(currentUser.accountId);
-      if (!userUuid) {
-        console.error('Could not get user UUID for marking notifications as read');
-        return;
-      }
-      
-      await socialDB.markAllNotificationsAsRead(userUuid);
+      // Mark all notifications as read using account_id directly
+      await socialDB.markAllNotificationsAsRead(currentUser.accountId);
       setNotifications(notifications.map(n => ({ ...n, read: true })));
     } catch (error) {
       console.error('Error marking all notifications as read:', error);

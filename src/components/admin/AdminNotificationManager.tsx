@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAdmin } from '@/contexts/AdminContext';
-import { socialDB, AdminNotificationRequest, NotificationTemplate } from '@/lib/social';
+import { adminDB } from '@/lib/supabase';
 
 export function AdminNotificationManager() {
   const { language } = useLanguage();
   const { currentAdmin } = useAdmin();
 
   const [loading, setLoading] = useState(true);
-  const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [message, setMessage] = useState('');
   const [notificationType, setNotificationType] = useState<'admin_announcement' | 'system_update' | 'maintenance' | 'welcome'>('admin_announcement');
@@ -25,8 +25,8 @@ export function AdminNotificationManager() {
     const initializeData = async () => {
       try {
         const [templatesData, statsData] = await Promise.all([
-          socialDB.getNotificationTemplates(),
-          socialDB.getNotificationStats()
+          adminDB.getNotificationTemplates(),
+          adminDB.getNotificationStats()
         ]);
         
         setTemplates(templatesData);
@@ -51,14 +51,12 @@ export function AdminNotificationManager() {
     setResult(null);
 
     try {
-      const request: AdminNotificationRequest = {
-        message: message.trim(),
-        type: notificationType,
+      const response = await adminDB.sendNotification(
+        message.trim(),
+        notificationType,
         sendToAll,
-        targetUsers: sendToAll ? undefined : targetUsers.split(',').map(u => u.trim()).filter(u => u)
-      };
-
-      const response = await socialDB.sendAdminNotification(request);
+        sendToAll ? undefined : targetUsers.split(',').map(u => u.trim()).filter(u => u)
+      );
       
       if (response.success) {
         setResult({ 
@@ -72,7 +70,7 @@ export function AdminNotificationManager() {
         setTargetUsers('');
         
         // Refresh stats
-        const newStats = await socialDB.getNotificationStats();
+        const newStats = await adminDB.getNotificationStats();
         setStats(newStats);
       } else {
         setResult({ success: false, message: response.error || 'Unknown error occurred' });
@@ -104,7 +102,7 @@ export function AdminNotificationManager() {
     if (!templateName || !message.trim()) return;
 
     try {
-      const newTemplate = await socialDB.createNotificationTemplate({
+      const newTemplate = await adminDB.createNotificationTemplate({
         name: templateName,
         message: message.trim(),
         type: notificationType

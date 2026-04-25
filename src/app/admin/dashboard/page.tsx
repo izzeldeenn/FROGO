@@ -7,6 +7,9 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminStats from '@/components/admin/AdminStats';
 import AdminUsersList from '@/components/admin/AdminUsersList';
 import AdminAdminsList from '@/components/admin/AdminAdminsList';
+import UserGrowthChart from '@/components/admin/UserGrowthChart';
+import UserDistributionChart from '@/components/admin/UserDistributionChart';
+import ScoreDistributionChart from '@/components/admin/ScoreDistributionChart';
 
 export default function AdminDashboard() {
   const { currentAdmin, isLoggedIn, isLoading, logout } = useAdmin();
@@ -52,9 +55,16 @@ export default function AdminDashboard() {
             <AdminStats />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AdminUsersList />
-              {currentAdmin.isSuperAdmin && <AdminAdminsList />}
+              <UserGrowthChart />
+              <UserDistributionChart />
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ScoreDistributionChart />
+              <AdminUsersList />
+            </div>
+
+            {currentAdmin.isSuperAdmin && <AdminAdminsList />}
           </div>
         </main>
       </div>
