@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function TeamPage() {
   const [mounted, setMounted] = useState(false);
@@ -31,6 +32,7 @@ function TeamPageContent() {
   const { theme } = useTheme();
   const { language } = useLanguage();
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const coreTeam = [
     {

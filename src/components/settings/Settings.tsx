@@ -1392,41 +1392,26 @@ export function SettingsButton() {
                               {t.language}
                             </label>
                           </div>
-                          
-                          <div className="relative">
-                            <select
-                              value={language}
-                              onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                              className="w-full px-5 py-4 rounded-2xl focus:outline-none transition-all duration-300 text-sm font-medium appearance-none peer"
-                              style={{
-                                backgroundColor: customTheme.colors.surface + '40',
-                                color: customTheme.colors.text,
-                                border: `2px solid ${customTheme.colors.border}30`
-                              }}
-                              onFocus={(e) => {
-                                e.currentTarget.style.backgroundColor = customTheme.colors.surface + '80';
-                                e.currentTarget.style.borderColor = customTheme.colors.primary;
-                                e.currentTarget.style.boxShadow = `0 0 0 4px ${customTheme.colors.primary}20, 0 8px 32px ${customTheme.colors.primary}30`;
-                              }}
-                              onBlur={(e) => {
-                                e.currentTarget.style.backgroundColor = customTheme.colors.surface + '40';
-                                e.currentTarget.style.borderColor = customTheme.colors.border + '30';
-                                e.currentTarget.style.boxShadow = 'none';
-                              }}
-                            >
-                              <option value="en">{texts.english}</option>
-                              <option value="ar">{texts.arabic}</option>
-                            </select>
-                            <div 
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none transition-transform duration-300 peer-focus:rotate-180"
-                              style={{
-                                background: `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`,
-                                clipPath: 'polygon(0 0%, 100% 0%, 50% 100%)',
-                                width: '12px',
-                                height: '12px'
-                              }}
-                            />
-                          </div>
+                          <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
+                            className={`w-full px-4 py-3 rounded-xl focus:outline-none transition-all text-xl font-semibold ${
+                              theme === 'light'
+                                ? 'bg-gray-50 text-gray-800 focus:bg-white hover:bg-gray-100'
+                                : 'bg-gray-800 text-gray-100 focus:bg-gray-750 hover:bg-gray-700'
+                            }`}
+                            onFocus={(e) => {
+                              e.currentTarget.style.backgroundColor = customTheme.colors.surface + '80';
+                              e.currentTarget.style.boxShadow = `0 0 0 4px ${customTheme.colors.primary}20, 0 8px 32px ${customTheme.colors.primary}30`;
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.backgroundColor = customTheme.colors.surface + '40';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                          >
+                            <option value="en">🇺🇸</option>
+                            <option value="ar">🇸🇦</option>
+                          </select>
                         </div>
                       </div>
                     </div>

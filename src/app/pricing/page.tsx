@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function PricingPage() {
   const [mounted, setMounted] = useState(false);
@@ -32,64 +33,36 @@ function PricingPageContent() {
   const { language } = useLanguage();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const plans = [
     {
-      name: 'Free',
+      name: texts.pricing.plans.free.name,
       price: billingCycle === 'monthly' ? '$0' : '$0',
-      description: 'Perfect for getting started',
-      features: [
-        'Basic focus timer',
-        'Study room access',
-        'Community features',
-        'Basic analytics',
-        '5 study sessions per day',
-        'Standard themes'
-      ],
-      limitations: [
-        'Limited storage',
-        'Basic support',
-        'No premium features'
-      ],
-      cta: 'Get Started',
+      description: texts.pricing.plans.free.description,
+      features: texts.pricing.plans.free.features,
+      limitations: texts.pricing.plans.free.limitations,
+      cta: texts.pricing.plans.free.cta,
       popular: false,
       color: 'gray'
     },
     {
-      name: 'Student',
+      name: texts.pricing.plans.student.name,
       price: billingCycle === 'monthly' ? '$4.99' : '$49.99',
-      description: 'Most popular for students',
-      features: [
-        'Everything in Free',
-        'Unlimited study sessions',
-        'Advanced analytics',
-        'Custom themes',
-        'Priority support',
-        'Export data',
-        'Study room creation',
-        'Achievement system'
-      ],
+      description: texts.pricing.plans.student.description,
+      features: texts.pricing.plans.student.features,
       limitations: [],
-      cta: 'Start Free Trial',
+      cta: texts.pricing.plans.student.cta,
       popular: true,
       color: 'blue'
     },
     {
-      name: 'Team',
+      name: texts.pricing.plans.team.name,
       price: billingCycle === 'monthly' ? '$9.99' : '$99.99',
-      description: 'For study groups and classes',
-      features: [
-        'Everything in Student',
-        'Team management',
-        'Collaborative analytics',
-        'Custom study rooms',
-        'Team challenges',
-        'Admin dashboard',
-        'API access',
-        'White-label options'
-      ],
+      description: texts.pricing.plans.team.description,
+      features: texts.pricing.plans.team.features,
       limitations: [],
-      cta: 'Contact Sales',
+      cta: texts.pricing.plans.team.cta,
       popular: false,
       color: 'purple'
     }

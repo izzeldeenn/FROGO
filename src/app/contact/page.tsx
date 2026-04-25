@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function ContactPage() {
   const [mounted, setMounted] = useState(false);
@@ -40,6 +41,7 @@ function ContactPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -69,33 +71,33 @@ function ContactPageContent() {
   const contactOptions = [
     {
       icon: '💬',
-      title: 'Discord Community',
+      title: texts.contact.options.discord,
       description: 'Join our active Discord server for instant help and community discussions',
-      action: 'Join Discord',
+      action: texts.contact.joinDiscord,
       link: 'https://discord.gg/5wBNne8Z3f',
       color: 'blue'
     },
     {
       icon: '📧',
-      title: 'Email Support',
+      title: texts.contact.options.emailSupport,
       description: 'Send us a detailed message and we\'ll respond within 24 hours',
-      action: 'Send Email',
+      action: texts.contact.sendEmail,
       link: 'mailto:support@goatly.app',
       color: 'green'
     },
     {
       icon: '🐙',
-      title: 'GitHub Issues',
+      title: texts.contact.options.github,
       description: 'Report bugs or request features directly on our GitHub repository',
-      action: 'Open Issue',
+      action: texts.contact.openIssue,
       link: 'https://github.com/izzeldeenn/goatly/issues',
       color: 'purple'
     },
     {
       icon: '🐦',
-      title: 'Social Media',
+      title: texts.contact.options.social,
       description: 'Follow us for updates, tips, and community highlights',
-      action: 'Follow Us',
+      action: texts.contact.followUs,
       link: 'https://twitter.com/goatly_app',
       color: 'sky'
     }

@@ -200,14 +200,14 @@ export function UserProfile() {
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors text-lg ${
+                    className={`w-full px-4 py-3 rounded-xl focus:outline-none transition-all text-xl font-semibold ${
                       theme === 'light'
-                        ? 'border-yellow-300 bg-white text-black focus:border-green-500'
-                        : 'border-yellow-600 bg-black text-white focus:border-green-400'
+                        ? 'bg-white text-black focus:bg-gray-50 hover:bg-gray-100'
+                        : 'bg-black text-white focus:bg-gray-900 hover:bg-gray-800'
                     }`}
                   >
-                    <option value="en">{texts.english}</option>
-                    <option value="ar">العربية</option>
+                    <option value="en">🇺🇸</option>
+                    <option value="ar">🇸🇦</option>
                   </select>
                 </div>
               </div>

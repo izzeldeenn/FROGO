@@ -308,14 +308,14 @@ export function CurrentUserSelector({ studyStreak }: { studyStreak?: number }) {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                      className={`w-full px-4 py-3 rounded-2xl focus:outline-none transition-all text-lg ${
+                      className={`w-full px-4 py-3 rounded-xl focus:outline-none transition-all text-xl font-semibold ${
                         theme === 'light'
-                          ? 'bg-gray-50 border-2 border-gray-200 text-gray-800 focus:border-blue-500 focus:bg-white'
-                          : 'bg-gray-800 border-2 border-gray-700 text-gray-100 focus:border-blue-400 focus:bg-gray-750'
+                          ? 'bg-gray-50 text-gray-800 focus:bg-white hover:bg-gray-100'
+                          : 'bg-gray-800 text-gray-100 focus:bg-gray-750 hover:bg-gray-700'
                       }`}
                     >
-                      <option value="en">{texts.english}</option>
-                      <option value="ar">العربية</option>
+                      <option value="en">🇺🇸</option>
+                      <option value="ar">🇸🇦</option>
                     </select>
                   </div>
                 </div>

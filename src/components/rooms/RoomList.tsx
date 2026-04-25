@@ -119,10 +119,10 @@ export function RoomList({ onJoinRoom }: RoomListProps) {
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 rounded-lg text-lg font-semibold bg-gray-800 text-white hover:bg-gray-700 transition-all hover:scale-105 cursor-pointer"
               >
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
+                <option value="en">🇺🇸</option>
+                <option value="ar">🇸🇦</option>
               </select>
             </div>
           </div>

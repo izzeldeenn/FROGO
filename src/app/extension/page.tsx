@@ -137,14 +137,14 @@ function ExtensionLandingPageContent() {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-lg font-semibold transition-all hover:scale-105 cursor-pointer ${
                     theme === 'light'
-                      ? 'bg-gray-100 border-gray-300 text-gray-800'
-                      : 'bg-slate-800 border-gray-700 text-gray-300'
+                      ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
                   }`}
                 >
-                  <option value="en">EN</option>
-                  <option value="ar">{landingTextsObj.arabic}</option>
+                  <option value="en">🇺🇸</option>
+                  <option value="ar">🇸🇦</option>
                 </select>
                 <ThemeToggle />
               </div>
@@ -218,8 +218,8 @@ function ExtensionLandingPageContent() {
                       : 'bg-gray-700 border-gray-600 text-gray-300'
                   }`}
                 >
-                  <option value="en">EN</option>
-                  <option value="ar">{landingTextsObj.arabic}</option>
+                  <option value="en">🇺🇸</option>
+                  <option value="ar">🇸🇦</option>
                 </select>
                 <ThemeToggle />
               </div>

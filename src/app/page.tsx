@@ -142,14 +142,14 @@ function LandingPageContent() {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-lg font-semibold transition-all hover:scale-105 cursor-pointer ${
                     theme === 'light'
-                      ? 'bg-yellow-50 border-lime-300 text-lime-800'
-                      : 'bg-slate-800 border-purple-600 text-purple-200'
+                      ? 'bg-yellow-50 text-lime-800 hover:bg-yellow-100'
+                      : 'bg-slate-800 text-purple-200 hover:bg-slate-700'
                   }`}
                 >
-                  <option value="en">EN</option>
-                  <option value="ar">العربية</option>
+                  <option value="en">🇺🇸</option>
+                  <option value="ar">🇸🇦</option>
                 </select>
                 <ThemeToggle />
                 <a
@@ -252,14 +252,14 @@ function LandingPageContent() {
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-                    className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-xl font-semibold transition-all hover:scale-105 cursor-pointer ${
                       theme === 'light'
-                        ? 'bg-yellow-50 border-lime-300 text-lime-800'
-                        : 'bg-slate-800 border-purple-600 text-purple-200'
+                        ? 'bg-yellow-50 text-lime-800 hover:bg-yellow-100'
+                        : 'bg-slate-800 text-purple-200 hover:bg-slate-700'
                     }`}
                   >
-                    <option value="en">EN</option>
-                    <option value="ar">العربية</option>
+                    <option value="en">🇺🇸</option>
+                    <option value="ar">🇸🇦</option>
                   </select>
                   <ThemeToggle />
                 </div>

@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function SupportPage() {
   const [mounted, setMounted] = useState(false);
@@ -34,87 +35,88 @@ function SupportPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const customTheme = useCustomThemeClasses();
 
+  const texts = pageTexts[language];
   const categories = [
-    { id: 'all', name: 'All Topics', icon: '📚' },
-    { id: 'getting-started', name: 'Getting Started', icon: '🚀' },
-    { id: 'features', name: 'Features', icon: '⭐' },
-    { id: 'account', name: 'Account', icon: '👤' },
-    { id: 'billing', name: 'Billing', icon: '💳' },
-    { id: 'technical', name: 'Technical', icon: '🔧' },
-    { id: 'community', name: 'Community', icon: '🤝' }
+    { id: 'all', name: texts.support.categories.all, icon: '📚' },
+    { id: 'getting-started', name: texts.support.categories.gettingStarted, icon: '🚀' },
+    { id: 'features', name: texts.support.categories.features, icon: '⭐' },
+    { id: 'account', name: texts.support.categories.account, icon: '👤' },
+    { id: 'billing', name: texts.support.categories.billing, icon: '💳' },
+    { id: 'technical', name: texts.support.categories.technical, icon: '🔧' },
+    { id: 'community', name: texts.support.categories.community, icon: '🤝' }
   ];
 
   const faqs = [
     {
       category: 'getting-started',
-      question: "How do I create an account?",
-      answer: "Creating an account is simple! Click 'Start Studying' on the homepage, then choose 'Create Account'. You can sign up with email or use your existing Google account. The whole process takes less than 30 seconds.",
+      question: texts.support.faqs.createAccount.question,
+      answer: texts.support.faqs.createAccount.answer,
       helpful: 45
     },
     {
       category: 'getting-started',
-      question: "What's the difference between Free and Premium plans?",
-      answer: "Our Free plan includes all core features like basic timer, study rooms, and community access. Premium adds unlimited sessions, advanced analytics, custom themes, priority support, and data export features.",
+      question: texts.support.faqs.freePremium.question,
+      answer: texts.support.faqs.freePremium.answer,
       helpful: 38
     },
     {
       category: 'features',
-      question: "How do study rooms work?",
-      answer: "Study rooms are virtual spaces where you can study with others in real-time. Create your own room or join existing ones. Each room has a shared timer, member list, and chat. You can see who's actively studying and motivate each other.",
+      question: texts.support.faqs.studyRooms.question,
+      answer: texts.support.faqs.studyRooms.answer,
       helpful: 52
     },
     {
       category: 'features',
-      question: "Can I customize my study experience?",
-      answer: "Yes! Premium users can customize themes, backgrounds, sounds, and timer settings. Free users have access to basic customization options. You can also set personal goals and track your progress.",
+      question: texts.support.faqs.customize.question,
+      answer: texts.support.faqs.customize.answer,
       helpful: 29
     },
     {
       category: 'account',
-      question: "How do I reset my password?",
-      answer: "Click 'Forgot Password' on the login page. Enter your email address, and we'll send you a password reset link. The link expires after 24 hours for security reasons.",
+      question: texts.support.faqs.resetPassword.question,
+      answer: texts.support.faqs.resetPassword.answer,
       helpful: 31
     },
     {
       category: 'account',
-      question: "Can I change my username?",
-      answer: "Yes! Go to Settings > Profile > Edit Username. You can change your username once every 30 days. Your old username becomes available for others to use.",
+      question: texts.support.faqs.changeUsername.question,
+      answer: texts.support.faqs.changeUsername.answer,
       helpful: 18
     },
     {
       category: 'billing',
-      question: "How do I cancel my subscription?",
-      answer: "You can cancel anytime from Settings > Billing > Manage Subscription. Your access continues until the end of your billing period. No cancellation fees or penalties.",
+      question: texts.support.faqs.cancelSubscription.question,
+      answer: texts.support.faqs.cancelSubscription.answer,
       helpful: 24
     },
     {
       category: 'billing',
-      question: "Do you offer refunds?",
-      answer: "We offer a 14-day money-back guarantee for new Premium subscriptions. If you're not satisfied, contact support within 14 days of your first payment for a full refund.",
+      question: texts.support.faqs.refunds.question,
+      answer: texts.support.faqs.refunds.answer,
       helpful: 19
     },
     {
       category: 'technical',
-      question: "Why isn't the timer working?",
-      answer: "First, check your internet connection. Make sure you're logged in. Try refreshing the page. If issues persist, clear your browser cache or try a different browser. Most timer issues are resolved with these steps.",
+      question: texts.support.faqs.timerNotWorking.question,
+      answer: texts.support.faqs.timerNotWorking.answer,
       helpful: 33
     },
     {
       category: 'technical',
-      question: "Is Goatly available on mobile?",
-      answer: "Yes! Goatly works on all devices with a web browser. We also have mobile apps for iOS and Android. Your data syncs seamlessly across all devices when you're logged in.",
+      question: texts.support.faqs.mobile.question,
+      answer: texts.support.faqs.mobile.answer,
       helpful: 41
     },
     {
       category: 'community',
-      question: "How do I join the Discord community?",
-      answer: "Click the Discord icon in our footer or visit goatly.app/discord. Our Discord has study channels, voice rooms, events, and direct access to our team. It's free for all users!",
+      question: texts.support.faqs.discord.question,
+      answer: texts.support.faqs.discord.answer,
       helpful: 56
     },
     {
       category: 'community',
-      question: "Can I contribute to Goatly's development?",
-      answer: "Absolutely! Goatly is open-source. Visit our GitHub repository to report issues, suggest features, or contribute code. We welcome contributions from developers, designers, and students.",
+      question: texts.support.faqs.contribute.question,
+      answer: texts.support.faqs.contribute.answer,
       helpful: 47
     }
   ];
@@ -174,7 +176,7 @@ function SupportPageContent() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <Logo />
+                <LandingLogo theme={theme} />
               </div>
               
               <nav className="hidden md:flex items-center gap-8">

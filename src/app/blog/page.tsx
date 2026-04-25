@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function BlogPage() {
   const [mounted, setMounted] = useState(false);
@@ -32,14 +33,15 @@ function BlogPageContent() {
   const { language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const categories = [
-    { id: 'all', name: 'All Posts', icon: '📚' },
-    { id: 'study-tips', name: 'Study Tips', icon: '💡' },
-    { id: 'product-updates', name: 'Product Updates', icon: '🚀' },
-    { id: 'success-stories', name: 'Success Stories', icon: '🎓' },
-    { id: 'community', name: 'Community', icon: '🤝' },
-    { id: 'research', name: 'Research', icon: '🔬' }
+    { id: 'all', name: texts.blog.categories.all, icon: '📚' },
+    { id: 'study-tips', name: texts.blog.categories.studyTips, icon: '💡' },
+    { id: 'product-updates', name: texts.blog.categories.productUpdates, icon: '🚀' },
+    { id: 'success-stories', name: texts.blog.categories.successStories, icon: '🎓' },
+    { id: 'community', name: texts.blog.categories.community, icon: '🤝' },
+    { id: 'research', name: texts.blog.categories.research, icon: '🔬' }
   ];
 
   const blogPosts = [

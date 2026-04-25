@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function NewsletterPage() {
   const [mounted, setMounted] = useState(false);
@@ -33,6 +34,7 @@ function NewsletterPageContent() {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,19 +83,19 @@ function NewsletterPageContent() {
   const newsletterStats = [
     {
       number: "50K+",
-      label: "Active Subscribers"
+      label: texts.newsletter.stats.subscribers
     },
     {
       number: "95%",
-      label: "Open Rate"
+      label: texts.newsletter.stats.openRate
     },
     {
       number: "4.8",
-      label: "Average Rating"
+      label: texts.newsletter.stats.rating
     },
     {
       number: "Weekly",
-      label: "Publication Frequency"
+      label: texts.newsletter.stats.frequency
     }
   ];
 

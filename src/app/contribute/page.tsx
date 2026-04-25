@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { CustomThemeProvider } from '@/contexts/CustomThemeContext';
 import { useCustomThemeClasses } from '@/hooks/useCustomThemeClasses';
 import { GoatlyStructuredData } from '@/components/seo/StructuredData';
+import { pageTexts } from '@/constants/pageTexts';
 
 export default function ContributePage() {
   const [mounted, setMounted] = useState(false);
@@ -32,54 +33,55 @@ function ContributePageContent() {
   const { language } = useLanguage();
   const [selectedContribution, setSelectedContribution] = useState('all');
   const customTheme = useCustomThemeClasses();
+  const texts = pageTexts[language];
 
   const contributionTypes = [
     {
       id: 'development',
-      name: 'Code Development',
+      name: texts.contribute.contributionTypes.development,
       icon: '👨‍💻',
       description: 'Help build features, fix bugs, and improve performance',
-      difficulty: 'Advanced',
+      difficulty: texts.contribute.difficulties.advanced,
       timeCommitment: '5-10 hours/week'
     },
     {
       id: 'design',
-      name: 'Design & UX',
+      name: texts.contribute.contributionTypes.design,
       icon: '🎨',
       description: 'Create beautiful interfaces and improve user experience',
-      difficulty: 'Intermediate',
+      difficulty: texts.contribute.difficulties.intermediate,
       timeCommitment: '3-8 hours/week'
     },
     {
       id: 'content',
-      name: 'Content Creation',
+      name: texts.contribute.contributionTypes.content,
       icon: '📝',
       description: 'Write tutorials, create videos, and share knowledge',
-      difficulty: 'Beginner',
+      difficulty: texts.contribute.difficulties.beginner,
       timeCommitment: '2-5 hours/week'
     },
     {
       id: 'community',
-      name: 'Community Support',
+      name: texts.contribute.contributionTypes.community,
       icon: '🤝',
       description: 'Help users, moderate discussions, and organize events',
-      difficulty: 'Beginner',
+      difficulty: texts.contribute.difficulties.beginner,
       timeCommitment: '2-4 hours/week'
     },
     {
       id: 'translation',
-      name: 'Localization',
+      name: texts.contribute.contributionTypes.translation,
       icon: '🌍',
       description: 'Translate Goatly into different languages',
-      difficulty: 'Intermediate',
+      difficulty: texts.contribute.difficulties.intermediate,
       timeCommitment: '3-6 hours/week'
     },
     {
       id: 'testing',
-      name: 'Testing & QA',
+      name: texts.contribute.contributionTypes.testing,
       icon: '🔬',
       description: 'Find bugs, test features, and provide feedback',
-      difficulty: 'Beginner',
+      difficulty: texts.contribute.difficulties.beginner,
       timeCommitment: '1-3 hours/week'
     }
   ];
