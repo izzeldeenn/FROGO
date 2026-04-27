@@ -135,47 +135,24 @@ export function RankingDisplay({ studyStreak, onUserClick }: RankingDisplayProps
   const renderRankingButton = () => (
     <button
       onClick={() => setIsRankingsOpen(!isRankingsOpen)}
-      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
       style={{
         background: isRankingsOpen 
           ? `linear-gradient(135deg, ${customTheme.colors.accent}, ${customTheme.colors.primary})` 
           : `linear-gradient(135deg, ${customTheme.colors.primary}, ${customTheme.colors.accent})`,
         boxShadow: isRankingsOpen 
-          ? `0 8px 32px ${customTheme.colors.accent}40, 0 0 0 2px ${customTheme.colors.accent}20` 
-          : `0 4px 16px ${customTheme.colors.primary}30, 0 0 0 2px ${customTheme.colors.primary}15`,
+          ? `0 4px 20px ${customTheme.colors.accent}40` 
+          : `0 2px 10px ${customTheme.colors.primary}30`,
         color: '#ffffff'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-        e.currentTarget.style.boxShadow = isRankingsOpen 
-          ? `0 12px 48px ${customTheme.colors.accent}50, 0 0 0 2px ${customTheme.colors.accent}30` 
-          : `0 6px 24px ${customTheme.colors.primary}40, 0 0 0 2px ${customTheme.colors.primary}20}`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1) translateY(0)';
-        e.currentTarget.style.boxShadow = isRankingsOpen 
-          ? `0 8px 32px ${customTheme.colors.accent}40, 0 0 0 2px ${customTheme.colors.accent}20` 
-          : `0 4px 16px ${customTheme.colors.primary}30, 0 0 0 2px ${customTheme.colors.primary}15}`;
       }}
       aria-label={language === 'ar' ? 'الترتيب' : 'Rankings'}
       title={`${language === 'ar' ? 'الترتيب' : 'Rankings'} - ${language === 'ar' ? 'الترتيب اليومي' : 'Daily Rank'} ${currentRank}`}
     >
-      {/* Trophy Icon with Animation */}
-      <div className="relative flex items-center justify-center">
-        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-          🏆
-        </span>
-        {/* Daily Rank Badge */}
-        <div className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-green-500 border-2 border-white shadow-lg flex items-center justify-center px-1">
-          <span className="text-xs font-bold text-white">{currentRank}</span>
-        </div>
-        {/* Shine Effect */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-          style={{
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-          }}
-        />
+      <span className="text-xl transition-transform duration-200 group-hover:rotate-12">
+        🏆
+      </span>
+      <div className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-green-500 border-2 border-white shadow-lg flex items-center justify-center px-1">
+        <span className="text-[10px] font-bold text-white">{currentRank}</span>
       </div>
     </button>
   );

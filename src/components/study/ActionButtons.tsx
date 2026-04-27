@@ -138,158 +138,85 @@ export function ActionButtons() {
   const renderStoreButton = () => (
     <button
       onClick={() => setShowStore(!showStore)}
-      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
       style={{
         background: showStore
           ? `linear-gradient(135deg, #8b5cf6, #7c3aed)`
           : `linear-gradient(135deg, #7c3aed, #8b5cf6)`,
         boxShadow: showStore
-          ? `0 8px 32px #8b5cf640, 0 0 0 2px #8b5cf620`
-          : `0 4px 16px #7c3aed30, 0 0 0 2px #7c3aed15`,
+          ? `0 4px 20px rgba(139, 92, 246, 0.4)`
+          : `0 2px 10px rgba(124, 58, 237, 0.2)`,
         color: '#ffffff'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-        e.currentTarget.style.boxShadow = showStore
-          ? `0 12px 48px #8b5cf650, 0 0 0 2px #8b5cf630`
-          : `0 6px 24px #7c3aed40, 0 0 0 2px #7c3aed20`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1) translateY(0)';
-        e.currentTarget.style.boxShadow = showStore
-          ? `0 8px 32px #8b5cf640, 0 0 0 2px #8b5cf620`
-          : `0 4px 16px #7c3aed30, 0 0 0 2px #7c3aed15`;
       }}
       aria-label={language === 'ar' ? 'المتجر' : 'Store'}
       title={language === 'ar' ? 'المتجر' : 'Store'}
     >
-      <div className="relative flex items-center justify-center">
-        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-          🏪
-        </span>
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-          style={{
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-          }}
-        />
-      </div>
+      <span className="text-xl transition-transform duration-200 group-hover:rotate-12">
+        🏪
+      </span>
     </button>
   );
 
   const renderRealTimeChallengeButton = () => (
     <button
       onClick={() => window.location.href = '/challenge'}
-      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
       style={{
         background: `linear-gradient(135deg, #ef4444, #dc2626)`,
-        boxShadow: `0 4px 16px #ef444430, 0 0 0 2px #ef444415`,
+        boxShadow: `0 2px 10px rgba(239, 68, 68, 0.3)`,
         color: '#ffffff'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-        e.currentTarget.style.boxShadow = `0 6px 24px #ef444440, 0 0 0 2px #ef444420`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1) translateY(0)';
-        e.currentTarget.style.boxShadow = `0 4px 16px #ef444430, 0 0 0 2px #ef444415`;
       }}
       aria-label={language === 'ar' ? 'تحدي فوري' : 'Real-time Challenge'}
       title={language === 'ar' ? 'تحدي فوري مع لاعبين حقيقيين' : 'Real-time challenge with live players'}
     >
-      <div className="relative flex items-center justify-center">
-        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-          ⚔️
-        </span>
-        <div className="absolute inset-0 rounded-2xl bg-red-400 opacity-0 group-hover:opacity-30 animate-pulse" />
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-          style={{
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-          }}
-        />
-      </div>
+      <span className="text-xl transition-transform duration-200 group-hover:rotate-12">
+        ⚔️
+      </span>
     </button>
   );
 
   const renderRoomsButton = () => (
     <button
       onClick={() => window.location.href = '/rooms'}
-      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
       style={{
         background: `linear-gradient(135deg, #6366f1, #4f46e5)`,
-        boxShadow: `0 4px 16px #6366f130, 0 0 0 2px #6366f115`,
+        boxShadow: `0 2px 10px rgba(99, 102, 241, 0.3)`,
         color: '#ffffff'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-        e.currentTarget.style.boxShadow = `0 6px 24px #6366f140, 0 0 0 2px #6366f120`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1) translateY(0)';
-        e.currentTarget.style.boxShadow = `0 4px 16px #6366f130, 0 0 0 2px #6366f115`;
       }}
       aria-label={language === 'ar' ? 'غرف الدراسة' : 'Study Rooms'}
       title={language === 'ar' ? 'غرف الدراسة' : 'Study Rooms'}
     >
-      <div className="relative flex items-center justify-center">
-        <img
-          src="/icons/icons8-team-48.png"
-          alt="Study Rooms"
-          className="w-8 h-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"
-        />
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-          style={{
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-          }}
-        />
-      </div>
+      <img
+        src="/icons/icons8-team-48.png"
+        alt="Study Rooms"
+        className="w-6 h-6 transition-transform duration-200 group-hover:rotate-12"
+      />
     </button>
   );
 
   const renderNotesButton = () => (
     <button
       onClick={() => setIsNotesOpen(!isNotesOpen)}
-      className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+      className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
       style={{
         background: isNotesOpen
           ? `linear-gradient(135deg, #10b981, #059669)`
           : `linear-gradient(135deg, #059669, #10b981)`,
         boxShadow: isNotesOpen
-          ? `0 8px 32px #10b98140, 0 0 0 2px #10b98120`
-          : `0 4px 16px #05966930, 0 0 0 2px #05966915`,
+          ? `0 4px 20px rgba(16, 185, 129, 0.4)`
+          : `0 2px 10px rgba(5, 150, 105, 0.2)`,
         color: '#ffffff'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-        e.currentTarget.style.boxShadow = isNotesOpen
-          ? `0 12px 48px #10b98150, 0 0 0 2px #10b98130`
-          : `0 6px 24px #05966940, 0 0 0 2px #05966920`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1) translateY(0)';
-        e.currentTarget.style.boxShadow = isNotesOpen
-          ? `0 8px 32px #10b98140, 0 0 0 2px #10b98120`
-          : `0 4px 16px #05966930, 0 0 0 2px #05966915`;
       }}
       aria-label={language === 'ar' ? 'ملاحظات' : 'Notes'}
       title={language === 'ar' ? 'الملاحظات' : 'Notes'}
     >
-      <div className="relative flex items-center justify-center">
-        <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-          📝
-        </span>
-        {notes === 'hasSlides' && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-        )}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-          style={{
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-          }}
-        />
-      </div>
+      <span className="text-xl transition-transform duration-200 group-hover:rotate-12">
+        📝
+      </span>
+      {notes === 'hasSlides' && (
+        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+      )}
     </button>
   );
 
@@ -299,35 +226,19 @@ export function ActionButtons() {
     return (
       <button
         onClick={claimDailyGift}
-        className="group relative w-12 h-12 rounded-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center justify-center overflow-hidden"
+        className="group relative w-10 h-10 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none inline-flex items-center justify-center"
         style={{
           background: `linear-gradient(135deg, #f59e0b, #d97706)`,
-          boxShadow: `0 4px 16px #f59e0b30, 0 0 0 2px #f59e0b15`,
+          boxShadow: `0 2px 10px rgba(245, 158, 11, 0.3)`,
           color: '#ffffff'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.05) translateY(-2px) rotateY(10deg)';
-          e.currentTarget.style.boxShadow = `0 6px 24px #f59e0b40, 0 0 0 2px #f59e0b20`;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1) translateY(0) rotateY(0deg)';
-          e.currentTarget.style.boxShadow = `0 4px 16px #f59e0b30, 0 0 0 2px #f59e0b15`;
         }}
         aria-label={language === 'ar' ? 'الهدية اليومية' : 'Daily Gift'}
         title={language === 'ar' ? 'الهدية اليومية' : 'Daily Gift'}
       >
-        <div className="relative flex items-center justify-center">
-          <span className="text-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 animate-bounce">
-            🎁
-          </span>
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping" />
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300"
-            style={{
-              background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)'
-            }}
-          />
-        </div>
+        <span className="text-xl transition-transform duration-200 group-hover:rotate-12 animate-bounce">
+          🎁
+        </span>
+        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
       </button>
     );
   };
