@@ -177,6 +177,36 @@ export class ActivitySessionDB {
     return this.convertToFrontend(data);
   }
 
+  // Get active sessions for multiple users at once (batch query)
+  async getActiveSessionsForUsers(accountIds: string[]): Promise<Map<string, ActivitySessionFrontend>> {
+    if (accountIds.length === 0) {
+      return new Map();
+    }
+
+    const { data, error } = await this.supabase
+      .from('activity_sessions')
+      .select('*')
+      .in('account_id', accountIds)
+      .is('end_time', null)
+      .order('start_time', { ascending: false });
+
+    if (error) {
+      console.error('Error getting active sessions for users:', error);
+      return new Map();
+    }
+
+    const activeSessionsMap = new Map<string, ActivitySessionFrontend>();
+    
+    // Group by account_id and keep only the most recent session for each user
+    for (const session of data || []) {
+      if (!activeSessionsMap.has(session.account_id)) {
+        activeSessionsMap.set(session.account_id, this.convertToFrontend(session));
+      }
+    }
+
+    return activeSessionsMap;
+  }
+
   // Update daily activity when session ends
   async updateDailyActivityFromSession(accountId: string, durationSeconds: number, pointsEarned: number): Promise<void> {
     const today = new Date().toISOString().split('T')[0];

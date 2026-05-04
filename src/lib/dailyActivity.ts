@@ -126,22 +126,29 @@ export class DailyActivityDB {
     }
   }
 
-  // Get today's rankings for all users
-  async getTodayRankings(): Promise<DailyActivity[]> {
+  // Get today's activities without ordering (shared function to avoid duplicate requests)
+  async getTodayActivities(): Promise<DailyActivity[]> {
     const today = new Date().toISOString().split('T')[0];
     
     try {
       const { data, error } = await supabase
         .from('daily_activities')
         .select('*')
-        .eq('date', today)
-        .order('daily_rank', { ascending: true });
+        .eq('date', today);
 
       if (error) throw error;
       return data || [];
     } catch (error) {
       return [];
     }
+  }
+
+  // Get today's rankings for all users (ordered by daily_rank)
+  async getTodayRankings(): Promise<DailyActivity[]> {
+    const activities = await this.getTodayActivities();
+    
+    // Sort by daily_rank in client-side
+    return activities.sort((a, b) => (a.daily_rank || 0) - (b.daily_rank || 0));
   }
 
   // Create or update daily activity
@@ -685,26 +692,19 @@ export class DailyActivityDB {
     }
   }
 
-  // Update daily rankings for all users today
+  // Update today's rankings
   async updateTodayRankings(): Promise<void> {
-    const today = new Date().toISOString().split('T')[0];
-    
     try {
-      // Get all activities for today
-      const { data: activities, error } = await supabase
-        .from('daily_activities')
-        .select('*')
-        .eq('date', today)
-        .order('study_seconds', { ascending: false });
+      // Get all activities for today using shared function (no server-side ordering)
+      const activities = await this.getTodayActivities();
 
-      if (error) {
-        throw error;
-      }
+      // Sort by study_seconds in client-side for ranking calculation
+      const sortedActivities = activities.sort((a, b) => (b.study_seconds || 0) - (a.study_seconds || 0));
 
       // Update ranks using batch operation instead of individual requests
-      if (activities && activities.length > 0) {
+      if (sortedActivities.length > 0) {
         // Create batch update payload
-        const updatePayload = activities.map((activity, index) => ({
+        const updatePayload = sortedActivities.map((activity, index) => ({
           id: activity.id,
           daily_rank: index + 1
         }));
@@ -727,7 +727,7 @@ export class DailyActivityDB {
         }
       }
     } catch (error) {
-      // Error updating today rankings
+      console.error('Error updating today rankings:', error);
     }
   }
 
