@@ -225,42 +225,47 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
-                        <span 
-                          className="text-sm font-bold flex-shrink-0"
-                          style={{
-                            color: (user.dailyRank || 0) === 1 
-                              ? customTheme.colors.secondary
-                              : (user.dailyRank || 0) % 2 === 0 
-                              ? customTheme.colors.primary 
-                              : customTheme.colors.secondary
-                          }}
-                        >
-                          #{user.dailyRank || 999}
-                        </span>
-                        
-                        <div className="text-xl flex-shrink-0">
-                          {user.avatar?.startsWith('http') ? (
-                            <img 
-                              src={user.avatar} 
-                              alt={user.username}
-                              className="w-8 h-8 rounded-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
+                        <div className="relative flex-shrink-0">
+                          <div className="text-xl">
+                            {user.avatar?.startsWith('http') ? (
+                              <img 
+                                src={user.avatar} 
+                                alt={user.username}
+                                className="w-10 h-10 rounded-lg object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl">
+                                {user.avatar || '👤'}
+                              </div>
+                            )}
+                          </div>
+                          {user.dailyRank && user.dailyRank !== 999 && (
+                            <div 
+                              className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                              style={{
+                                backgroundColor: user.dailyRank === 1 
+                                  ? customTheme.colors.secondary
+                                  : user.dailyRank % 2 === 0 
+                                  ? customTheme.colors.primary 
+                                  : customTheme.colors.secondary
                               }}
-                            />
-                          ) : (
-                            user.avatar || '👤'
+                            >
+                              {user.dailyRank}
+                            </div>
                           )}
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-1">
+                          <div className="flex flex-col">
                             <span className={`text-sm font-semibold block ${
                               theme === 'light' ? 'text-black' : 'text-white'
                             } truncate`} title={user.username}>{user.username}</span>
                             
                             {isRecentlyActive(user) && (
-                              <span className="flex items-center space-x-1">
+                              <span className="flex items-center space-x-1 mt-1">
                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse flex-shrink-0"></span>
                                 <span className="text-xs text-red-500 font-medium">يدرس الآن</span>
                               </span>
@@ -270,6 +275,15 @@ export function UserRankings({ onUserClick }: UserRankingsProps) {
                       </div>
                       
                       <div className="flex items-center space-x-2 flex-shrink-0">
+                        {isRecentlyActive(user) ? (
+                          <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                          </svg>
+                        )}
                         <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                           theme === 'light'
                             ? 'bg-gradient-to-r from-yellow-50 to-green-50 text-green-700 border border-yellow-200'
