@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useStudySession } from '@/contexts/StudySessionContext';
 import { usePoints } from '@/contexts/PointsContext';
@@ -31,6 +31,9 @@ export function useUserRankings() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [activeUsers, setActiveUsers] = useState<Set<string>>(new Set());
+  const isLoadingRef = useRef(false);
+  const activeUsersCacheRef = useRef<{ data: Set<string>; timestamp: number } | null>(null);
+  const CACHE_TTL = 30000; // 30 seconds
 
   useEffect(() => {
     // Don't update rankings if there's an active session
@@ -100,7 +103,14 @@ export function useUserRankings() {
   }, [users, dailyRankings, isSessionActive, currentPage, itemsPerPage]);
 
   const loadDailyRankings = async (showLoading = true, forceUpdate = false) => {
+    // Prevent duplicate parallel requests
+    if (isLoadingRef.current && !forceUpdate) {
+      return;
+    }
+    
     try {
+      isLoadingRef.current = true;
+      
       if (showLoading) {
         setLoading(true);
       }
@@ -138,6 +148,7 @@ export function useUserRankings() {
     } catch (error) {
       console.error('Failed to load daily rankings:', error);
     } finally {
+      isLoadingRef.current = false;
       if (showLoading) {
         setLoading(false);
       }
@@ -174,15 +185,27 @@ export function useUserRankings() {
       if (isSessionActive) return;
       
       try {
-        const activeSet = new Set<string>();
-        
-        // Check all display users for active sessions
-        for (const user of displayUsers) {
-          const activeSession = await activitySessionDB.getActiveSession(user.accountId);
-          if (activeSession) {
-            activeSet.add(user.accountId);
-          }
+        // Check cache first
+        const now = Date.now();
+        if (activeUsersCacheRef.current && (now - activeUsersCacheRef.current.timestamp) < CACHE_TTL) {
+          setActiveUsers(activeUsersCacheRef.current.data);
+          return;
         }
+        
+        // Get all account IDs from display users
+        const accountIds = displayUsers.map(user => user.accountId);
+        
+        // Use batch query instead of individual requests
+        const activeSessionsMap = await activitySessionDB.getActiveSessionsForUsers(accountIds);
+        
+        // Convert map to set of active account IDs
+        const activeSet = new Set<string>(activeSessionsMap.keys());
+        
+        // Update cache
+        activeUsersCacheRef.current = {
+          data: activeSet,
+          timestamp: now
+        };
         
         setActiveUsers(activeSet);
       } catch (error) {
@@ -193,8 +216,8 @@ export function useUserRankings() {
     // Check immediately
     checkActiveUsers();
     
-    // Check every 10 seconds
-    const interval = setInterval(checkActiveUsers, 10000);
+    // Check every 30 seconds (increased from 10s to reduce egress)
+    const interval = setInterval(checkActiveUsers, 30000);
     
     return () => clearInterval(interval);
   }, [displayUsers, isSessionActive]);
