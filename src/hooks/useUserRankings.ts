@@ -103,13 +103,25 @@ export function useUserRankings() {
   }, [users, dailyRankings, isSessionActive, currentPage, itemsPerPage]);
 
   const loadDailyRankings = async (showLoading = true, forceUpdate = false) => {
-    // Prevent duplicate parallel requests
+    // Global deduplication using localStorage to prevent duplicate requests across components
+    const loadingKey = 'dailyRankingsLoading';
+    const loadingStartTime = localStorage.getItem(loadingKey);
+    const now = Date.now();
+    
+    // If another component is loading (within last 5 seconds), skip this request
+    if (loadingStartTime && (now - parseInt(loadingStartTime)) < 5000 && !forceUpdate) {
+      console.log('Skipping duplicate rankings request - another component is loading');
+      return;
+    }
+    
+    // Prevent duplicate parallel requests within this component
     if (isLoadingRef.current && !forceUpdate) {
       return;
     }
     
     try {
       isLoadingRef.current = true;
+      localStorage.setItem(loadingKey, now.toString());
       
       if (showLoading) {
         setLoading(true);
@@ -117,7 +129,6 @@ export function useUserRankings() {
       
       // Force update if requested, otherwise use the 2-minute cache
       const lastRankUpdate = localStorage.getItem('lastRankUpdate');
-      const now = Date.now();
       const shouldUpdateRankings = forceUpdate || !lastRankUpdate || (now - parseInt(lastRankUpdate)) > 120000; // 2 minutes
       
       if (shouldUpdateRankings) {
@@ -149,6 +160,7 @@ export function useUserRankings() {
       console.error('Failed to load daily rankings:', error);
     } finally {
       isLoadingRef.current = false;
+      localStorage.removeItem(loadingKey);
       if (showLoading) {
         setLoading(false);
       }
